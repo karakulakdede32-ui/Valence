@@ -1,0 +1,25 @@
+modLoader="javafxmod"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="valence"
+version="0.1.0"
+displayName="Valence"
+displayURL="https://github.com/karakulakdede32-ui/Valence"
+logoFile="assets/valence/logo.png"
+creditText="Created by karakulakdede32-ui"
+
+[[dependencies.valence]]
+    modId="forge"
+    mandatory=true
+    versionRange="[47.4.20,)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.valence]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.20.1]"
+    ordering="NONE"
+    side="BOTH"
