@@ -6,3 +6,8 @@ Valence is a tech and chemistry oriented minecraft mod, aiming to bring similar 
 - **Minecraft Version:** `1.20.1`
 - **Mod Loader:** Forge (Build `47.4.20` or higher)
 - **Java Version:** `Java 17`
+
+
+### Download
+
+First get the appropriate version in [Releases](./releases)
