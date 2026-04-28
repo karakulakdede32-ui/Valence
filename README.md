@@ -4,4 +4,5 @@ Valence is a tech and chemistry oriented minecraft mod, aiming to bring similar 
 
 ## Requirements
 Currently there are all Requirements:
-  Forge Version 1.20.1/47.2.0
+
+-Forge Version 1.20.1/47.2.0
