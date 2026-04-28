@@ -10,4 +10,4 @@ Valence is a tech and chemistry oriented minecraft mod, aiming to bring similar 
 
 ### Download
 
-First get the appropriate version in [Releases](./releases)
+First get the appropriate version in [Releases](https://github.com/karakulakdede32-ui/Valence/releases)
