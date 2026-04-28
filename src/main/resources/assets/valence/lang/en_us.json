@@ -1,0 +1,21 @@
+{
+  "en_us": {
+    "block.valence.chemical_reactor": "Chemical Reactor",
+    "block.valence.centrifuge": "Centrifuge",
+    "block.valence.distillation_tower": "Distillation Tower",
+    "block.valence.electrolyzer": "Electrolyzer",
+    
+    "item.valence.hydrogen_vial": "Hydrogen Vial",
+    "item.valence.oxygen_vial": "Oxygen Vial",
+    "item.valence.sulfuric_acid": "Sulfuric Acid",
+    "item.valence.nitric_acid": "Nitric Acid",
+    
+    "item.valence.copper_dust": "Copper Dust",
+    "item.valence.iron_dust": "Iron Dust",
+    "item.valence.gold_dust": "Gold Dust",
+    
+    "item.valence.titanium_ingot": "Titanium Ingot",
+    "item.valence.tungsten_ingot": "Tungsten Ingot",
+    "item.valence.chrome_ingot": "Chrome Ingot"
+  }
+}
