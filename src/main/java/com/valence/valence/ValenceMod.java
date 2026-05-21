@@ -1,6 +1,5 @@
 package com.valence.valence;
 
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -14,7 +13,7 @@ public class ValenceMod {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public ValenceMod() {
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+        var bus = FMLJavaModLoadingContext.get().getModEventBus();
         
         // Register blocks and items
         Registration.BLOCKS.register(bus);

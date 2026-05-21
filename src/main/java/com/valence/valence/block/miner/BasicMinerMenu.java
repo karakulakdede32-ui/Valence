@@ -2,39 +2,51 @@ package com.valence.valence.block.miner;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 
-public class BasicMinerMenu extends AbstractContainerMenu {
-    public static final MenuType<BasicMinerMenu> TYPE = MenuType.create(
-        (id, inv) -> new BasicMinerMenu(id, inv),
-        (id, inv, buf) -> new BasicMinerMenu(id, inv)
-    );
+public class BasicMinerMenu extends net.minecraft.world.inventory.AbstractContainerMenu {
+    private final BasicMinerTileEntity tileEntity;
+    private final ContainerOpenersCounter openersCounter;
 
-    public BasicMinerMenu(int id, Inventory inv) {
+    public static final MenuType<BasicMinerMenu> TYPE = net.minecraft.world.inventory.MenuType.create(
+        "basic_miner", BasicMinerMenu::create);
+
+    public BasicMinerMenu(int id, Inventory playerInv, BasicMinerTileEntity te) {
         super(TYPE, id);
-
-        // Output slots for scanned ores (slots 0-3)
-        // Row 1: results left (x=35, y=20) and right (x=125, y=20) - skip 18px for slot size
-        // Actually we'll do 2x2 grid at typical center
-        this.addSlot(new Slot(inv, 0, 80, 24));   // Slot 0: Top-left ore
-        this.addSlot(new Slot(inv, 1, 116, 24));  // Slot 1: Top-right ore  
-        this.addSlot(new Slot(inv, 2, 80, 60));  // Slot 2: Bottom-left ore
-        this.addSlot(new Slot(inv, 3, 116, 60)); // Slot 3: Bottom-right ore
-
-        // Player inventory (slots 9-35, 3 rows below)
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 9; col++) {
-                this.addSlot(new Slot(inv, 9 + row * 9 + col, 8 + col * 18, 96 + row * 18));
+        this.tileEntity = te;
+        this.openersCounter = te.openersCounter;
+        
+        // 4 output slots in 2x2 grid
+        this.addSlot(new Slot(tileEntity, 0, 80, 30));
+        this.addSlot(new Slot(tileEntity, 1, 98, 30));
+        this.addSlot(new Slot(tileEntity, 2, 80, 48));
+        this.addSlot(new Slot(tileEntity, 3, 98, 48));
+        
+        // Player inventory
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++) {
+                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
-
-        // Hotbar (slots 0-8 at y=154)
-        for (int col = 0; col < 9; col++) {
-            this.addSlot(new Slot(inv, col, 8 + col * 18, 154));
+        
+        // Hotbar
+        for (int i = 0; i < 9; i++) {
+            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
         }
+    }
+
+    private static BasicMinerMenu create(int id, Inventory inv, net.minecraft.world.inventory.ContainerLevelAccess access) {
+        BlockEntity te = access.getBlockEntity();
+        if (te instanceof BasicMinerTileEntity minerTE) {
+            return new BasicMinerMenu(id, inv, minerTE);
+        }
+        return null;
     }
 
     @Override
@@ -43,12 +55,7 @@ public class BasicMinerMenu extends AbstractContainerMenu {
     }
 
     @Override
-    public ItemStack quickMoveStack(Player player, int slotIdx) {
+    public ItemStack quickMoveStack(Player player, int index) {
         return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void removed(Player player) {
-        super.removed(player);
     }
 }

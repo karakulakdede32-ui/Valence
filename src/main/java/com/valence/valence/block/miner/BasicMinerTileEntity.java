@@ -5,6 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.Blocks;
@@ -12,12 +14,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundTag;
 
-public class BasicMinerTileEntity extends BlockEntity {
+public class BasicMinerTileEntity extends BlockEntity implements ContainerOpenersCounter {
     private final List<ItemStack> scannedOres = new ArrayList<ItemStack>();
     private boolean hasScanned = false;
+    public final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter();
 
-    public BasicMinerTileEntity(BlockPos pos, BlockState state) {
-        super(pos, state);
+    // Required constructor for 1.20.1
+    public BasicMinerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
     }
 
     @Override
@@ -28,78 +32,60 @@ public class BasicMinerTileEntity extends BlockEntity {
     public void scanChunk(ServerLevel lvl) {
         if (lvl == null) return;
         BlockPos p = this.getBlockPos();
-        int cx = p.getX() >> 4;
-        int cz = p.getZ() >> 4;
-        LevelChunk ch = lvl.getChunk(cx, cz);
-        if (ch == null) return;
-
-        Map<String, Integer> counts = new HashMap<String, Integer>();
-        counts.put("coal", 0); counts.put("iron", 0); counts.put("gold", 0);
-        counts.put("redstone", 0); counts.put("lapis", 0); counts.put("diamond", 0);
-        counts.put("emerald", 0); counts.put("copper", 0);
-
-        int minY = lvl.getMinBuildHeight();
-        int maxY = lvl.getMaxBuildHeight();
-        int bx = ch.getPos().getMinBlockX();
-        int bz = ch.getPos().getMinBlockZ();
-
-        for (int x = 0; x < 16; x++) {
-            for (int y = minY; y < maxY; y++) {
-                for (int z = 0; z < 16; z++) {
-                    BlockPos sp = new BlockPos(bx + x, y, bz + z);
-                    net.minecraft.world.level.block.Block b = lvl.getBlockState(sp).getBlock();
-                    if (b == Blocks.COAL_ORE) counts.merge("coal", 1, Integer::sum);
-                    else if (b == Blocks.IRON_ORE) counts.merge("iron", 1, Integer::sum);
-                    else if (b == Blocks.GOLD_ORE) counts.merge("gold", 1, Integer::sum);
-                    else if (b == Blocks.REDSTONE_ORE) counts.merge("redstone", 1, Integer::sum);
-                    else if (b == Blocks.LAPIS_ORE) counts.merge("lapis", 1, Integer::sum);
-                    else if (b == Blocks.DIAMOND_ORE) counts.merge("diamond", 1, Integer::sum);
-                    else if (b == Blocks.EMERALD_ORE) counts.merge("emerald", 1, Integer::sum);
-                    else if (b == Blocks.COPPER_ORE) counts.merge("copper", 1, Integer::sum);
+        if (p == null) return;
+        
+        scannedOres.clear();
+        
+        int chunkX = (p.getX() >> 4) << 4;
+        int chunkZ = (p.getZ() >> 4) << 4;
+        
+        // Count ore types
+        Map<net.minecraft.world.level.block.Block, Integer> oreCounts = new HashMap<>();
+        
+        // Scan chunk area
+        for (int x = chunkX; x < chunkX + 16; x++) {
+            for (int z = chunkZ; z < chunkZ + 16; z++) {
+                for (int y = -64; y < 320; y++) {
+                    BlockPos checkPos = new BlockPos(x, y, z);
+                    BlockState bs = lvl.getBlockState(checkPos);
+                    if (isOre(bs)) {
+                        oreCounts.merge(bs.getBlock(), 1, Integer::sum);
+                    }
                 }
             }
         }
-
-        List<Map.Entry<String, Integer>> sorted = new ArrayList<Map.Entry<String, Integer>>(counts.entrySet());
-        sorted.sort((a, b) -> b.getValue().compareTo(a.getValue()));
-
-        scannedOres.clear();
-        for (int i = 0; i < 4 && i < sorted.size(); i++) {
-            Map.Entry<String, Integer> e = sorted.get(i);
-            if (e.getValue() > 0) {
-                scannedOres.add(new ItemStack(getOreItem(e.getKey()), e.getValue()));
-            }
+        
+        // Sort by count (descending)
+        List<Map.Entry<net.minecraft.world.level.block.Block, Integer>> sorted = new ArrayList<>(oreCounts.entrySet());
+        sorted.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
+        
+        // Take top 4 unique ores
+        int count = 0;
+        Set<net.minecraft.world.level.block.Block> seen = new HashSet<>();
+        for (Map.Entry<net.minecraft.world.level.block.Block, Integer> entry : sorted) {
+            net.minecraft.world.level.block.Block blk = entry.getKey();
+            if (count >= 4 || seen.contains(blk)) continue;
+            seen.add(blk);
+            scannedOres.add(new ItemStack(blk, entry.getValue()));
+            count++;
         }
+        
         hasScanned = true;
-        setChanged();
+    }
+    
+    private boolean isOre(BlockState state) {
+        net.minecraft.world.level.block.Block blk = state.getBlock();
+        return blk == Blocks.COAL_ORE || blk == Blocks.IRON_ORE 
+            || blk == Blocks.GOLD_ORE || blk == Blocks.COPPER_ORE
+            || blk == Blocks.DIAMOND_ORE || blk == Blocks.EMERALD_ORE
+            || blk == Blocks.LAPIS_ORE || blk == Blocks.REDSTONE_ORE;
     }
 
-    private net.minecraft.world.item.Item getOreItem(String name) {
-        switch (name) {
-            case "coal": return Items.COAL;
-            case "iron": return Items.RAW_IRON;
-            case "gold": return Items.RAW_GOLD;
-            case "redstone": return Items.REDSTONE;
-            case "lapis": return Items.LAPIS_LAZULI;
-            case "diamond": return Items.DIAMOND;
-            case "emerald": return Items.EMERALD;
-            case "copper": return Items.RAW_COPPER;
-            default: return Items.AIR;
-        }
+    public List<ItemStack> getScannedOres() {
+        return scannedOres;
     }
 
-    public List<ItemStack> getScannedOres() { return scannedOres; }
-    public boolean hasScanned() { return hasScanned; }
-
-    @Override
-    public void load(CompoundTag nbt) {
-        super.load(nbt);
-        hasScanned = nbt.getBoolean("hasScanned");
-    }
-
-    @Override
-    public void saveAdditional(CompoundTag nbt) {
-        super.saveAdditional(nbt);
-        nbt.putBoolean("hasScanned", hasScanned);
+    public boolean hasScanned() {
+        return hasScanned;
     }
 }
