@@ -2,23 +2,59 @@ package com.valence.valence.block.miner;
 
 import java.util.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.item.ItemStack;
+
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
     private int fuel = 0;
     private final List<ItemStack> extractedOres = new ArrayList<>();
-    private final ItemStack[] slots = new ItemStack[9]; // 1 fuel + 8 output slots
+    
+    // ItemStackHandler for mod compatibility (EnderIO, Create, Mekanism, etc.)
+    // Slot 0 = Fuel input, Slots 1-8 = Output slots
+    private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
+        @Override
+        public void onContentsChanged(int slot) {
+            setChanged();
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+            // Auto-detect fuel from slot 0
+            if (slot == 0) {
+                updateFuelFromSlot();
+            }
+        }
+        
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            if (slot == 0) {
+                // Fuel slot - accept any fuel item (coal, etc.)
+                // Use getBurnTime with a RecipeType parameter
+                return stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING) > 0;
+            }
+            return false; // Output slots don't accept items
+        }
+    };
+    
+    // LazyOptional for capability-based access
+    private final LazyOptional<IItemHandler> itemHandlerCapability = LazyOptional.of(() -> itemHandler);
 
     // Constructor for BlockEntityType.Builder.of (BlockPos, BlockState)
     public AdvancedMinerTileEntity(BlockPos pos, BlockState state) {
@@ -28,8 +64,35 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     // Full constructor with BlockEntityType
     public AdvancedMinerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        Arrays.fill(slots, ItemStack.EMPTY);
     }
+
+    @Override
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        if (tag.contains("Items")) {
+            itemHandler.deserializeNBT(tag.getCompound("Items"));
+        }
+        fuel = tag.getInt("fuel");
+        hasScanned = tag.getBoolean("hasScanned");
+    }
+
+    @Override
+    public void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("Items", itemHandler.serializeNBT());
+        tag.putInt("fuel", fuel);
+        tag.putBoolean("hasScanned", hasScanned);
+    }
+    
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return itemHandlerCapability.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
+    private boolean hasScanned = false;
 
     @Override
     public Component getDisplayName() {
@@ -47,6 +110,25 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     public void setFuel(int amount) {
         this.fuel = amount;
+    }
+    
+    private void updateFuelFromSlot() {
+        ItemStack fuelStack = itemHandler.getStackInSlot(0);
+        if (!fuelStack.isEmpty()) {
+            // Get burn time using getItem() method
+            int burnTime = fuelStack.getItem().getBurnTime(fuelStack, net.minecraft.world.item.crafting.RecipeType.SMELTING);
+            if (burnTime > 0) {
+                fuel = fuelStack.getCount();
+            } else {
+                fuel = 0;
+            }
+        } else {
+            fuel = 0;
+        }
+    }
+    
+    public ItemStackHandler getItemHandler() {
+        return itemHandler;
     }
 
     public void extractAllOreTypes(ServerLevel lvl) {
@@ -92,31 +174,33 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     public List<ItemStack> getExtractedOres() {
         return extractedOres;
     }
+    
+    public boolean hasScanned() {
+        return hasScanned;
+    }
 
-    // Container implementation
+    // ========== Container implementation (for vanilla) ==========
     @Override
     public boolean isEmpty() {
-        for (ItemStack slot : slots) {
-            if (!slot.isEmpty()) return false;
-        }
-        return true;
+        return java.util.stream.IntStream.range(0, itemHandler.getSlots())
+                .noneMatch(i -> !itemHandler.getStackInSlot(i).isEmpty());
     }
 
-    // WorldlyContainer implementation
+    // WorldlyContainer implementation - all sides have access to all slots
     @Override
-    public int[] getSlotsForFace(net.minecraft.core.Direction p_155524_1_) {
-        int[] slots = new int[9];
-        for (int i = 0; i < 9; i++) slots[i] = i;
-        return slots;
+    public int[] getSlotsForFace(Direction side) {
+        int[] result = new int[9];
+        for (int i = 0; i < 9; i++) result[i] = i;
+        return result;
     }
 
     @Override
-    public boolean canPlaceItemThroughFace(int index, ItemStack stack, net.minecraft.core.Direction direction) {
+    public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
         return index == 0; // Only allow fuel in slot 0
     }
 
     @Override
-    public boolean canTakeItemThroughFace(int index, ItemStack stack, net.minecraft.core.Direction direction) {
+    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
         return index > 0; // Can only take from output slots
     }
 
@@ -127,43 +211,35 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     @Override
     public ItemStack getItem(int index) {
-        return index >= 0 && index < 9 ? slots[index] : ItemStack.EMPTY;
+        return itemHandler.getStackInSlot(index);
     }
 
     @Override
     public ItemStack removeItem(int index, int count) {
-        if (index >= 0 && index < 9) {
-            ItemStack stack = slots[index];
-            slots[index] = ItemStack.EMPTY;
-            return stack;
-        }
-        return ItemStack.EMPTY;
+        return itemHandler.extractItem(index, count, false);
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-        if (index >= 0 && index < 9) {
-            ItemStack stack = slots[index];
-            slots[index] = ItemStack.EMPTY;
-            return stack;
-        }
-        return ItemStack.EMPTY;
+        ItemStack stack = itemHandler.getStackInSlot(index);
+        itemHandler.setStackInSlot(index, ItemStack.EMPTY);
+        return stack;
     }
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        if (index >= 0 && index < 9) {
-            slots[index] = stack;
-        }
+        itemHandler.setStackInSlot(index, stack);
     }
 
     @Override
-    public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
     @Override
     public void clearContent() {
-        Arrays.fill(slots, ItemStack.EMPTY);
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
     }
 }

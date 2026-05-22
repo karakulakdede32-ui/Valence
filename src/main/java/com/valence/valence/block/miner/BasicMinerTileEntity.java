@@ -1,10 +1,12 @@
 package com.valence.valence.block.miner;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -18,10 +20,29 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
+
 public class BasicMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
     private final List<ItemStack> scannedOres = new ArrayList<>();
     private boolean hasScanned = false;
-    private final ItemStack[] slots = new ItemStack[4];
+    
+    // ItemStackHandler for mod compatibility (EnderIO, Create, Mekanism, etc.)
+    private final ItemStackHandler itemHandler = new ItemStackHandler(4) {
+        @Override
+        public void onContentsChanged(int slot) {
+            setChanged();
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
+        }
+    };
+    
+    // LazyOptional for capability-based access
+    private final LazyOptional<IItemHandler> itemHandlerCapability = LazyOptional.of(() -> itemHandler);
 
     // Constructor for BlockEntityType.Builder.of (BlockPos, BlockState)
     public BasicMinerTileEntity(BlockPos pos, BlockState state) {
@@ -31,7 +52,30 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     // Full constructor with BlockEntityType
     public BasicMinerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        Arrays.fill(slots, ItemStack.EMPTY);
+    }
+
+    @Override
+    public void load(CompoundTag tag) {
+        super.load(tag);
+        if (tag.contains("Items")) {
+            itemHandler.deserializeNBT(tag.getCompound("Items"));
+        }
+        hasScanned = tag.getBoolean("hasScanned");
+    }
+
+    @Override
+    public void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        tag.put("Items", itemHandler.serializeNBT());
+        tag.putBoolean("hasScanned", hasScanned);
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            return itemHandlerCapability.cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     @Override
@@ -104,29 +148,11 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         return hasScanned;
     }
 
-    // Container implementation
+    // ========== Container implementation (for vanilla) ==========
     @Override
     public boolean isEmpty() {
-        for (ItemStack slot : slots) {
-            if (!slot.isEmpty()) return false;
-        }
-        return true;
-    }
-
-    // WorldlyContainer implementation
-    @Override
-    public int[] getSlotsForFace(net.minecraft.core.Direction p_155524_1_) {
-        return new int[]{0, 1, 2, 3};
-    }
-
-    @Override
-    public boolean canPlaceItemThroughFace(int index, ItemStack stack, net.minecraft.core.Direction direction) {
-        return false;
-    }
-
-    @Override
-    public boolean canTakeItemThroughFace(int index, ItemStack stack, net.minecraft.core.Direction direction) {
-        return true;
+        return itemHandler.getSlots() == 0 || java.util.stream.IntStream.range(0, itemHandler.getSlots())
+                .noneMatch(i -> !itemHandler.getStackInSlot(i).isEmpty());
     }
 
     @Override
@@ -136,43 +162,51 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     @Override
     public ItemStack getItem(int index) {
-        return index >= 0 && index < 4 ? slots[index] : ItemStack.EMPTY;
+        return itemHandler.getStackInSlot(index);
     }
 
     @Override
     public ItemStack removeItem(int index, int count) {
-        if (index >= 0 && index < 4) {
-            ItemStack stack = slots[index];
-            slots[index] = ItemStack.EMPTY;
-            return stack;
-        }
-        return ItemStack.EMPTY;
+        return itemHandler.extractItem(index, count, false);
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-        if (index >= 0 && index < 4) {
-            ItemStack stack = slots[index];
-            slots[index] = ItemStack.EMPTY;
-            return stack;
-        }
-        return ItemStack.EMPTY;
+        ItemStack stack = itemHandler.getStackInSlot(index);
+        itemHandler.setStackInSlot(index, ItemStack.EMPTY);
+        return stack;
     }
 
     @Override
     public void setItem(int index, ItemStack stack) {
-        if (index >= 0 && index < 4) {
-            slots[index] = stack;
-        }
+        itemHandler.setStackInSlot(index, stack);
     }
 
     @Override
-    public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+    public boolean stillValid(Player player) {
         return true;
     }
 
     @Override
     public void clearContent() {
-        Arrays.fill(slots, ItemStack.EMPTY);
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
+    }
+
+    // ========== WorldlyContainer implementation ==========
+    @Override
+    public int[] getSlotsForFace(Direction side) {
+        return new int[]{0, 1, 2, 3};
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
+        return false; // Miners don't accept items from automation
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
+        return true;
     }
 }
