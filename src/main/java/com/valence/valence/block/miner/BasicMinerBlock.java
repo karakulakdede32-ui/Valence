@@ -7,6 +7,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,8 +36,10 @@ public class BasicMinerBlock extends BaseEntityBlock {
         BlockEntity te = lvl.getBlockEntity(pos);
         if (!(te instanceof BasicMinerTileEntity miner)) return InteractionResult.FAIL;
         
-        // Right-click: Open GUI
-        pl.openMenu((MenuProvider) miner);
+        // Right-click: Open GUI with position data
+        if (pl instanceof ServerPlayer serverPlayer) {
+            NetworkHooks.openScreen(serverPlayer, (MenuProvider) miner, pos);
+        }
         return InteractionResult.SUCCESS;
     }
 }

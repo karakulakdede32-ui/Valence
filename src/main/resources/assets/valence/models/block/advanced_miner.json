@@ -1,6 +1,1 @@
-{
-  "parent": "block/cube_all",
-  "textures": {
-    "all": "valence:block/advanced_miner"
-  }
-}
+{"parent": "minecraft:block/cube_all", "textures": {"all": "valence:block/advanced_miner"}}

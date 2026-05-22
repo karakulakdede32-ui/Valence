@@ -1,5 +1,1 @@
-{
-  "variants": {
-    "": { "model": "valence:block/advanced_miner" }
-  }
-}
+{"variants": {"": {"model": "valence:block/advanced_miner"}}}

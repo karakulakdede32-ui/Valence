@@ -5,6 +5,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -38,7 +40,9 @@ public class GrinderBlock extends BaseEntityBlock {
 
         BlockEntity te = level.getBlockEntity(pos);
         if (te instanceof GrinderTileEntity grinder) {
-            player.openMenu(grinder);
+            if (player instanceof ServerPlayer serverPlayer) {
+                NetworkHooks.openScreen(serverPlayer, grinder, pos);
+            }
         }
         return InteractionResult.SUCCESS;
     }
