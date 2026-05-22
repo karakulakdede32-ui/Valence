@@ -7,7 +7,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
-@Mod("valence")
+@Mod(ValenceMod.MODID)
 public class ValenceMod {
     public static final String MODID = "valence";
     private static final Logger LOGGER = LogUtils.getLogger();

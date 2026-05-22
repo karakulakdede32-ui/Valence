@@ -1,5 +1,6 @@
 package com.valence.valence;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -19,6 +21,12 @@ import com.valence.valence.block.miner.AdvancedMinerTileEntity;
 import com.valence.valence.block.miner.BasicMinerMenu;
 import com.valence.valence.block.miner.AdvancedMinerMenu;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.slf4j.Logger;
+import com.mojang.logging.LogUtils;
 
 public class Registration {
     // Block property - stone-like
@@ -55,13 +63,18 @@ public class Registration {
     public static final RegistryObject<Item> ADVANCED_MINER_ITEM = ITEMS.register("advanced_miner",
             () -> new BlockItem(ADVANCED_MINER.get(), new Item.Properties()));
 
-    // Creative tab for Valence mod - must be last and use static references
-    public static final CreativeModeTab VALENCE_TAB = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
-            .title(net.minecraft.network.chat.Component.literal("Valence"))
+    // Creative tab (Forge 1.20.1 pattern)
+    public static final CreativeModeTab VALENCE_TAB = CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.valence"))
             .icon(() -> new ItemStack(Blocks.DIAMOND_ORE))
-            .displayItems((parameters, output) -> {
-                BASIC_MINER_ITEM.ifPresent(item -> output.accept(item));
-                ADVANCED_MINER_ITEM.ifPresent(item -> output.accept(item));
+            .displayItems((params, output) -> {
+                output.accept(BASIC_MINER_ITEM.get());
+                output.accept(ADVANCED_MINER_ITEM.get());
             })
             .build();
+
+    // Helper method for ResourceLocation
+    public static ResourceLocation location(String name) {
+        return ResourceLocation.fromNamespaceAndPath(ValenceMod.MODID, name);
+    }
 }
