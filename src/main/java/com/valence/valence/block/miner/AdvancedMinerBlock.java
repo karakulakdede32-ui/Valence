@@ -7,26 +7,25 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.BlockBehaviour;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import com.valence.valence.Registration;
+
 public class AdvancedMinerBlock extends BaseEntityBlock {
-    public AdvancedMinerBlock(BlockBehaviour.Properties p) {
+    public AdvancedMinerBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties p) {
         super(p);
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new AdvancedMinerTileEntity(BlockEntityType.BARREL, pos, state);
+        return new AdvancedMinerTileEntity(Registration.ADVANCED_MINER_TE.get(), pos, state);
     }
 
     @Override
@@ -49,7 +48,7 @@ public class AdvancedMinerBlock extends BaseEntityBlock {
         
         if (miner.hasFuel() && isCoal) {
             // Extract all ore types
-            miner.extractAllOreTypes(lvl);
+            miner.extractAllOreTypes((ServerLevel) lvl);
             held.shrink(1);
             pl.displayClientMessage(Component.literal("Extracted!"), true);
         } else if (!miner.hasFuel()) {

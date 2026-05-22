@@ -8,22 +8,22 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.BlockBehaviour;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
+import com.valence.valence.Registration;
+
 public class BasicMinerBlock extends BaseEntityBlock {
-    public BasicMinerBlock(BlockBehaviour.Properties p) {
+    public BasicMinerBlock(net.minecraft.world.level.block.state.BlockBehaviour.Properties p) {
         super(p);
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new BasicMinerTileEntity(BlockEntityType.BARREL, pos, state);
+        return new BasicMinerTileEntity(Registration.BASIC_MINER_TE.get(), pos, state);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class BasicMinerBlock extends BaseEntityBlock {
         }
         
         // Single right-click: Quick scan
-        miner.scanChunk(lvl);
+        miner.scanChunk((ServerLevel) lvl);
         
         if (miner.getScannedOres().isEmpty()) {
             pl.displayClientMessage(Component.literal("No ores found"), true);

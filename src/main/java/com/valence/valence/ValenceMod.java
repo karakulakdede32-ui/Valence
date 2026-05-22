@@ -15,9 +15,11 @@ public class ValenceMod {
     public ValenceMod() {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         
-        // Register blocks and items
+        // Register all deferred registries
         Registration.BLOCKS.register(bus);
         Registration.ITEMS.register(bus);
+        Registration.BLOCK_ENTITIES.register(bus);
+        Registration.MENUS.register(bus);
         
         bus.addListener(this::commonSetup);
         bus.addListener(this::clientSetup);

@@ -1,22 +1,21 @@
 package com.valence.valence.block.miner;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
+import net.minecraft.world.level.Level;
 
-public class AdvancedMinerMenu extends net.minecraft.world.inventory.AbstractContainerMenu {
+import com.valence.valence.Registration;
+
+public class AdvancedMinerMenu extends AbstractContainerMenu {
     private final AdvancedMinerTileEntity tileEntity;
 
-    public static final MenuType<AdvancedMinerMenu> TYPE = net.minecraft.world.inventory.MenuType.create(
-        "advanced_miner", AdvancedMinerMenu::create);
-
     public AdvancedMinerMenu(int id, Inventory playerInv, AdvancedMinerTileEntity te) {
-        super(TYPE, id);
+        super(Registration.ADVANCED_MINER_MENU.get(), id);
         this.tileEntity = te;
         
         // 1 fuel slot (index 0)
@@ -43,12 +42,16 @@ public class AdvancedMinerMenu extends net.minecraft.world.inventory.AbstractCon
         }
     }
 
-    private static AdvancedMinerMenu create(int id, Inventory inv, net.minecraft.world.inventory.ContainerLevelAccess access) {
-        BlockEntity te = access.getBlockEntity();
-        if (te instanceof AdvancedMinerTileEntity minerTE) {
-            return new AdvancedMinerMenu(id, inv, minerTE);
-        }
-        return null;
+    // Constructor for MenuType - receives ContainerLevelAccess
+    public AdvancedMinerMenu(int id, Inventory inv, ContainerLevelAccess access) {
+        this(id, inv, getTileEntity(access));
+    }
+
+    private static AdvancedMinerTileEntity getTileEntity(ContainerLevelAccess access) {
+        return access.evaluate((level, pos) -> {
+            if (level.getBlockEntity(pos) instanceof AdvancedMinerTileEntity te) return te;
+            return null;
+        }, null);
     }
 
     @Override

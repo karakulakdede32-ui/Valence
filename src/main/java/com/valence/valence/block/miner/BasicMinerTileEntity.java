@@ -1,32 +1,47 @@
 package com.valence.valence.block.miner;
 
-import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.Container;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.nbt.CompoundTag;
+import org.jetbrains.annotations.Nullable;
 
-public class BasicMinerTileEntity extends BlockEntity implements ContainerOpenersCounter {
-    private final List<ItemStack> scannedOres = new ArrayList<ItemStack>();
+import java.util.*;
+
+public class BasicMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
+    private final List<ItemStack> scannedOres = new ArrayList<>();
     private boolean hasScanned = false;
-    public final ContainerOpenersCounter openersCounter = new ContainerOpenersCounter();
+    private final ItemStack[] slots = new ItemStack[4];
 
-    // Required constructor for 1.20.1
+    // Constructor for BlockEntityType.Builder.of (BlockPos, BlockState)
+    public BasicMinerTileEntity(BlockPos pos, BlockState state) {
+        this((BlockEntityType<BasicMinerTileEntity>) null, pos, state);
+    }
+
+    // Full constructor with BlockEntityType
     public BasicMinerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        Arrays.fill(slots, ItemStack.EMPTY);
     }
 
     @Override
     public Component getDisplayName() {
         return Component.literal("Basic Miner");
+    }
+
+    @Override
+    public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id, Inventory inv, Player player) {
+        return new BasicMinerMenu(id, inv, this);
     }
 
     public void scanChunk(ServerLevel lvl) {
@@ -87,5 +102,77 @@ public class BasicMinerTileEntity extends BlockEntity implements ContainerOpener
 
     public boolean hasScanned() {
         return hasScanned;
+    }
+
+    // Container implementation
+    @Override
+    public boolean isEmpty() {
+        for (ItemStack slot : slots) {
+            if (!slot.isEmpty()) return false;
+        }
+        return true;
+    }
+
+    // WorldlyContainer implementation
+    @Override
+    public int[] getSlotsForFace(net.minecraft.core.Direction p_155524_1_) {
+        return new int[]{0, 1, 2, 3};
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int index, ItemStack stack, net.minecraft.core.Direction direction) {
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int index, ItemStack stack, net.minecraft.core.Direction direction) {
+        return true;
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 4;
+    }
+
+    @Override
+    public ItemStack getItem(int index) {
+        return index >= 0 && index < 4 ? slots[index] : ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        if (index >= 0 && index < 4) {
+            ItemStack stack = slots[index];
+            slots[index] = ItemStack.EMPTY;
+            return stack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        if (index >= 0 && index < 4) {
+            ItemStack stack = slots[index];
+            slots[index] = ItemStack.EMPTY;
+            return stack;
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public void setItem(int index, ItemStack stack) {
+        if (index >= 0 && index < 4) {
+            slots[index] = stack;
+        }
+    }
+
+    @Override
+    public boolean stillValid(net.minecraft.world.entity.player.Player player) {
+        return true;
+    }
+
+    @Override
+    public void clearContent() {
+        Arrays.fill(slots, ItemStack.EMPTY);
     }
 }

@@ -1,26 +1,22 @@
 package com.valence.valence.block.miner;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
+import net.minecraft.world.level.Level;
 
-public class BasicMinerMenu extends net.minecraft.world.inventory.AbstractContainerMenu {
+import com.valence.valence.Registration;
+
+public class BasicMinerMenu extends AbstractContainerMenu {
     private final BasicMinerTileEntity tileEntity;
-    private final ContainerOpenersCounter openersCounter;
-
-    public static final MenuType<BasicMinerMenu> TYPE = net.minecraft.world.inventory.MenuType.create(
-        "basic_miner", BasicMinerMenu::create);
 
     public BasicMinerMenu(int id, Inventory playerInv, BasicMinerTileEntity te) {
-        super(TYPE, id);
+        super(Registration.BASIC_MINER_MENU.get(), id);
         this.tileEntity = te;
-        this.openersCounter = te.openersCounter;
         
         // 4 output slots in 2x2 grid
         this.addSlot(new Slot(tileEntity, 0, 80, 30));
@@ -41,12 +37,16 @@ public class BasicMinerMenu extends net.minecraft.world.inventory.AbstractContai
         }
     }
 
-    private static BasicMinerMenu create(int id, Inventory inv, net.minecraft.world.inventory.ContainerLevelAccess access) {
-        BlockEntity te = access.getBlockEntity();
-        if (te instanceof BasicMinerTileEntity minerTE) {
-            return new BasicMinerMenu(id, inv, minerTE);
-        }
-        return null;
+    // Constructor for MenuType - receives ContainerLevelAccess
+    public BasicMinerMenu(int id, Inventory inv, ContainerLevelAccess access) {
+        this(id, inv, getTileEntity(access));
+    }
+
+    private static BasicMinerTileEntity getTileEntity(ContainerLevelAccess access) {
+        return access.evaluate((level, pos) -> {
+            if (level.getBlockEntity(pos) instanceof BasicMinerTileEntity te) return te;
+            return null;
+        }, null);
     }
 
     @Override
