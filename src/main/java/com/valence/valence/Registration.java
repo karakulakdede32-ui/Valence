@@ -2,7 +2,9 @@ package com.valence.valence;
 
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -52,4 +54,14 @@ public class Registration {
             () -> new BlockItem(BASIC_MINER.get(), new Item.Properties()));
     public static final RegistryObject<Item> ADVANCED_MINER_ITEM = ITEMS.register("advanced_miner",
             () -> new BlockItem(ADVANCED_MINER.get(), new Item.Properties()));
+
+    // Creative tab for Valence mod - must be last and use static references
+    public static final CreativeModeTab VALENCE_TAB = CreativeModeTab.builder(CreativeModeTab.Row.TOP, 0)
+            .title(net.minecraft.network.chat.Component.literal("Valence"))
+            .icon(() -> new ItemStack(Blocks.DIAMOND_ORE))
+            .displayItems((parameters, output) -> {
+                BASIC_MINER_ITEM.ifPresent(item -> output.accept(item));
+                ADVANCED_MINER_ITEM.ifPresent(item -> output.accept(item));
+            })
+            .build();
 }
