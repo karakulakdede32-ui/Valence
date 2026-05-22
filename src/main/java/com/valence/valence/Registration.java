@@ -62,6 +62,8 @@ public class Registration {
     // Register block items
     public static final RegistryObject<Item> BASIC_MINER_ITEM = ITEMS.register("basic_miner",
             () -> new BlockItem(BASIC_MINER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STONE_PEBBLE = ITEMS.register("stone_pebble",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> ADVANCED_MINER_ITEM = ITEMS.register("advanced_miner",
             () -> new BlockItem(ADVANCED_MINER.get(), new Item.Properties()));
     public static final RegistryObject<Item> GRINDER_ITEM = ITEMS.register("grinder",
