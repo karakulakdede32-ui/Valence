@@ -172,6 +172,10 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         return hasScanned;
     }
 
+    public ItemStackHandler getItemHandler() {
+        return itemHandler;
+    }
+
     // ========== Container implementation (for vanilla) ==========
     @Override
     public boolean isEmpty() {
