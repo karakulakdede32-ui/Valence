@@ -17,6 +17,7 @@ public class ClientSetup {
         event.enqueueWork(() -> {
             MenuScreens.register(Registration.BASIC_MINER_MENU.get(), BasicMinerScreen::new);
             MenuScreens.register(Registration.ADVANCED_MINER_MENU.get(), AdvancedMinerScreen::new);
+            MenuScreens.register(Registration.GRINDER_MENU.get(), com.valence.valence.client.gui.GrinderScreen::new);
         });
     }
 }

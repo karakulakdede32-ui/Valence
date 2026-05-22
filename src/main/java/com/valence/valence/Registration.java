@@ -48,12 +48,16 @@ public class Registration {
             () -> BlockEntityType.Builder.of(BasicMinerTileEntity::new, BASIC_MINER.get()).build(null));
     public static final RegistryObject<BlockEntityType<AdvancedMinerTileEntity>> ADVANCED_MINER_TE = BLOCK_ENTITIES.register("advanced_miner",
             () -> BlockEntityType.Builder.of(AdvancedMinerTileEntity::new, ADVANCED_MINER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<com.valence.valence.block.GrinderTileEntity>> GRINDER_TE = BLOCK_ENTITIES.register("grinder",
+            () -> BlockEntityType.Builder.of(com.valence.valence.block.GrinderTileEntity::new, GRINDER.get()).build(null));
 
     // MenuType suppliers
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner",
             () -> IForgeMenuType.create(BasicMinerMenu::new));
     public static final RegistryObject<MenuType<AdvancedMinerMenu>> ADVANCED_MINER_MENU = MENUS.register("advanced_miner",
             () -> IForgeMenuType.create(AdvancedMinerMenu::new));
+    public static final RegistryObject<MenuType<com.valence.valence.block.GrinderMenu>> GRINDER_MENU = MENUS.register("grinder",
+            () -> IForgeMenuType.create(com.valence.valence.block.GrinderMenu::new));
 
     // Register block items
     public static final RegistryObject<Item> BASIC_MINER_ITEM = ITEMS.register("basic_miner",

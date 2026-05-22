@@ -34,26 +34,8 @@ public class BasicMinerBlock extends BaseEntityBlock {
         BlockEntity te = lvl.getBlockEntity(pos);
         if (!(te instanceof BasicMinerTileEntity miner)) return InteractionResult.FAIL;
         
-        // Sneak + right-click: Open GUI
-        if (pl.isShiftKeyDown()) {
-            pl.openMenu((MenuProvider) miner);
-            return InteractionResult.SUCCESS;
-        }
-        
-        // Single right-click: Quick scan
-        miner.scanChunk((ServerLevel) lvl);
-        
-        if (miner.getScannedOres().isEmpty()) {
-            pl.displayClientMessage(Component.literal("No ores found"), true);
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < Math.min(4, miner.getScannedOres().size()); i++) {
-                if (i > 0) sb.append(", ");
-                sb.append(miner.getScannedOres().get(i).getDisplayName().getString());
-            }
-            pl.displayClientMessage(Component.literal("Top ores: " + sb), true);
-        }
-        
+        // Right-click: Open GUI
+        pl.openMenu((MenuProvider) miner);
         return InteractionResult.SUCCESS;
     }
 }

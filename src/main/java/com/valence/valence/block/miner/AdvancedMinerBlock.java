@@ -36,34 +36,8 @@ public class AdvancedMinerBlock extends BaseEntityBlock {
         BlockEntity te = lvl.getBlockEntity(pos);
         if (!(te instanceof AdvancedMinerTileEntity miner)) return InteractionResult.FAIL;
         
-        // Sneak + right-click: Open GUI
-        if (pl.isShiftKeyDown()) {
-            pl.openMenu((MenuProvider) miner);
-            return InteractionResult.SUCCESS;
-        }
-        
-        // Check for fuel in hand
-        ItemStack held = pl.getItemInHand(hnd);
-        boolean isCoal = held.is(Items.COAL) || held.is(Items.CHARCOAL);
-        
-        if (miner.hasFuel() && isCoal) {
-            // Extract all ore types
-            miner.extractAllOreTypes((ServerLevel) lvl);
-            held.shrink(1);
-            pl.displayClientMessage(Component.literal("Extracted!"), true);
-        } else if (!miner.hasFuel()) {
-            // Add fuel
-            if (isCoal) {
-                miner.setFuel(1);
-                held.shrink(1);
-                pl.displayClientMessage(Component.literal("Fuel added!"), true);
-            } else {
-                pl.displayClientMessage(Component.literal("Need coal/charcoal for fuel"), true);
-            }
-        } else {
-            pl.displayClientMessage(Component.literal("Need fuel to extract"), true);
-        }
-        
+        // Right-click: Open GUI
+        pl.openMenu((MenuProvider) miner);
         return InteractionResult.SUCCESS;
     }
 }
