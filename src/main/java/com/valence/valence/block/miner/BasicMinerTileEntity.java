@@ -154,10 +154,14 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     
     private boolean isOre(BlockState state) {
         net.minecraft.world.level.block.Block blk = state.getBlock();
-        return blk == Blocks.COAL_ORE || blk == Blocks.IRON_ORE 
-            || blk == Blocks.GOLD_ORE || blk == Blocks.COPPER_ORE
-            || blk == Blocks.DIAMOND_ORE || blk == Blocks.EMERALD_ORE
-            || blk == Blocks.LAPIS_ORE || blk == Blocks.REDSTONE_ORE;
+        return blk == Blocks.COAL_ORE || blk == Blocks.DEEPSLATE_COAL_ORE
+            || blk == Blocks.IRON_ORE || blk == Blocks.DEEPSLATE_IRON_ORE
+            || blk == Blocks.GOLD_ORE || blk == Blocks.DEEPSLATE_GOLD_ORE
+            || blk == Blocks.COPPER_ORE || blk == Blocks.DEEPSLATE_COPPER_ORE
+            || blk == Blocks.DIAMOND_ORE || blk == Blocks.DEEPSLATE_DIAMOND_ORE
+            || blk == Blocks.EMERALD_ORE || blk == Blocks.DEEPSLATE_EMERALD_ORE
+            || blk == Blocks.LAPIS_ORE || blk == Blocks.DEEPSLATE_LAPIS_ORE
+            || blk == Blocks.REDSTONE_ORE || blk == Blocks.DEEPSLATE_REDSTONE_ORE;
     }
 
     public List<ItemStack> getScannedOres() {

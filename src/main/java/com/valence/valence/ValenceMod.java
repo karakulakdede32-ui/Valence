@@ -20,6 +20,7 @@ public class ValenceMod {
         Registration.ITEMS.register(bus);
         Registration.BLOCK_ENTITIES.register(bus);
         Registration.MENUS.register(bus);
+        Registration.CREATIVE_MODE_TABS.register(bus);
         
         bus.addListener(this::commonSetup);
         bus.addListener(this::clientSetup);

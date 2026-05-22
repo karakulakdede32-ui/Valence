@@ -1,5 +1,6 @@
 package com.valence.valence;
 
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -21,12 +22,6 @@ import com.valence.valence.block.miner.AdvancedMinerTileEntity;
 import com.valence.valence.block.miner.BasicMinerMenu;
 import com.valence.valence.block.miner.AdvancedMinerMenu;
 import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.slf4j.Logger;
-import com.mojang.logging.LogUtils;
 
 public class Registration {
     // Block property - stone-like
@@ -38,6 +33,7 @@ public class Registration {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ValenceMod.MODID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ValenceMod.MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ValenceMod.MODID);
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ValenceMod.MODID);
 
     // Register blocks
     public static final RegistryObject<Block> BASIC_MINER = BLOCKS.register("basic_miner",
@@ -51,7 +47,7 @@ public class Registration {
     public static final RegistryObject<BlockEntityType<AdvancedMinerTileEntity>> ADVANCED_MINER_TE = BLOCK_ENTITIES.register("advanced_miner",
             () -> BlockEntityType.Builder.of(AdvancedMinerTileEntity::new, ADVANCED_MINER.get()).build(null));
 
-    // MenuType suppliers - using IForgeMenuType.create for TileEntity-backed menus
+    // MenuType suppliers
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner",
             () -> IForgeMenuType.create(BasicMinerMenu::new));
     public static final RegistryObject<MenuType<AdvancedMinerMenu>> ADVANCED_MINER_MENU = MENUS.register("advanced_miner",
@@ -63,18 +59,19 @@ public class Registration {
     public static final RegistryObject<Item> ADVANCED_MINER_ITEM = ITEMS.register("advanced_miner",
             () -> new BlockItem(ADVANCED_MINER.get(), new Item.Properties()));
 
-    // Creative tab (Forge 1.20.1 pattern)
-    public static final CreativeModeTab VALENCE_TAB = CreativeModeTab.builder()
-            .title(Component.translatable("itemGroup.valence"))
-            .icon(() -> new ItemStack(Blocks.DIAMOND_ORE))
-            .displayItems((params, output) -> {
-                output.accept(BASIC_MINER_ITEM.get());
-                output.accept(ADVANCED_MINER_ITEM.get());
-            })
-            .build();
+    // Creative tab registration
+    public static final RegistryObject<CreativeModeTab> VALENCE_TAB = CREATIVE_MODE_TABS.register("valence_tab",
+            () -> CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.valence"))
+                    .icon(() -> new ItemStack(BASIC_MINER_ITEM.get()))
+                    .displayItems((params, output) -> {
+                        output.accept(BASIC_MINER_ITEM.get());
+                        output.accept(ADVANCED_MINER_ITEM.get());
+                    })
+                    .build());
 
-    // Helper method for ResourceLocation
+    // Helper method for ResourceLocation - Fixed for 1.20.1
     public static ResourceLocation location(String name) {
-        return ResourceLocation.fromNamespaceAndPath(ValenceMod.MODID, name);
+        return new ResourceLocation(ValenceMod.MODID, name);
     }
 }

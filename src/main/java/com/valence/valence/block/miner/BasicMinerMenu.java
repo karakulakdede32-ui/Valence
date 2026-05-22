@@ -2,7 +2,6 @@ package com.valence.valence.block.miner;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -10,6 +9,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.items.SlotItemHandler;
 
 import com.valence.valence.Registration;
 
@@ -17,52 +17,36 @@ public class BasicMinerMenu extends AbstractContainerMenu {
     private final BasicMinerTileEntity tileEntity;
     
     // Slot indices
-    private static final int MINER_SLOTS = 4;
+    private static final int MINER_SLOTS_COUNT = 4;
     private static final int PLAYER_INVENTORY_START = 4;
-    private static final int PLAYER_INVENTORY_END = 36;
-    private static final int HOTBAR_START = 36;
+    private static final int HOTBAR_END = 40;
 
     public BasicMinerMenu(int id, Inventory playerInv, BasicMinerTileEntity te) {
         super(Registration.BASIC_MINER_MENU.get(), id);
         this.tileEntity = te;
         
-        // ===== MINER OUTPUT SECTION =====
-        // 4 output slots in a clean 2x2 grid, centered
-        // Row 1
-        this.addSlot(new Slot(tileEntity, 0, 35, 17));
-        this.addSlot(new Slot(tileEntity, 1, 62, 17));
-        this.addSlot(new Slot(tileEntity, 2, 89, 17));
-        this.addSlot(new Slot(tileEntity, 3, 116, 17));
-        
-        // ===== PLAYER INVENTORY SECTION =====
-        // Player inventory - 3 rows below miner
-        // Row 1 (main inventory)
-        for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i + 9, 8 + i * 18, 58 + 18));
-        }
-        // Row 2
-        for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i + 18, 8 + i * 18, 58 + 36));
-        }
-        // Row 3
-        for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i + 27, 8 + i * 18, 58 + 54));
+        if (te != null) {
+            // Miner output slots
+            for (int i = 0; i < 4; i++) {
+                this.addSlot(new SlotItemHandler(te.getItemHandler(), i, 35 + i * 27, 17));
+            }
         }
         
-        // Hotbar - bottom row
+        // Player inventory
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 9; j++) {
+                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 76 + i * 18));
+            }
+        }
+        
+        // Hotbar
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 139));
+            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 134));
         }
     }
 
-    // Constructor for IForgeMenuType.create (client-side, FriendlyByteBuf)
     public BasicMinerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
         this(id, inv, getTileEntityFromBuf(buf));
-    }
-
-    // Constructor for MenuSupplier (server-side with ContainerLevelAccess)
-    public BasicMinerMenu(int id, Inventory inv, ContainerLevelAccess access) {
-        this(id, inv, getTileEntityFromAccess(access));
     }
 
     private static BasicMinerTileEntity getTileEntityFromBuf(FriendlyByteBuf buf) {
@@ -70,13 +54,6 @@ public class BasicMinerMenu extends AbstractContainerMenu {
         Level level = getClientLevel();
         if (level != null && level.getBlockEntity(pos) instanceof BasicMinerTileEntity te) return te;
         return null;
-    }
-
-    private static BasicMinerTileEntity getTileEntityFromAccess(ContainerLevelAccess access) {
-        return access.evaluate((level, pos) -> {
-            if (level.getBlockEntity(pos) instanceof BasicMinerTileEntity te) return te;
-            return null;
-        }, null);
     }
 
     private static Level getClientLevel() {
@@ -91,7 +68,8 @@ public class BasicMinerMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return true;
+        return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate((level, pos) -> 
+            player.distanceToSqr((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D) <= 64.0D, true);
     }
 
     @Override
@@ -102,18 +80,18 @@ public class BasicMinerMenu extends AbstractContainerMenu {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             
-            // Transfer from miner output to player inventory
-            if (index < MINER_SLOTS) {
-                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, PLAYER_INVENTORY_END + 9, true)) {
+            if (index < MINER_SLOTS_COUNT) {
+                // From miner to player inventory
+                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 0, MINER_SLOTS, false)) {
-                // Try to put back in miner
+            } else {
+                // Basic Miner has only output slots, so we don't allow moving items into it
                 return ItemStack.EMPTY;
             }
             
-            if (itemstack1.getCount() == 0) {
-                slot.setByPlayer(ItemStack.EMPTY);
+            if (itemstack1.isEmpty()) {
+                slot.set(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
