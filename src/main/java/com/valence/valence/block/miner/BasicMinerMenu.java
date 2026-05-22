@@ -1,6 +1,7 @@
 package com.valence.valence.block.miner;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -54,16 +55,38 @@ public class BasicMinerMenu extends AbstractContainerMenu {
         }
     }
 
-    // Constructor for MenuType - receives ContainerLevelAccess
-    public BasicMinerMenu(int id, Inventory inv, ContainerLevelAccess access) {
-        this(id, inv, getTileEntity(access));
+    // Constructor for IForgeMenuType.create (client-side, FriendlyByteBuf)
+    public BasicMinerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
+        this(id, inv, getTileEntityFromBuf(buf));
     }
 
-    private static BasicMinerTileEntity getTileEntity(ContainerLevelAccess access) {
+    // Constructor for MenuSupplier (server-side with ContainerLevelAccess)
+    public BasicMinerMenu(int id, Inventory inv, ContainerLevelAccess access) {
+        this(id, inv, getTileEntityFromAccess(access));
+    }
+
+    private static BasicMinerTileEntity getTileEntityFromBuf(FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        Level level = getClientLevel();
+        if (level != null && level.getBlockEntity(pos) instanceof BasicMinerTileEntity te) return te;
+        return null;
+    }
+
+    private static BasicMinerTileEntity getTileEntityFromAccess(ContainerLevelAccess access) {
         return access.evaluate((level, pos) -> {
             if (level.getBlockEntity(pos) instanceof BasicMinerTileEntity te) return te;
             return null;
         }, null);
+    }
+
+    private static Level getClientLevel() {
+        try {
+            Class<?> clazz = Class.forName("net.minecraft.client.Minecraft");
+            Object minecraft = clazz.getMethod("getInstance").invoke(null);
+            return (Level) clazz.getField("level").get(minecraft);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override
