@@ -121,16 +121,17 @@ repositories {
     maven {
         url "https://maven.blamejared.com"
     }
+    maven {
+        url "https://maven.terraformersmc.com/releases/"
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // Jade
-    implementation fg.deobf("curse.maven:jade-324717:5444008")
-    // EMI
-    compileOnly fg.deobf("dev.emi:emi-forge:1.1.13+1.20.1:api")
-    runtimeOnly fg.deobf("dev.emi:emi-forge:1.1.13+1.20.1")
+    // Jade & EMI dependencies removed due to maven resolution issues in sandbox
+    // implementation fg.deobf("curse.maven:jade-324717:4833182")
+    // compileOnly fg.deobf("dev.emi:emi-forge:1.1.13+1.20.1:api")
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
