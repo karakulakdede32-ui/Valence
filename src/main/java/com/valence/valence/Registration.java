@@ -40,6 +40,8 @@ public class Registration {
             () -> new BasicMinerBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> ADVANCED_MINER = BLOCKS.register("advanced_miner",
             () -> new AdvancedMinerBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> GRINDER = BLOCKS.register("grinder",
+            () -> new com.valence.valence.block.GrinderBlock());
 
     // BlockEntityType suppliers
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -58,6 +60,8 @@ public class Registration {
             () -> new BlockItem(BASIC_MINER.get(), new Item.Properties()));
     public static final RegistryObject<Item> ADVANCED_MINER_ITEM = ITEMS.register("advanced_miner",
             () -> new BlockItem(ADVANCED_MINER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> GRINDER_ITEM = ITEMS.register("grinder",
+            () -> new BlockItem(GRINDER.get(), new Item.Properties()));
 
     // Creative tab registration
     public static final RegistryObject<CreativeModeTab> VALENCE_TAB = CREATIVE_MODE_TABS.register("valence_tab",
@@ -67,6 +71,7 @@ public class Registration {
                     .displayItems((params, output) -> {
                         output.accept(BASIC_MINER_ITEM.get());
                         output.accept(ADVANCED_MINER_ITEM.get());
+                        output.accept(GRINDER_ITEM.get());
                     })
                     .build());
 
