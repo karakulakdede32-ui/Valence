@@ -14,6 +14,12 @@ import com.valence.valence.Registration;
 
 public class BasicMinerMenu extends AbstractContainerMenu {
     private final BasicMinerTileEntity tileEntity;
+    
+    // Slot indices
+    private static final int MINER_SLOTS = 4;
+    private static final int PLAYER_INVENTORY_START = 4;
+    private static final int PLAYER_INVENTORY_END = 36;
+    private static final int HOTBAR_START = 36;
 
     public BasicMinerMenu(int id, Inventory playerInv, BasicMinerTileEntity te) {
         super(Registration.BASIC_MINER_MENU.get(), id);
@@ -74,11 +80,11 @@ public class BasicMinerMenu extends AbstractContainerMenu {
             itemstack = itemstack1.copy();
             
             // Transfer from miner output to player inventory
-            if (index < 4) {
-                if (!this.moveItemStackTo(itemstack1, 4, 40, true)) {
+            if (index < MINER_SLOTS) {
+                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, PLAYER_INVENTORY_END + 9, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(itemstack1, 0, 4, false)) {
+            } else if (!this.moveItemStackTo(itemstack1, 0, MINER_SLOTS, false)) {
                 // Try to put back in miner
                 return ItemStack.EMPTY;
             }

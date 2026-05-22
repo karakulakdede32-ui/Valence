@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
@@ -61,6 +62,16 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
             itemHandler.deserializeNBT(tag.getCompound("Items"));
         }
         hasScanned = tag.getBoolean("hasScanned");
+        
+        // Load scanned ores
+        scannedOres.clear();
+        if (tag.contains("ScannedOres")) {
+            ListTag oreList = tag.getList("ScannedOres", 10);
+            for (int i = 0; i < oreList.size(); i++) {
+                CompoundTag oreTag = oreList.getCompound(i);
+                scannedOres.add(ItemStack.of(oreTag));
+            }
+        }
     }
 
     @Override
@@ -68,6 +79,15 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         super.saveAdditional(tag);
         tag.put("Items", itemHandler.serializeNBT());
         tag.putBoolean("hasScanned", hasScanned);
+        
+        // Save scanned ores
+        ListTag oreList = new ListTag();
+        for (ItemStack ore : scannedOres) {
+            CompoundTag oreTag = new CompoundTag();
+            ore.save(oreTag);
+            oreList.add(oreTag);
+        }
+        tag.put("ScannedOres", oreList);
     }
 
     @Override

@@ -14,6 +14,14 @@ import com.valence.valence.Registration;
 
 public class AdvancedMinerMenu extends AbstractContainerMenu {
     private final AdvancedMinerTileEntity tileEntity;
+    
+    // Slot indices
+    private static final int FUEL_SLOT = 0;
+    private static final int OUTPUT_SLOTS_START = 1;
+    private static final int OUTPUT_SLOTS = 8;
+    private static final int PLAYER_INVENTORY_START = 9;
+    private static final int PLAYER_INVENTORY_END = 36;
+    private static final int HOTBAR_START = 36;
 
     public AdvancedMinerMenu(int id, Inventory playerInv, AdvancedMinerTileEntity te) {
         super(Registration.ADVANCED_MINER_MENU.get(), id);
@@ -83,19 +91,19 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
             itemstack = itemstack1.copy();
             
             // Transfer from miner output to player inventory
-            if (index < 9) {
+            if (index < OUTPUT_SLOTS_START + OUTPUT_SLOTS) {
                 // From fuel (0) or output slots (1-8) to player inventory
-                if (!this.moveItemStackTo(itemstack1, 9, 45, true)) {
+                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, PLAYER_INVENTORY_END + 9, true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (index >= 9 && index < 45) {
+            } else if (index >= PLAYER_INVENTORY_START && index < PLAYER_INVENTORY_END) {
                 // From player inventory to miner slots
-                if (index == 9 && this.slots.get(0).mayPlace(itemstack1)) {
+                if (index == PLAYER_INVENTORY_START && this.slots.get(FUEL_SLOT).mayPlace(itemstack1)) {
                     // Fuel slot - can only accept fuel items
-                    if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
+                    if (!this.moveItemStackTo(itemstack1, FUEL_SLOT, FUEL_SLOT + 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (!this.moveItemStackTo(itemstack1, 1, 9, false)) {
+                } else if (!this.moveItemStackTo(itemstack1, OUTPUT_SLOTS_START, OUTPUT_SLOTS_START + OUTPUT_SLOTS, false)) {
                     // Try to put in output slots
                     return ItemStack.EMPTY;
                 }

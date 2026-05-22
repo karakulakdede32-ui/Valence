@@ -25,7 +25,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
     private int fuel = 0;
-    private final List<ItemStack> extractedOres = new ArrayList<>();
+    private boolean hasScanned = false;
     
     // ItemStackHandler for mod compatibility (EnderIO, Create, Mekanism, etc.)
     // Slot 0 = Fuel input, Slots 1-8 = Output slots
@@ -72,7 +72,8 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         if (tag.contains("Items")) {
             itemHandler.deserializeNBT(tag.getCompound("Items"));
         }
-        fuel = tag.getInt("fuel");
+        // Sync fuel from itemHandler if items were loaded
+        updateFuelFromSlot();
         hasScanned = tag.getBoolean("hasScanned");
     }
 
@@ -91,8 +92,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         }
         return super.getCapability(cap, side);
     }
-
-    private boolean hasScanned = false;
 
     @Override
     public Component getDisplayName() {
@@ -115,7 +114,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     private void updateFuelFromSlot() {
         ItemStack fuelStack = itemHandler.getStackInSlot(0);
         if (!fuelStack.isEmpty()) {
-            // Get burn time using getItem() method
             int burnTime = fuelStack.getItem().getBurnTime(fuelStack, net.minecraft.world.item.crafting.RecipeType.SMELTING);
             if (burnTime > 0) {
                 fuel = fuelStack.getCount();
@@ -131,6 +129,10 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         return itemHandler;
     }
 
+    public int getFuel() {
+        return fuel;
+    }
+
     public void extractAllOreTypes(ServerLevel lvl) {
         if (lvl == null || fuel <= 0) return;
         
@@ -140,7 +142,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         int chunkX = (p.getX() >> 4) << 4;
         int chunkZ = (p.getZ() >> 4) << 4;
         
-        // Collect one of each ore type
         Set<net.minecraft.world.level.block.Block> foundOres = new HashSet<>();
         
         for (int x = chunkX; x < chunkX + 16; x++) {
@@ -150,7 +151,14 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
                     BlockState bs = lvl.getBlockState(checkPos);
                     if (isOre(bs) && !foundOres.contains(bs.getBlock())) {
                         foundOres.add(bs.getBlock());
-                        extractedOres.add(new ItemStack(bs.getBlock(), 1));
+                        
+                        // Find first empty output slot and add the ore
+                        for (int slot = 1; slot < 9; slot++) {
+                            if (itemHandler.getStackInSlot(slot).isEmpty()) {
+                                itemHandler.setStackInSlot(slot, new ItemStack(bs.getBlock(), 1));
+                                break;
+                            }
+                        }
                         
                         if (foundOres.size() >= 8) break;
                     }
@@ -161,6 +169,8 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         }
         
         fuel--;
+        hasScanned = true;
+        setChanged();
     }
 
     private boolean isOre(BlockState state) {
@@ -169,10 +179,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
             || blk == Blocks.GOLD_ORE || blk == Blocks.COPPER_ORE
             || blk == Blocks.DIAMOND_ORE || blk == Blocks.EMERALD_ORE
             || blk == Blocks.LAPIS_ORE || blk == Blocks.REDSTONE_ORE;
-    }
-
-    public List<ItemStack> getExtractedOres() {
-        return extractedOres;
     }
     
     public boolean hasScanned() {
