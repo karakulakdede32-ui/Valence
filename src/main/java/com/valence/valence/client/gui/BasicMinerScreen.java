@@ -15,6 +15,8 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
 
     public BasicMinerScreen(BasicMinerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
+        this.imageWidth = 176;
+        this.imageHeight = 166;
     }
 
     @Override

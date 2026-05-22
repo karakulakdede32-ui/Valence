@@ -69,6 +69,15 @@ public class Registration {
     public static final RegistryObject<Item> GRINDER_ITEM = ITEMS.register("grinder",
             () -> new BlockItem(GRINDER.get(), new Item.Properties()));
 
+    public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> GOLD_POWDER = ITEMS.register("gold_powder",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> REDSTONE_POWDER = ITEMS.register("redstone_powder",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> LAPIS_POWDER = ITEMS.register("lapis_powder",
+            () -> new Item(new Item.Properties()));
+
     // Creative tab registration
     public static final RegistryObject<CreativeModeTab> VALENCE_TAB = CREATIVE_MODE_TABS.register("valence_tab",
             () -> CreativeModeTab.builder()
@@ -78,6 +87,10 @@ public class Registration {
                         output.accept(BASIC_MINER_ITEM.get());
                         output.accept(ADVANCED_MINER_ITEM.get());
                         output.accept(GRINDER_ITEM.get());
+                        output.accept(IRON_POWDER.get());
+                        output.accept(GOLD_POWDER.get());
+                        output.accept(REDSTONE_POWDER.get());
+                        output.accept(LAPIS_POWDER.get());
                     })
                     .build());
 

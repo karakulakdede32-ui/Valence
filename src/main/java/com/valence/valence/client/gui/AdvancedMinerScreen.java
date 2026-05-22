@@ -15,8 +15,9 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
 
     public AdvancedMinerScreen(AdvancedMinerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.imageHeight = 184; // Slightly taller for advanced miner
-        this.inventoryLabelY = imageHeight - 94;
+        this.imageWidth = 176;
+        this.imageHeight = 184;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override

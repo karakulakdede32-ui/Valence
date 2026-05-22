@@ -22,8 +22,13 @@ public class GrinderMenu extends AbstractContainerMenu {
         this.tileEntity = (GrinderTileEntity) entity;
 
         if (tileEntity != null) {
-            this.addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 0, 56, 35)); // Input
-            this.addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 1, 116, 35)); // Output
+            this.addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 0, 44, 35)); // Input
+            this.addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 1, 116, 35) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return false; // Cannot put items into output slot
+                }
+            }); // Output
         }
 
         layoutPlayerInventorySlots(inv, 8, 84);
