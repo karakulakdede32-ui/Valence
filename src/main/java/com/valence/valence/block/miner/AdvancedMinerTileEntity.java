@@ -189,6 +189,15 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         return hasScanned;
     }
 
+    public static void tick(Level level, BlockPos pos, BlockState state, AdvancedMinerTileEntity pEntity) {
+        if (level.isClientSide()) return;
+
+        if (!pEntity.hasScanned() && pEntity.hasFuel()) {
+            pEntity.extractAllOreTypes((ServerLevel) level);
+            setChanged(level, pos, state);
+        }
+    }
+
     // ========== Container implementation (for vanilla) ==========
     @Override
     public boolean isEmpty() {

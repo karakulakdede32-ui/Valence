@@ -176,6 +176,15 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         return itemHandler;
     }
 
+    public static void tick(Level level, BlockPos pos, BlockState state, BasicMinerTileEntity pEntity) {
+        if (level.isClientSide()) return;
+        
+        if (!pEntity.hasScanned()) {
+            pEntity.scanChunk((ServerLevel) level);
+            setChanged(level, pos, state);
+        }
+    }
+
     // ========== Container implementation (for vanilla) ==========
     @Override
     public boolean isEmpty() {
