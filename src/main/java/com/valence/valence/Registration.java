@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import com.valence.valence.recipe.GrinderRecipe;
 import com.valence.valence.block.miner.BasicMinerBlock;
 import com.valence.valence.block.miner.BasicMinerTileEntity;
 import com.valence.valence.block.miner.AdvancedMinerBlock;
@@ -34,6 +35,8 @@ public class Registration {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ValenceMod.MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, ValenceMod.MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ValenceMod.MODID);
+    public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, ValenceMod.MODID);
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ValenceMod.MODID);
 
     // Register blocks
     public static final RegistryObject<Block> BASIC_MINER = BLOCKS.register("basic_miner",
@@ -58,6 +61,9 @@ public class Registration {
             () -> IForgeMenuType.create(AdvancedMinerMenu::new));
     public static final RegistryObject<MenuType<com.valence.valence.block.GrinderMenu>> GRINDER_MENU = MENUS.register("grinder",
             () -> IForgeMenuType.create(com.valence.valence.block.GrinderMenu::new));
+
+    public static final RegistryObject<RecipeType<GrinderRecipe>> GRINDING_RECIPE_TYPE = RECIPE_TYPES.register("grinding", () -> GrinderRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<GrinderRecipe>> GRINDING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("grinding", () -> GrinderRecipe.Serializer.INSTANCE);
 
     // Register block items
     public static final RegistryObject<Item> BASIC_MINER_ITEM = ITEMS.register("basic_miner",

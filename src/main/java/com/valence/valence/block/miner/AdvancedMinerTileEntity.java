@@ -17,6 +17,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.resources.ResourceLocation;
 
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -113,16 +115,15 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     }
     
     private void updateFuelFromSlot() {
-        ItemStack fuelStack = itemHandler.getStackInSlot(0);
-        if (!fuelStack.isEmpty()) {
-            int burnTime = fuelStack.getItem().getBurnTime(fuelStack, net.minecraft.world.item.crafting.RecipeType.SMELTING);
-            if (burnTime > 0) {
-                fuel = fuelStack.getCount();
-            } else {
-                fuel = 0;
+        if (fuel <= 0) {
+            ItemStack fuelStack = itemHandler.getStackInSlot(0);
+            if (!fuelStack.isEmpty()) {
+                int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(fuelStack, net.minecraft.world.item.crafting.RecipeType.SMELTING);
+                if (burnTime > 0) {
+                    fuel = burnTime;
+                    itemHandler.extractItem(0, 1, false);
+                }
             }
-        } else {
-            fuel = 0;
         }
     }
     
@@ -176,14 +177,14 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     private boolean isOre(BlockState state) {
         net.minecraft.world.level.block.Block blk = state.getBlock();
-        return blk == Blocks.COAL_ORE || blk == Blocks.DEEPSLATE_COAL_ORE
-            || blk == Blocks.IRON_ORE || blk == Blocks.DEEPSLATE_IRON_ORE
-            || blk == Blocks.GOLD_ORE || blk == Blocks.DEEPSLATE_GOLD_ORE
-            || blk == Blocks.COPPER_ORE || blk == Blocks.DEEPSLATE_COPPER_ORE
-            || blk == Blocks.DIAMOND_ORE || blk == Blocks.DEEPSLATE_DIAMOND_ORE
-            || blk == Blocks.EMERALD_ORE || blk == Blocks.DEEPSLATE_EMERALD_ORE
-            || blk == Blocks.LAPIS_ORE || blk == Blocks.DEEPSLATE_LAPIS_ORE
-            || blk == Blocks.REDSTONE_ORE || blk == Blocks.DEEPSLATE_REDSTONE_ORE;
+        return blk.builtInRegistryHolder().is(BlockTags.IRON_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.GOLD_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.COPPER_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.REDSTONE_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.LAPIS_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.DIAMOND_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.EMERALD_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.COAL_ORES);
     }
     
     public boolean hasScanned() {
@@ -194,7 +195,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         if (level.isClientSide()) return;
 
         if (!pEntity.hasScanned() && pEntity.hasFuel()) {
-            pEntity.extractAllOreTypes((ServerLevel) level);
+            pEntity.scanStep((ServerLevel) level);
             setChanged(level, pos, state);
         }
     }

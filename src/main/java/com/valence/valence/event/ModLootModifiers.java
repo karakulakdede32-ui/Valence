@@ -10,6 +10,9 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.tags.BlockTags;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -31,7 +34,18 @@ public class ModLootModifiers {
 
         @Override
         protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-            // Implementation would go here to restrict drops
+            BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
+            if (state != null && (state.builtInRegistryHolder().is(BlockTags.IRON_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.GOLD_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.COPPER_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.REDSTONE_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.LAPIS_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.DIAMOND_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.EMERALD_ORES) ||
+                                 state.builtInRegistryHolder().is(BlockTags.COAL_ORES))) {
+                generatedLoot.clear();
+                generatedLoot.add(new ItemStack(state.getBlock()));
+            }
             return generatedLoot;
         }
 

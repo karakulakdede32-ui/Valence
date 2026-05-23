@@ -21,6 +21,9 @@ public class ValenceMod {
         Registration.BLOCK_ENTITIES.register(bus);
         Registration.MENUS.register(bus);
         Registration.CREATIVE_MODE_TABS.register(bus);
+        Registration.RECIPE_TYPES.register(bus);
+        Registration.RECIPE_SERIALIZERS.register(bus);
+        com.valence.valence.event.ModLootModifiers.LOOT_MODIFIER_SERIALIZERS.register(bus);
         
         bus.addListener(this::commonSetup);
         bus.addListener(this::clientSetup);

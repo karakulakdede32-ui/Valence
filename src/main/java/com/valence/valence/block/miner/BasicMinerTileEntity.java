@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,6 +32,9 @@ import net.minecraftforge.items.ItemStackHandler;
 public class BasicMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
     private final List<ItemStack> scannedOres = new ArrayList<>();
     private boolean hasScanned = false;
+    private int currentX = 0;
+    private int currentZ = 0;
+    private final Map<net.minecraft.world.level.block.Block, Integer> oreCounts = new HashMap<>();
     
     // ItemStackHandler for mod compatibility (EnderIO, Create, Mekanism, etc.)
     private final ItemStackHandler itemHandler = new ItemStackHandler(4) {
@@ -108,60 +113,59 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         return new BasicMinerMenu(id, inv, this);
     }
 
-    public void scanChunk(ServerLevel lvl) {
+    public void scanStep(ServerLevel lvl) {
         if (lvl == null) return;
         BlockPos p = this.getBlockPos();
         if (p == null) return;
-        
-        scannedOres.clear();
-        
-        int chunkX = (p.getX() >> 4) << 4;
-        int chunkZ = (p.getZ() >> 4) << 4;
-        
-        // Count ore types
-        Map<net.minecraft.world.level.block.Block, Integer> oreCounts = new HashMap<>();
-        
-        // Scan chunk area
-        for (int x = chunkX; x < chunkX + 16; x++) {
-            for (int z = chunkZ; z < chunkZ + 16; z++) {
-                for (int y = -64; y < 320; y++) {
-                    BlockPos checkPos = new BlockPos(x, y, z);
-                    BlockState bs = lvl.getBlockState(checkPos);
-                    if (isOre(bs)) {
-                        oreCounts.merge(bs.getBlock(), 1, Integer::sum);
-                    }
-                }
+
+        int chunkStartX = (p.getX() >> 4) << 4;
+        int chunkStartZ = (p.getZ() >> 4) << 4;
+
+        // Scan one vertical column (384 blocks) per tick
+        for (int y = -64; y < 320; y++) {
+            BlockPos checkPos = new BlockPos(chunkStartX + currentX, y, chunkStartZ + currentZ);
+            BlockState bs = lvl.getBlockState(checkPos);
+            if (isOre(bs)) {
+                oreCounts.merge(bs.getBlock(), 1, Integer::sum);
             }
         }
-        
-        // Sort by count (descending)
+
+        currentX++;
+        if (currentX >= 16) {
+            currentX = 0;
+            currentZ++;
+        }
+
+        if (currentZ >= 16) {
+            finalizeScan();
+        }
+    }
+
+    private void finalizeScan() {
+        scannedOres.clear();
         List<Map.Entry<net.minecraft.world.level.block.Block, Integer>> sorted = new ArrayList<>(oreCounts.entrySet());
         sorted.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
-        
-        // Take top 4 unique ores
+
         int count = 0;
-        Set<net.minecraft.world.level.block.Block> seen = new HashSet<>();
         for (Map.Entry<net.minecraft.world.level.block.Block, Integer> entry : sorted) {
-            net.minecraft.world.level.block.Block blk = entry.getKey();
-            if (count >= 4 || seen.contains(blk)) continue;
-            seen.add(blk);
-            scannedOres.add(new ItemStack(blk, entry.getValue()));
+            if (count >= 4) break;
+            scannedOres.add(new ItemStack(entry.getKey(), entry.getValue()));
             count++;
         }
-        
         hasScanned = true;
+        setChanged();
     }
     
     private boolean isOre(BlockState state) {
         net.minecraft.world.level.block.Block blk = state.getBlock();
-        return blk == Blocks.COAL_ORE || blk == Blocks.DEEPSLATE_COAL_ORE
-            || blk == Blocks.IRON_ORE || blk == Blocks.DEEPSLATE_IRON_ORE
-            || blk == Blocks.GOLD_ORE || blk == Blocks.DEEPSLATE_GOLD_ORE
-            || blk == Blocks.COPPER_ORE || blk == Blocks.DEEPSLATE_COPPER_ORE
-            || blk == Blocks.DIAMOND_ORE || blk == Blocks.DEEPSLATE_DIAMOND_ORE
-            || blk == Blocks.EMERALD_ORE || blk == Blocks.DEEPSLATE_EMERALD_ORE
-            || blk == Blocks.LAPIS_ORE || blk == Blocks.DEEPSLATE_LAPIS_ORE
-            || blk == Blocks.REDSTONE_ORE || blk == Blocks.DEEPSLATE_REDSTONE_ORE;
+        return blk.builtInRegistryHolder().is(BlockTags.IRON_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.GOLD_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.COPPER_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.REDSTONE_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.LAPIS_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.DIAMOND_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.EMERALD_ORES) ||
+               blk.builtInRegistryHolder().is(BlockTags.COAL_ORES);
     }
 
     public List<ItemStack> getScannedOres() {
@@ -180,7 +184,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         if (level.isClientSide()) return;
         
         if (!pEntity.hasScanned()) {
-            pEntity.scanChunk((ServerLevel) level);
+            pEntity.scanStep((ServerLevel) level);
             setChanged(level, pos, state);
         }
     }

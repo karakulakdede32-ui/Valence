@@ -23,13 +23,23 @@ public class GrinderScreen extends AbstractContainerScreen<GrinderMenu> {
     protected void init() {
         super.init();
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
+        this.titleLabelY = 6;
+        this.inventoryLabelX = 8;
+        this.inventoryLabelY = imageHeight - 96;
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        renderBackground(guiGraphics);
+        this.renderBg(guiGraphics, delta, mouseX, mouseY);
         super.render(guiGraphics, mouseX, mouseY, delta);
-        renderTooltip(guiGraphics, mouseX, mouseY);
+        this.renderLabels(guiGraphics, mouseX, mouseY);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        guiGraphics.drawString(this.font, this.title, (float)this.titleLabelX, (float)this.titleLabelY, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle, (float)this.inventoryLabelX, (float)this.inventoryLabelY, 4210752, false);
     }
 
     @Override
