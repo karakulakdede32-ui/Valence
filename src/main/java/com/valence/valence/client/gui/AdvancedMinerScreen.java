@@ -17,7 +17,6 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
         super(menu, inventory, title);
         this.imageWidth = 176;
         this.imageHeight = 184;
-        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
@@ -26,6 +25,7 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
         this.titleLabelY = 6;
         this.inventoryLabelX = 8;
+        this.inventoryLabelY = 92; // Matches player inventory start y=106 minus padding
     }
 
     @Override

@@ -25,7 +25,7 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
         this.titleLabelY = 6;
         this.inventoryLabelX = 8;
-        this.inventoryLabelY = imageHeight - 96;
+        this.inventoryLabelY = 68; // Matches player inventory start y=84 minus padding
     }
 
     @Override

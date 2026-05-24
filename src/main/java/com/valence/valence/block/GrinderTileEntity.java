@@ -10,12 +10,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import com.valence.valence.recipe.GrinderRecipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.SimpleContainer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -33,18 +31,14 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider {
 
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            return switch (slot) {
-                case 0 -> true; // Input
-                case 1 -> false; // Output
-                default -> super.isItemValid(slot, stack);
-            };
+            return slot == 0; // Only input slot accepts items
         }
     };
 
     private final LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.of(() -> itemHandler);
 
     private int progress = 0;
-    private int maxProgress = 0; // Will be set by recipe
+    private int maxProgress = 0;
 
     public GrinderTileEntity(BlockPos pos, BlockState state) {
         super(Registration.GRINDER_TE.get(), pos, state);
@@ -88,24 +82,20 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider {
             return;
         }
 
-            if (pEntity.hasRecipe()) {
-                level.getRecipeManager().getRecipeFor(GrinderRecipe.Type.INSTANCE, pEntity, level).ifPresent(recipe -> {
-                    pEntity.maxProgress = recipe.getProcessingTime();
-                    pEntity.progress++;
-                    setChanged(level, pos, state);
-
-                    if (pEntity.progress >= pEntity.maxProgress) {
-                        pEntity.craftItem();
-                    }
-                });
-            } else {
-                pEntity.resetProgress();
+        if (pEntity.hasRecipe()) {
+            level.getRecipeManager().getRecipeFor(GrinderRecipe.Type.INSTANCE, pEntity, level).ifPresent(recipe -> {
+                pEntity.maxProgress = recipe.getProcessingTime();
+                pEntity.progress++;
                 setChanged(level, pos, state);
-            }
-    }
 
-    private void resetProgress() {
-        this.progress = 0;
+                if (pEntity.progress >= pEntity.maxProgress) {
+                    pEntity.craftItem();
+                }
+            });
+        } else {
+            pEntity.progress = 0;
+            setChanged(level, pos, state);
+        }
     }
 
     private void craftItem() {
@@ -121,19 +111,12 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider {
         resetProgress();
     }
 
+    private void resetProgress() {
+        this.progress = 0;
+    }
+
     private boolean hasRecipe() {
         return level.getRecipeManager().getRecipeFor(GrinderRecipe.Type.INSTANCE, this, level).isPresent();
-    }
-
-
-
-    private boolean canInsertItemIntoOutputSlot(net.minecraft.world.item.Item item) {
-        return itemHandler.getStackInSlot(1).isEmpty() || itemHandler.getStackInSlot(1).is(item);
-    }
-
-    private boolean canInsertAmountIntoOutputSlot(int count) {
-        return itemHandler.getStackInSlot(1).getMaxStackSize() >=
-                itemHandler.getStackInSlot(1).getCount() + count;
     }
 
     public ItemStackHandler getItemHandler() {

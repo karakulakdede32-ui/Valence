@@ -22,6 +22,7 @@ public class GrinderMenu extends AbstractContainerMenu {
         this.tileEntity = (GrinderTileEntity) entity;
 
         if (tileEntity != null) {
+            // Machine slots: input at (44, 35), output at (116, 35)
             this.addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 0, 44, 35)); // Input
             this.addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 1, 116, 35) {
                 @Override
@@ -31,7 +32,17 @@ public class GrinderMenu extends AbstractContainerMenu {
             }); // Output
         }
 
-        layoutPlayerInventorySlots(inv, 8, 84);
+        // Player inventory: starts at y=84
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                this.addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+            }
+        }
+
+        // Hotbar: y=142
+        for (int i = 0; i < 9; i++) {
+            this.addSlot(new Slot(inv, i, 8 + i * 18, 142));
+        }
     }
 
     @Override
@@ -42,10 +53,12 @@ public class GrinderMenu extends AbstractContainerMenu {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
             if (index < 2) {
+                // From machine to player inventory
                 if (!this.moveItemStackTo(itemstack1, 2, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
             } else if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
+                // From player inventory to input slot only
                 return ItemStack.EMPTY;
             }
 
@@ -60,28 +73,9 @@ public class GrinderMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return tileEntity != null && player.distanceToSqr((double)tileEntity.getBlockPos().getX() + 0.5D, (double)tileEntity.getBlockPos().getY() + 0.5D, (double)tileEntity.getBlockPos().getZ() + 0.5D) <= 64.0D;
-    }
-
-    private int addSlotRange(Inventory playerInventory, int index, int x, int y, int amount, int dx) {
-        for (int i = 0; i < amount; i++) {
-            addSlot(new Slot(playerInventory, index, x, y));
-            x += dx;
-            index++;
-        }
-        return index;
-    }
-
-    private int addSlotBox(Inventory playerInventory, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
-        for (int j = 0; j < verAmount; j++) {
-            index = addSlotRange(playerInventory, index, x, y, horAmount, dx);
-            y += dy;
-        }
-        return index;
-    }
-
-    private void layoutPlayerInventorySlots(Inventory playerInventory, int x, int y) {
-        addSlotBox(playerInventory, 9, x, y, 9, 18, 3, 18);
-        addSlotRange(playerInventory, 0, x, y + 58, 9, 18);
+        return tileEntity != null && player.distanceToSqr(
+            (double) tileEntity.getBlockPos().getX() + 0.5D,
+            (double) tileEntity.getBlockPos().getY() + 0.5D,
+            (double) tileEntity.getBlockPos().getZ() + 0.5D) <= 64.0D;
     }
 }
