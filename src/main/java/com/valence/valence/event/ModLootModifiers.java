@@ -35,14 +35,14 @@ public class ModLootModifiers {
         @Override
         protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
             BlockState state = context.getParamOrNull(LootContextParams.BLOCK_STATE);
-            if (state != null && (state.builtInRegistryHolder().is(BlockTags.IRON_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.GOLD_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.COPPER_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.REDSTONE_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.LAPIS_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.DIAMOND_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.EMERALD_ORES) ||
-                                 state.builtInRegistryHolder().is(BlockTags.COAL_ORES))) {
+            if (state != null && (state.getBlock().builtInRegistryHolder().is(BlockTags.IRON_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.GOLD_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.COPPER_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.REDSTONE_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.LAPIS_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.DIAMOND_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.EMERALD_ORES) ||
+                                 state.getBlock().builtInRegistryHolder().is(BlockTags.COAL_ORES))) {
                 generatedLoot.clear();
                 generatedLoot.add(new ItemStack(state.getBlock()));
             }

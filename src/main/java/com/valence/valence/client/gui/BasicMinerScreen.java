@@ -25,7 +25,7 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
         this.titleLabelY = 6;
         this.inventoryLabelX = 8;
-        this.inventoryLabelY = imageHeight - 96;
+        this.inventoryLabelY = 68; // Matches player inventory start y=84 minus padding
     }
 
     @Override
@@ -38,8 +38,8 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
 
     @Override
     protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(this.font, this.title, (float)this.titleLabelX, (float)this.titleLabelY, 4210752, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, (float)this.inventoryLabelX, (float)this.inventoryLabelY, 4210752, false);
+        guiGraphics.drawString(this.font, this.title.getString(), this.titleLabelX, this.titleLabelY, 4210752, false);
+        guiGraphics.drawString(this.font, this.playerInventoryTitle.getString(), this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
     }
 
     @Override

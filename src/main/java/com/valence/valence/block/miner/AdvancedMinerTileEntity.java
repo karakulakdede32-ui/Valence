@@ -191,6 +191,11 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         return hasScanned;
     }
 
+    public void scanStep(ServerLevel lvl) {
+        if (lvl == null) return;
+        extractAllOreTypes(lvl);
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState state, AdvancedMinerTileEntity pEntity) {
         if (level.isClientSide()) return;
 
