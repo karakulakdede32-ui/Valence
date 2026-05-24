@@ -3,12 +3,15 @@ package com.valence.valence.block;
 import com.valence.valence.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.RecipeHolder;
 import net.minecraft.world.item.ItemStack;
 import com.valence.valence.recipe.GrinderRecipe;
 import net.minecraft.world.level.Level;
@@ -22,7 +25,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GrinderTileEntity extends BlockEntity implements MenuProvider {
+public class GrinderTileEntity extends BlockEntity implements MenuProvider, Container, RecipeHolder {
     private final ItemStackHandler itemHandler = new ItemStackHandler(2) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -39,6 +42,7 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider {
 
     private int progress = 0;
     private int maxProgress = 0;
+    private ItemStack lastRecipeResult = ItemStack.EMPTY;
 
     public GrinderTileEntity(BlockPos pos, BlockState state) {
         super(Registration.GRINDER_TE.get(), pos, state);
@@ -104,8 +108,12 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider {
             ItemStack result = recipe.assemble(this, level.registryAccess());
 
             itemHandler.extractItem(0, 1, false);
-            itemHandler.setStackInSlot(1, new ItemStack(result.getItem(),
-                    itemHandler.getStackInSlot(1).getCount() + result.getCount()));
+            ItemStack existingOutput = itemHandler.getStackInSlot(1);
+            if (existingOutput.isEmpty()) {
+                itemHandler.setStackInSlot(1, result.copy());
+            } else {
+                existingOutput.grow(result.getCount());
+            }
         });
 
         resetProgress();
@@ -121,5 +129,65 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider {
 
     public ItemStackHandler getItemHandler() {
         return itemHandler;
+    }
+
+    // Container implementation
+    @Override
+    public int getContainerSize() {
+        return 2;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return itemHandler.getStackInSlot(0).isEmpty() && itemHandler.getStackInSlot(1).isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        return itemHandler.getStackInSlot(slot);
+    }
+
+    @Override
+    public ItemStack removeItem(int slot, int count) {
+        return itemHandler.extractItem(slot, count, false);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        ItemStack stack = itemHandler.getStackInSlot(slot);
+        itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
+        return stack;
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack stack) {
+        itemHandler.setStackInSlot(slot, stack);
+    }
+
+    @Override
+    public void clearContent() {
+        for (int i = 0; i < getContainerSize(); i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return player.distanceToSqr(
+            (double) getBlockPos().getX() + 0.5D,
+            (double) getBlockPos().getY() + 0.5D,
+            (double) getBlockPos().getZ() + 0.5D) <= 64.0D;
+    }
+
+    @Override
+    public void setRecipeUsed(@Nullable net.minecraft.world.item.crafting.Recipe<?> recipe) {
+        if (recipe != null) {
+            lastRecipeResult = recipe.getResultItem(level.registryAccess());
+        }
+    }
+
+    @Override
+    public net.minecraft.world.item.crafting.Recipe<?> getRecipeUsed() {
+        return null;
     }
 }

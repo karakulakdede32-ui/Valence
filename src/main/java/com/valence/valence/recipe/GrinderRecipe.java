@@ -3,9 +3,11 @@ package com.valence.valence.recipe;
 import com.google.gson.JsonObject;
 import com.valence.valence.ValenceMod;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
@@ -14,7 +16,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public class GrinderRecipe implements Recipe<SimpleContainer> {
+public class GrinderRecipe implements Recipe<Container> {
     private final ResourceLocation id;
     private final Ingredient input;
     private final ItemStack output;
@@ -28,7 +30,7 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(SimpleContainer pContainer, Level pLevel) {
+    public boolean matches(Container pContainer, Level pLevel) {
         if (pLevel.isClientSide()) {
             return false;
         }
@@ -36,7 +38,7 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer pContainer, RegistryAccess pRegistryAccess) {
+    public ItemStack assemble(Container pContainer, RegistryAccess pRegistryAccess) {
         return output.copy();
     }
 
@@ -85,13 +87,16 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
 
     public static class Serializer implements RecipeSerializer<GrinderRecipe> {
         public static final Serializer INSTANCE = new Serializer();
-        public static final ResourceLocation ID = new ResourceLocation(ValenceMod.MODID, "grinding");
 
         @Override
         public GrinderRecipe fromJson(ResourceLocation pRecipeId, JsonObject pJson) {
             Ingredient input = Ingredient.fromJson(pJson.get("ingredients"));
-            ItemStack output = ItemStack.fromJson(pJson.getAsJsonObject("output"));
-            int processingTime = pJson.has("processingtime") ? pJson.get("processingtime").getAsInt() : 200; // Default to 200 ticks
+            
+            // Parse output from JSON using Forge's ShapedRecipe.itemFromJson (returns Item)
+            Item outputItem = net.minecraft.world.item.crafting.ShapedRecipe.itemFromJson(pJson.getAsJsonObject("output"));
+            ItemStack output = new ItemStack(outputItem);
+            
+            int processingTime = pJson.has("processingtime") ? pJson.get("processingtime").getAsInt() : 200;
 
             return new GrinderRecipe(pRecipeId, input, output, processingTime);
         }
