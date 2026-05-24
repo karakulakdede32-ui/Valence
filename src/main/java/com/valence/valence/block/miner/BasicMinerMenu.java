@@ -19,6 +19,8 @@ public class BasicMinerMenu extends AbstractContainerMenu {
     // Slot indices
     private static final int MINER_SLOTS_COUNT = 4;
     private static final int PLAYER_INVENTORY_START = 4;
+    private static final int PLAYER_INVENTORY_END = 31;
+    private static final int HOTBAR_START = 31;
     private static final int HOTBAR_END = 40;
 
     public BasicMinerMenu(int id, Inventory playerInv, BasicMinerTileEntity te) {
@@ -26,44 +28,24 @@ public class BasicMinerMenu extends AbstractContainerMenu {
         this.tileEntity = te;
         
         if (te != null) {
-            // Miner output slots
-            for (int i = 0; i < 4; i++) {
-                this.addSlot(new SlotItemHandler(te.getItemHandler(), i, 35 + i * 27, 17));
-            }
+            // Arrange output slots in a 2x2 grid at the top of the GUI
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 62, 17));
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 1, 80, 17));
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 2, 62, 35));
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 3, 80, 35));
         }
         
-        // Player inventory
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 9; j++) {
-                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 76 + i * 18));
-            }
-        }
-        
+        // Player inventory (standard vanilla layout)
+        for (int row = 0; row < 3; row++)
+            for (int col = 0; col < 9; col++)
+                this.addSlot(new Slot(playerInv, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
         // Hotbar
-        for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 134));
-        }
+        for (int i = 0; i < 9; i++)
+            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
     }
 
     public BasicMinerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
-        this(id, inv, getTileEntityFromBuf(buf));
-    }
-
-    private static BasicMinerTileEntity getTileEntityFromBuf(FriendlyByteBuf buf) {
-        BlockPos pos = buf.readBlockPos();
-        Level level = getClientLevel();
-        if (level != null && level.getBlockEntity(pos) instanceof BasicMinerTileEntity te) return te;
-        return null;
-    }
-
-    private static Level getClientLevel() {
-        try {
-            Class<?> clazz = Class.forName("net.minecraft.client.Minecraft");
-            Object minecraft = clazz.getMethod("getInstance").invoke(null);
-            return (Level) clazz.getField("level").get(minecraft);
-        } catch (Exception e) {
-            return null;
-        }
+        this(id, inv, inv.player.level().getBlockEntity(buf.readBlockPos()) instanceof BasicMinerTileEntity te ? te : null);
     }
 
     @Override
@@ -79,17 +61,17 @@ public class BasicMinerMenu extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            
+
             if (index < MINER_SLOTS_COUNT) {
                 // From miner to player inventory
-                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
+                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END + 1, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // Basic Miner has only output slots, so we don't allow moving items into it
+                // Prevent moving items into miner output slots
                 return ItemStack.EMPTY;
             }
-            
+
             if (itemstack1.isEmpty()) {
                 slot.set(ItemStack.EMPTY);
             } else {
