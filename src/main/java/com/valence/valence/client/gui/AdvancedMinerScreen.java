@@ -55,7 +55,7 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
         // Main machine panel
         drawMachinePanel(guiGraphics, x, y, imageWidth, imageHeight);
 
-        // Fuel slot at top center
+        // Fuel slot at top center (menu pos: 80, 8 → draw at 79, 7)
         drawSlot(guiGraphics, x + 79, y + 7);
 
         // Fuel bar
@@ -68,15 +68,24 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
             drawFuelBar(guiGraphics, x + 103, y + 8, barHeight, filled);
         }
 
-        // Output slots: 2x4 grid
+        // Output slots: 2x4 grid (menu pos: 26 + j*27, 44 + i*27 → draw at 25 + j*27, 43 + i*27)
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 4; j++) {
                 drawSlot(guiGraphics, x + 25 + j * 27, y + 43 + i * 27);
             }
         }
 
-        // Player inventory
-        drawPlayerInventory(guiGraphics, x + 7, y + 101);
+        // Player inventory (menu: main at 106, hotbar at 160)
+        // Draw main inventory rows (menu: y=106,124,142 → draw at 105,123,141)
+        for (int row = 0; row < 3; row++) {
+            for (int col = 0; col < 9; col++) {
+                drawSlot(guiGraphics, x + 7 + col * 18, y + 105 + row * 18);
+            }
+        }
+        // Draw hotbar (menu: y=160 → draw at 159)
+        for (int col = 0; col < 9; col++) {
+            drawSlot(guiGraphics, x + 7 + col * 18, y + 159);
+        }
     }
 
     private static void drawMachinePanel(GuiGraphics guiGraphics, int x, int y, int width, int height) {
@@ -102,17 +111,6 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
         // Fill (from bottom to top)
         if (filled > 0) {
             guiGraphics.fill(x + 1, y + height - filled, x + 5, y + height - 1, FUEL_BAR_FILL);
-        }
-    }
-
-    private static void drawPlayerInventory(GuiGraphics guiGraphics, int x, int y) {
-        for (int row = 0; row < 3; row++) {
-            for (int column = 0; column < 9; column++) {
-                drawSlot(guiGraphics, x + column * 18, y + row * 18);
-            }
-        }
-        for (int column = 0; column < 9; column++) {
-            drawSlot(guiGraphics, x + column * 18, y + 58);
         }
     }
 }
