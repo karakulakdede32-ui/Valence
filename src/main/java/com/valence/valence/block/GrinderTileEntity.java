@@ -168,9 +168,8 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
             } else {
                 itemHandler.setStackInSlot(1, new ItemStack(result.getItem(), output.getCount() + result.getCount()));
             }
+            resetProgress();
         });
-
-        resetProgress();
     }
 
     private boolean hasRecipe() {
@@ -191,8 +190,11 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
     }
 
     private boolean canInsertAmountIntoOutputSlot(int count) {
-        return itemHandler.getStackInSlot(1).getMaxStackSize() >=
-                itemHandler.getStackInSlot(1).getCount() + count;
+        ItemStack outputStack = itemHandler.getStackInSlot(1);
+        if (outputStack.isEmpty()) {
+            return true;
+        }
+        return outputStack.getMaxStackSize() >= outputStack.getCount() + count;
     }
 
     public ItemStackHandler getItemHandler() {

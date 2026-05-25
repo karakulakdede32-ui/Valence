@@ -1,0 +1,11 @@
+{
+  "type": "valence:grinding",
+  "ingredients": [
+    {"item": "minecraft:raw_gold"}
+  ],
+  "output": {
+    "item": "valence:gold_powder",
+    "count": 1
+  },
+  "processingtime": 200
+}

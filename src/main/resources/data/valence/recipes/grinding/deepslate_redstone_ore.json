@@ -1,0 +1,11 @@
+{
+  "type": "valence:grinding",
+  "ingredients": [
+    {"item": "minecraft:deepslate_redstone_ore"}
+  ],
+  "output": {
+    "item": "valence:redstone_powder",
+    "count": 4
+  },
+  "processingtime": 200
+}

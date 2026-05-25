@@ -1,0 +1,11 @@
+{
+  "type": "valence:grinding",
+  "ingredients": [
+    {"item": "minecraft:iron_ore"}
+  ],
+  "output": {
+    "item": "valence:iron_powder",
+    "count": 2
+  },
+  "processingtime": 200
+}
