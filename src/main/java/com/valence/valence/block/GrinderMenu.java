@@ -63,6 +63,10 @@ public class GrinderMenu extends AbstractContainerMenu {
         return tileEntity != null && player.distanceToSqr((double)tileEntity.getBlockPos().getX() + 0.5D, (double)tileEntity.getBlockPos().getY() + 0.5D, (double)tileEntity.getBlockPos().getZ() + 0.5D) <= 64.0D;
     }
 
+    public GrinderTileEntity getTileEntity() {
+        return tileEntity;
+    }
+
     private int addSlotRange(Inventory playerInventory, int index, int x, int y, int amount, int dx) {
         for (int i = 0; i < amount; i++) {
             addSlot(new Slot(playerInventory, index, x, y));

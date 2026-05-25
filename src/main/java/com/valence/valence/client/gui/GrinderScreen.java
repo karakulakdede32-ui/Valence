@@ -1,16 +1,22 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.GrinderMenu;
+import com.valence.valence.block.GrinderTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public class GrinderScreen extends AbstractContainerScreen<GrinderMenu> {
-    private static final int PANEL = 0xFFB8B8B8;
-    private static final int PANEL_DARK = 0xFF555555;
-    private static final int PANEL_LIGHT = 0xFFFFFFFF;
-    private static final int SLOT = 0xFF8B8B8B;
+    // Colors
+    private static final int PANEL_DARK = 0xFF373737;
+    private static final int PANEL_MID = 0xFF8B8B8B;
+    private static final int PANEL_LIGHT = 0xFFC6C6C6;
+    private static final int SLOT_BG = 0xFF6B6B6B;
+    private static final int SLOT_BORDER_DARK = 0xFF555555;
+    private static final int SLOT_BORDER_LIGHT = 0xFFD0D0D0;
+    private static final int ARROW_BG = 0xFF555555;
+    private static final int ARROW_FILL = 0xFFFFFFFF;
 
     public GrinderScreen(GrinderMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -45,17 +51,57 @@ public class GrinderScreen extends AbstractContainerScreen<GrinderMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        drawPanel(guiGraphics, x, y, imageWidth, imageHeight);
+
+        drawMachinePanel(guiGraphics, x, y, imageWidth, imageHeight);
+
+        // Input slot (left)
         drawSlot(guiGraphics, x + 43, y + 34);
-        drawArrow(guiGraphics, x + 76, y + 38);
+
+        // Progress arrow
+        GrinderTileEntity te = menu.getTileEntity();
+        int progress = 0;
+        int maxProgress = 1;
+        if (te != null) {
+            progress = te.getProgress();
+            maxProgress = te.getMaxProgress();
+        }
+        drawProgressArrow(guiGraphics, x + 72, y + 37, progress, maxProgress);
+
+        // Output slot (right)
         drawSlot(guiGraphics, x + 115, y + 34);
+
+        // Player inventory
         drawPlayerInventory(guiGraphics, x + 7, y + 83);
     }
 
-    private static void drawPanel(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+    private static void drawMachinePanel(GuiGraphics guiGraphics, int x, int y, int width, int height) {
         guiGraphics.fill(x, y, x + width, y + height, PANEL_DARK);
-        guiGraphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, PANEL_LIGHT);
-        guiGraphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, PANEL);
+        guiGraphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, PANEL_MID);
+        guiGraphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, PANEL_LIGHT);
+    }
+
+    private static void drawSlot(GuiGraphics guiGraphics, int x, int y) {
+        guiGraphics.fill(x, y, x + 18, y + 18, SLOT_BORDER_DARK);
+        guiGraphics.fill(x + 1, y + 1, x + 17, y + 17, SLOT_BORDER_LIGHT);
+        guiGraphics.fill(x + 2, y + 2, x + 16, y + 16, SLOT_BG);
+    }
+
+    private static void drawProgressArrow(GuiGraphics guiGraphics, int x, int y, int progress, int maxProgress) {
+        int arrowWidth = 22;
+        int arrowHeight = 15;
+
+        // Arrow background
+        guiGraphics.fill(x, y, x + arrowWidth, y + arrowHeight, ARROW_BG);
+
+        // Arrow fill (from left to right)
+        int filled = maxProgress > 0 ? (progress * (arrowWidth - 2)) / maxProgress : 0;
+        if (filled > 0) {
+            guiGraphics.fill(x + 1, y + 1, x + 1 + filled, y + arrowHeight - 1, ARROW_FILL);
+        }
+
+        // Arrow head
+        guiGraphics.fill(x + arrowWidth, y + 3, x + arrowWidth + 4, y + arrowHeight - 3, ARROW_BG);
+        guiGraphics.fill(x + arrowWidth + 4, y + 5, x + arrowWidth + 6, y + arrowHeight - 5, ARROW_BG);
     }
 
     private static void drawPlayerInventory(GuiGraphics guiGraphics, int x, int y) {
@@ -67,17 +113,5 @@ public class GrinderScreen extends AbstractContainerScreen<GrinderMenu> {
         for (int column = 0; column < 9; column++) {
             drawSlot(guiGraphics, x + column * 18, y + 58);
         }
-    }
-
-    private static void drawArrow(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.fill(x, y + 5, x + 24, y + 9, PANEL_DARK);
-        guiGraphics.fill(x + 20, y + 1, x + 24, y + 13, PANEL_DARK);
-        guiGraphics.fill(x + 24, y + 3, x + 28, y + 11, PANEL_DARK);
-    }
-
-    private static void drawSlot(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.fill(x, y, x + 18, y + 18, PANEL_DARK);
-        guiGraphics.fill(x + 1, y + 1, x + 17, y + 17, PANEL_LIGHT);
-        guiGraphics.fill(x + 2, y + 2, x + 16, y + 16, SLOT);
     }
 }

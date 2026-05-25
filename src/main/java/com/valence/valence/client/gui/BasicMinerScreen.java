@@ -1,21 +1,31 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.miner.BasicMinerMenu;
+import com.valence.valence.block.miner.BasicMinerTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
-    private static final int PANEL = 0xFFB8B8B8;
-    private static final int PANEL_DARK = 0xFF555555;
-    private static final int PANEL_LIGHT = 0xFFFFFFFF;
-    private static final int SLOT = 0xFF8B8B8B;
+    private static final ResourceLocation BG = new ResourceLocation("valence", "textures/gui/basic_miner.png");
+
+    // Machine panel colors
+    private static final int PANEL_DARK = 0xFF373737;
+    private static final int PANEL_MID = 0xFF8B8B8B;
+    private static final int PANEL_LIGHT = 0xFFC6C6C6;
+    private static final int SLOT_BG = 0xFF6B6B6B;
+    private static final int SLOT_BORDER_DARK = 0xFF555555;
+    private static final int SLOT_BORDER_LIGHT = 0xFFD0D0D0;
+    private static final int FUEL_BAR_BG = 0xFF555555;
+    private static final int FUEL_BAR_FILL = 0xFFFF6A00;
 
     public BasicMinerScreen(BasicMinerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 166;
+        this.imageHeight = 184;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
@@ -24,7 +34,6 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
         this.titleLabelX = (imageWidth - font.width(title)) / 2;
         this.titleLabelY = 6;
         this.inventoryLabelX = 8;
-        this.inventoryLabelY = imageHeight - 96;
     }
 
     @Override
@@ -45,33 +54,67 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        drawPanel(guiGraphics, x, y, imageWidth, imageHeight);
-        drawSlotGrid(guiGraphics, x + 61, y + 16, 2, 2);
-        drawPlayerInventory(guiGraphics, x + 7, y + 83);
+
+        // Main machine panel
+        drawMachinePanel(guiGraphics, x, y, imageWidth, imageHeight);
+
+        // Fuel slot at top center
+        drawSlot(guiGraphics, x + 79, y + 7);
+
+        // Fuel bar
+        BasicMinerTileEntity te = menu.getTileEntity();
+        if (te != null) {
+            int fuel = te.getFuel();
+            int maxFuel = 200;
+            int barHeight = 16;
+            int filled = maxFuel > 0 ? (fuel * barHeight) / maxFuel : 0;
+            drawFuelBar(guiGraphics, x + 103, y + 8, barHeight, filled);
+        }
+
+        // Output slots: 2x2 grid
+        drawSlot(guiGraphics, x + 61, y + 43);
+        drawSlot(guiGraphics, x + 79, y + 43);
+        drawSlot(guiGraphics, x + 61, y + 61);
+        drawSlot(guiGraphics, x + 79, y + 61);
+
+        // Player inventory
+        drawPlayerInventory(guiGraphics, x + 7, y + 101);
     }
 
-    private static void drawPanel(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+    private static void drawMachinePanel(GuiGraphics guiGraphics, int x, int y, int width, int height) {
+        // Outer dark border
         guiGraphics.fill(x, y, x + width, y + height, PANEL_DARK);
-        guiGraphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, PANEL_LIGHT);
-        guiGraphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, PANEL);
+        // Inner lighter border
+        guiGraphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, PANEL_MID);
+        // Background
+        guiGraphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, PANEL_LIGHT);
     }
 
-    private static void drawSlotGrid(GuiGraphics guiGraphics, int x, int y, int columns, int rows) {
-        for (int row = 0; row < rows; row++) {
-            for (int column = 0; column < columns; column++) {
-                drawSlot(guiGraphics, x + column * 18, y + row * 18);
-            }
+    private static void drawSlot(GuiGraphics guiGraphics, int x, int y) {
+        // Slot border
+        guiGraphics.fill(x, y, x + 18, y + 18, SLOT_BORDER_DARK);
+        guiGraphics.fill(x + 1, y + 1, x + 17, y + 17, SLOT_BORDER_LIGHT);
+        // Slot background
+        guiGraphics.fill(x + 2, y + 2, x + 16, y + 16, SLOT_BG);
+    }
+
+    private static void drawFuelBar(GuiGraphics guiGraphics, int x, int y, int height, int filled) {
+        // Background
+        guiGraphics.fill(x, y, x + 6, y + height, FUEL_BAR_BG);
+        // Fill (from bottom to top)
+        if (filled > 0) {
+            guiGraphics.fill(x + 1, y + height - filled, x + 5, y + height - 1, FUEL_BAR_FILL);
         }
     }
 
     private static void drawPlayerInventory(GuiGraphics guiGraphics, int x, int y) {
-        drawSlotGrid(guiGraphics, x, y, 9, 3);
-        drawSlotGrid(guiGraphics, x, y + 58, 9, 1);
-    }
-
-    private static void drawSlot(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.fill(x, y, x + 18, y + 18, PANEL_DARK);
-        guiGraphics.fill(x + 1, y + 1, x + 17, y + 17, PANEL_LIGHT);
-        guiGraphics.fill(x + 2, y + 2, x + 16, y + 16, SLOT);
+        for (int row = 0; row < 3; row++) {
+            for (int column = 0; column < 9; column++) {
+                drawSlot(guiGraphics, x + column * 18, y + row * 18);
+            }
+        }
+        for (int column = 0; column < 9; column++) {
+            drawSlot(guiGraphics, x + column * 18, y + 58);
+        }
     }
 }

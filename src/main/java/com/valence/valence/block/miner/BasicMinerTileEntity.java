@@ -27,6 +27,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
+import org.jetbrains.annotations.NotNull;
 
 public class BasicMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
     private final List<ItemStack> scannedOres = new ArrayList<>();
@@ -34,14 +35,24 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     private int currentX = 0;
     private int currentZ = 0;
     private final Map<Block, Integer> oreCounts = new HashMap<>();
+    private int fuel = 0;
 
-    private final ItemStackHandler itemHandler = new ItemStackHandler(4) {
+    // Slot 0 = Fuel, Slots 1-4 = Output
+    private final ItemStackHandler itemHandler = new ItemStackHandler(5) {
         @Override
         public void onContentsChanged(int slot) {
             setChanged();
             if (level != null && !level.isClientSide()) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            if (slot == 0) {
+                return stack.is(net.minecraft.world.item.Items.COAL) || stack.is(net.minecraft.world.item.Items.CHARCOAL);
+            }
+            return false;
         }
     };
 
@@ -66,6 +77,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         hasScanned = tag.getBoolean("hasScanned");
         currentX = tag.getInt("currentX");
         currentZ = tag.getInt("currentZ");
+        fuel = tag.getInt("fuel");
 
         scannedOres.clear();
         if (tag.contains("ScannedOres")) {
@@ -97,6 +109,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         tag.putBoolean("hasScanned", hasScanned);
         tag.putInt("currentX", currentX);
         tag.putInt("currentZ", currentZ);
+        tag.putInt("fuel", fuel);
 
         ListTag oreList = new ListTag();
         for (ItemStack ore : scannedOres) {
@@ -150,6 +163,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     public void scanStep(ServerLevel lvl) {
         if (lvl == null) return;
+        if (fuel <= 0) return;
         BlockPos p = this.getBlockPos();
         if (p == null) return;
 
@@ -172,6 +186,11 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
         if (currentZ >= 16) {
             finalizeScan();
+            fuel--;
+            setChanged();
+            if (fuel <= 0) {
+                tryConsumeFuel();
+            }
         }
     }
 
@@ -181,9 +200,16 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         sorted.sort((a, b) -> Integer.compare(b.getValue(), a.getValue()));
 
         int count = 0;
+        int slotIndex = 1;
         for (Map.Entry<Block, Integer> entry : sorted) {
             if (count >= 4) break;
             scannedOres.add(new ItemStack(entry.getKey(), entry.getValue()));
+
+            // Place into output slot if empty
+            if (slotIndex <= 4 && itemHandler.getStackInSlot(slotIndex).isEmpty()) {
+                itemHandler.setStackInSlot(slotIndex, new ItemStack(entry.getKey(), 1));
+            }
+            slotIndex++;
             count++;
         }
         hasScanned = true;
@@ -202,6 +228,21 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
                blk.builtInRegistryHolder().is(BlockTags.COAL_ORES);
     }
 
+    private void tryConsumeFuel() {
+        if (fuel > 0) return;
+        ItemStack fuelStack = itemHandler.getStackInSlot(0);
+        if (!fuelStack.isEmpty()) {
+            fuel = 200;
+            itemHandler.extractItem(0, 1, false);
+            currentX = 0;
+            currentZ = 0;
+            scannedOres.clear();
+            oreCounts.clear();
+            hasScanned = false;
+            setChanged();
+        }
+    }
+
     public List<ItemStack> getScannedOres() {
         return scannedOres;
     }
@@ -214,19 +255,29 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         return itemHandler;
     }
 
+    public int getFuel() {
+        return fuel;
+    }
+
     public static void tick(Level level, BlockPos pos, BlockState state, BasicMinerTileEntity pEntity) {
         if (level.isClientSide()) return;
 
+        if (pEntity.fuel <= 0) {
+            pEntity.tryConsumeFuel();
+        }
+
         if (!pEntity.hasScanned()) {
-            pEntity.scanStep((ServerLevel) level);
-            setChanged(level, pos, state);
+            if (pEntity.fuel > 0) {
+                pEntity.scanStep((ServerLevel) level);
+                setChanged(level, pos, state);
+            }
         }
     }
 
     // ========== Container implementation ==========
     @Override
     public boolean isEmpty() {
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
+        for (int i = 1; i < itemHandler.getSlots(); i++) {
             if (!itemHandler.getStackInSlot(i).isEmpty()) return false;
         }
         return true;
@@ -234,7 +285,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     @Override
     public int getContainerSize() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -275,16 +326,16 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     @Override
     public int[] getSlotsForFace(Direction side) {
-        return new int[]{0, 1, 2, 3};
+        return side == Direction.DOWN ? new int[]{1, 2, 3, 4} : new int[]{0};
     }
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return false;
+        return direction != Direction.DOWN && index == 0 && (stack.is(net.minecraft.world.item.Items.COAL) || stack.is(net.minecraft.world.item.Items.CHARCOAL));
     }
 
     @Override
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return true;
+        return direction == Direction.DOWN && index > 0;
     }
 }

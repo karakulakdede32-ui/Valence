@@ -99,4 +99,8 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
         }
         return itemstack;
     }
+
+    public AdvancedMinerTileEntity getTileEntity() {
+        return tileEntity;
+    }
 }

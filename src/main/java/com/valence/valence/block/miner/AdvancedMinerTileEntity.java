@@ -138,6 +138,8 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         return new AdvancedMinerMenu(id, inv, this);
     }
 
+    public int getMaxFuel() { return 1600; }
+
     public int getFuel() {
         return fuel;
     }

@@ -197,6 +197,9 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
         return outputStack.getMaxStackSize() >= outputStack.getCount() + count;
     }
 
+    public int getProgress() { return progress; }
+    public int getMaxProgress() { return maxProgress; }
+
     public ItemStackHandler getItemHandler() {
         return itemHandler;
     }
