@@ -21,16 +21,21 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.*;
 
 public class GrinderTileEntity extends BlockEntity implements MenuProvider, WorldlyContainer {
     private final ItemStackHandler itemHandler = new ItemStackHandler(2) {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+            }
         }
 
         @Override
@@ -43,7 +48,9 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
         }
     };
 
-    private final LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.of(() -> itemHandler);
+    // Sided wrappers for mod compatibility (Create funnels, EnderIO conduits, etc.)
+    private final Map<Direction, LazyOptional<IItemHandler>> sidedWrappers = new EnumMap<>(Direction.class);
+    private final LazyOptional<IItemHandler> unsidedWrapper = LazyOptional.of(() -> new InvWrapper(this));
 
     private int progress = 0;
     private int maxProgress = 0;
@@ -66,9 +73,23 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return lazyItemHandler.cast();
+            if (side == null) {
+                return unsidedWrapper.cast();
+            }
+            return sidedWrappers.computeIfAbsent(side, s ->
+                LazyOptional.of(() -> new SidedInvWrapper(this, s))).cast();
         }
         return super.getCapability(cap, side);
+    }
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        unsidedWrapper.invalidate();
+        for (LazyOptional<IItemHandler> lo : sidedWrappers.values()) {
+            lo.invalidate();
+        }
+        sidedWrappers.clear();
     }
 
     @Override
@@ -119,6 +140,10 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
         return level.getRecipeManager().getRecipeFor(GrinderRecipe.Type.INSTANCE, asRecipeContainer(), level);
     }
 
+    private SimpleContainer asRecipeContainer() {
+        return new SimpleContainer(itemHandler.getStackInSlot(0), itemHandler.getStackInSlot(1));
+    }
+
     private void craftItem() {
         if (level == null) {
             return;
@@ -159,10 +184,6 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
                     && canInsertItemIntoOutputSlot(result.getItem())
                     && canInsertAmountIntoOutputSlot(result.getCount());
         }).orElse(false);
-    }
-
-    private SimpleContainer asRecipeContainer() {
-        return new SimpleContainer(itemHandler.getStackInSlot(0), itemHandler.getStackInSlot(1));
     }
 
     private boolean canInsertItemIntoOutputSlot(net.minecraft.world.item.Item item) {

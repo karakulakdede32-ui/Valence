@@ -15,69 +15,55 @@ import com.valence.valence.Registration;
 
 public class AdvancedMinerMenu extends AbstractContainerMenu {
     private final AdvancedMinerTileEntity tileEntity;
-    
-    // Slot indices
-    private static final int FUEL_SLOT = 0;
-    private static final int OUTPUT_SLOTS_START = 1;
-    private static final int OUTPUT_SLOTS_COUNT = 8;
+
     private static final int PLAYER_INVENTORY_START = 9;
-    private static final int PLAYER_INVENTORY_END = 36;
-    private static final int HOTBAR_START = 36;
     private static final int HOTBAR_END = 45;
 
     public AdvancedMinerMenu(int id, Inventory playerInv, AdvancedMinerTileEntity te) {
         super(Registration.ADVANCED_MINER_MENU.get(), id);
         this.tileEntity = te;
-        
+
         if (te != null) {
             // Fuel slot
-            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 8, 35));
-            
-            // Output slots
-            for (int row = 0; row < 2; row++) {
-                for (int column = 0; column < 4; column++) {
-                    this.addSlot(new SlotItemHandler(te.getItemHandler(), 1 + column + row * 4, 53 + column * 18, 26 + row * 18));
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 80, 8));
+
+            // Output slots: 2x4 grid
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 4; j++) {
+                    this.addSlot(new SlotItemHandler(te.getItemHandler(), 1 + j + i * 4, 26 + j * 27, 44 + i * 27));
                 }
             }
         }
-        
+
         // Player inventory
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
-                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 106 + i * 18));
             }
         }
-        
+
         // Hotbar
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
+            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 160));
         }
     }
 
     public AdvancedMinerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
-        this(id, inv, getTileEntityFromBuf(buf));
+        this(id, inv, getTileEntity(inv, buf));
     }
 
-    private static AdvancedMinerTileEntity getTileEntityFromBuf(FriendlyByteBuf buf) {
+    private static AdvancedMinerTileEntity getTileEntity(Inventory inv, FriendlyByteBuf buf) {
         BlockPos pos = buf.readBlockPos();
-        Level level = getClientLevel();
-        if (level != null && level.getBlockEntity(pos) instanceof AdvancedMinerTileEntity te) return te;
-        return null;
-    }
-
-    private static Level getClientLevel() {
-        try {
-            Class<?> clazz = Class.forName("net.minecraft.client.Minecraft");
-            Object minecraft = clazz.getMethod("getInstance").invoke(null);
-            return (Level) clazz.getField("level").get(minecraft);
-        } catch (Exception e) {
-            return null;
+        Level level = inv.player.level();
+        if (level.getBlockEntity(pos) instanceof AdvancedMinerTileEntity te) {
+            return te;
         }
+        return null;
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate((level, pos) -> 
+        return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate((level, pos) ->
             player.distanceToSqr((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D) <= 64.0D, true);
     }
 
@@ -88,26 +74,23 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
         if (slot != null && slot.hasItem()) {
             ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            
+
             if (index < PLAYER_INVENTORY_START) {
                 // From miner to player inventory
-                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
+                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END + 1, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {
-                // From player to miner
-                if (tileEntity.getItemHandler().isItemValid(0, itemstack1)) {
-                    // Try fuel slot
+                // From player to miner — only allow fuel in slot 0
+                if (tileEntity != null && tileEntity.getItemHandler().isItemValid(0, itemstack1)) {
                     if (!this.moveItemStackTo(itemstack1, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else {
-                    // Output slots are usually output-only, but if we want to allow putting items back:
-                    // For now, let's just return EMPTY if it's not fuel to prevent putting junk in output slots
                     return ItemStack.EMPTY;
                 }
             }
-            
+
             if (itemstack1.isEmpty()) {
                 slot.set(ItemStack.EMPTY);
             } else {
