@@ -212,22 +212,20 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
                 .noneMatch(i -> !itemHandler.getStackInSlot(i).isEmpty());
     }
 
-    // WorldlyContainer implementation - all sides have access to all slots
+    // WorldlyContainer implementation
     @Override
     public int[] getSlotsForFace(Direction side) {
-        int[] result = new int[9];
-        for (int i = 0; i < 9; i++) result[i] = i;
-        return result;
+        return side == Direction.DOWN ? new int[]{1, 2, 3, 4, 5, 6, 7, 8} : new int[]{0};
     }
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return index == 0; // Only allow fuel in slot 0
+        return direction != Direction.DOWN && index == 0;
     }
 
     @Override
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return index > 0; // Can only take from output slots
+        return direction == Direction.DOWN && index > 0;
     }
 
     @Override

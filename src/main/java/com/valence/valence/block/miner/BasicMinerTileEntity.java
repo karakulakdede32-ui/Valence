@@ -243,11 +243,11 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return false; // Miners don't accept items from automation
+        return direction != Direction.DOWN;
     }
 
     @Override
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return true;
+        return direction == Direction.DOWN;
     }
 }

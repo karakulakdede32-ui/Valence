@@ -64,7 +64,7 @@ public class BasicMinerMenu extends AbstractContainerMenu {
 
             if (index < MINER_SLOTS_COUNT) {
                 // From miner to player inventory
-                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END + 1, true)) {
+                if (!this.moveItemStackTo(itemstack1, PLAYER_INVENTORY_START, HOTBAR_END, true)) {
                     return ItemStack.EMPTY;
                 }
             } else {

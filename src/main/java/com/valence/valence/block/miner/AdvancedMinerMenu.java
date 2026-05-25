@@ -31,12 +31,12 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
         
         if (te != null) {
             // Fuel slot
-            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 80, 8));
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 8, 35));
             
             // Output slots
-            for (int i = 0; i < 2; i++) {
-                for (int j = 0; j < 4; j++) {
-                    this.addSlot(new SlotItemHandler(te.getItemHandler(), 1 + j + i * 4, 26 + j * 27, 44 + i * 27));
+            for (int row = 0; row < 2; row++) {
+                for (int column = 0; column < 4; column++) {
+                    this.addSlot(new SlotItemHandler(te.getItemHandler(), 1 + column + row * 4, 53 + column * 18, 26 + row * 18));
                 }
             }
         }
@@ -44,13 +44,13 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
         // Player inventory
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
-                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 106 + i * 18));
+                this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
         
         // Hotbar
         for (int i = 0; i < 9; i++) {
-            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 160));
+            this.addSlot(new Slot(playerInv, i, 8 + i * 18, 142));
         }
     }
 

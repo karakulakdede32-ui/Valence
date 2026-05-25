@@ -227,16 +227,16 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
 
     @Override
     public int[] getSlotsForFace(Direction side) {
-        return new int[]{0, 1};
+        return side == Direction.DOWN ? new int[]{1} : new int[]{0};
     }
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return index == 0;
+        return direction != Direction.DOWN && index == 0;
     }
 
     @Override
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return index == 1;
+        return direction == Direction.DOWN && index == 1;
     }
 }
