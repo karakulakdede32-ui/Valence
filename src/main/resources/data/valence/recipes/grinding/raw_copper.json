@@ -1,0 +1,11 @@
+{
+  "type": "valence:grinding",
+  "ingredients": [
+    {"item": "minecraft:raw_copper"}
+  ],
+  "output": {
+    "item": "valence:copper_powder",
+    "count": 1
+  },
+  "processingtime": 200
+}

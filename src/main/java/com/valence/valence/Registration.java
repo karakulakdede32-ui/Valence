@@ -94,6 +94,11 @@ public class Registration {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> REDSTONE_POWDER = ITEMS.register("redstone_powder",
             () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_POWDER = ITEMS.register("copper_powder",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> BRONZE_INGOT = ITEMS.register("bronze_ingot",
+            () -> new Item(new Item.Properties()));
+
     public static final RegistryObject<Item> LAPIS_POWDER = ITEMS.register("lapis_powder",
             () -> new Item(new Item.Properties()));
 
@@ -110,6 +115,8 @@ public class Registration {
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());
+                        output.accept(COPPER_POWDER.get());
+                        output.accept(BRONZE_INGOT.get());
                         output.accept(LAPIS_POWDER.get());
                     })
                     .build());
