@@ -4,6 +4,8 @@ import com.valence.valence.Registration;
 import com.valence.valence.ValenceMod;
 import com.valence.valence.client.gui.AdvancedMinerScreen;
 import com.valence.valence.client.gui.BasicMinerScreen;
+import com.valence.valence.client.gui.GrinderScreen;
+import com.valence.valence.client.gui.WaterCollectorScreen;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,7 +19,8 @@ public class ClientSetup {
         event.enqueueWork(() -> {
             MenuScreens.register(Registration.BASIC_MINER_MENU.get(), BasicMinerScreen::new);
             MenuScreens.register(Registration.ADVANCED_MINER_MENU.get(), AdvancedMinerScreen::new);
-            MenuScreens.register(Registration.GRINDER_MENU.get(), com.valence.valence.client.gui.GrinderScreen::new);
+            MenuScreens.register(Registration.GRINDER_MENU.get(), GrinderScreen::new);
+            MenuScreens.register(Registration.WATER_COLLECTOR_MENU.get(), WaterCollectorScreen::new);
         });
     }
 }

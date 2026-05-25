@@ -3,15 +3,18 @@
     "block.valence.basic_miner": "Basic Miner",
     "block.valence.advanced_miner": "Advanced Miner",
     "block.valence.grinder": "Grinder",
+    "block.valence.water_collector": "Water Collector",
     "item.valence.stone_pebble": "Stone Pebble",
     "item.valence.basic_miner": "Basic Miner",
     "item.valence.advanced_miner": "Advanced Miner",
     "item.valence.grinder": "Grinder",
+    "item.valence.water_collector": "Water Collector",
     "item.valence.iron_powder": "Iron Powder",
     "item.valence.gold_powder": "Gold Powder",
     "item.valence.redstone_powder": "Redstone Powder",
     "item.valence.lapis_powder": "Lapis Powder",
     "container.valence.basic_miner": "Basic Miner",
     "container.valence.advanced_miner": "Advanced Miner",
-    "container.valence.grinder": "Grinder"
+    "container.valence.grinder": "Grinder",
+    "container.valence.water_collector": "Water Collector"
 }

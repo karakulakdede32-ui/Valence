@@ -24,6 +24,9 @@ import com.valence.valence.block.miner.AdvancedMinerBlock;
 import com.valence.valence.block.miner.AdvancedMinerTileEntity;
 import com.valence.valence.block.miner.BasicMinerMenu;
 import com.valence.valence.block.miner.AdvancedMinerMenu;
+import com.valence.valence.block.collector.WaterCollectorBlock;
+import com.valence.valence.block.collector.WaterCollectorTileEntity;
+import com.valence.valence.block.collector.WaterCollectorMenu;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
 public class Registration {
@@ -47,6 +50,8 @@ public class Registration {
             () -> new AdvancedMinerBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> GRINDER = BLOCKS.register("grinder",
             () -> new com.valence.valence.block.GrinderBlock());
+    public static final RegistryObject<Block> WATER_COLLECTOR = BLOCKS.register("water_collector",
+            () -> new WaterCollectorBlock(BLOCK_PROPS));
 
     // BlockEntityType suppliers
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -55,6 +60,8 @@ public class Registration {
             () -> BlockEntityType.Builder.of(AdvancedMinerTileEntity::new, ADVANCED_MINER.get()).build(null));
     public static final RegistryObject<BlockEntityType<com.valence.valence.block.GrinderTileEntity>> GRINDER_TE = BLOCK_ENTITIES.register("grinder",
             () -> BlockEntityType.Builder.of(com.valence.valence.block.GrinderTileEntity::new, GRINDER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<WaterCollectorTileEntity>> WATER_COLLECTOR_TE = BLOCK_ENTITIES.register("water_collector",
+            () -> BlockEntityType.Builder.of(WaterCollectorTileEntity::new, WATER_COLLECTOR.get()).build(null));
 
     // MenuType suppliers
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner",
@@ -63,6 +70,8 @@ public class Registration {
             () -> IForgeMenuType.create(AdvancedMinerMenu::new));
     public static final RegistryObject<MenuType<com.valence.valence.block.GrinderMenu>> GRINDER_MENU = MENUS.register("grinder",
             () -> IForgeMenuType.create(com.valence.valence.block.GrinderMenu::new));
+    public static final RegistryObject<MenuType<WaterCollectorMenu>> WATER_COLLECTOR_MENU = MENUS.register("water_collector",
+            () -> IForgeMenuType.create(WaterCollectorMenu::new));
 
     public static final RegistryObject<RecipeType<GrinderRecipe>> GRINDING_RECIPE_TYPE = RECIPE_TYPES.register("grinding", () -> GrinderRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeSerializer<GrinderRecipe>> GRINDING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("grinding", () -> GrinderRecipe.Serializer.INSTANCE);
@@ -76,6 +85,8 @@ public class Registration {
             () -> new BlockItem(ADVANCED_MINER.get(), new Item.Properties()));
     public static final RegistryObject<Item> GRINDER_ITEM = ITEMS.register("grinder",
             () -> new BlockItem(GRINDER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> WATER_COLLECTOR_ITEM = ITEMS.register("water_collector",
+            () -> new BlockItem(WATER_COLLECTOR.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder",
             () -> new Item(new Item.Properties()));
@@ -95,6 +106,7 @@ public class Registration {
                         output.accept(BASIC_MINER_ITEM.get());
                         output.accept(ADVANCED_MINER_ITEM.get());
                         output.accept(GRINDER_ITEM.get());
+                        output.accept(WATER_COLLECTOR_ITEM.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());

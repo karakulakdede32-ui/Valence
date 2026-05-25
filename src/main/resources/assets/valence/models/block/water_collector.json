@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "valence:block/water_collector",
+    "side": "valence:block/water_collector_side",
+    "bottom": "valence:block/water_collector_bottom"
+  }
+}
