@@ -78,6 +78,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         // Sync fuel from itemHandler if items were loaded
         updateFuelFromSlot();
         hasScanned = tag.getBoolean("hasScanned");
+        fuel = tag.getInt("fuel");
     }
 
     @Override
@@ -133,6 +134,10 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     public int getFuel() {
         return fuel;
+    }
+
+    public void scanStep(ServerLevel lvl) {
+        extractAllOreTypes(lvl);
     }
 
     public void extractAllOreTypes(ServerLevel lvl) {

@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -90,7 +91,7 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
         @Override
         public GrinderRecipe fromJson(ResourceLocation pRecipeId, JsonObject pJson) {
             Ingredient input = Ingredient.fromJson(pJson.get("ingredients"));
-            ItemStack output = ItemStack.fromJson(pJson.getAsJsonObject("output"));
+            ItemStack output = ShapedRecipe.itemStackFromJson(pJson.getAsJsonObject("output"));
             int processingTime = pJson.has("processingtime") ? pJson.get("processingtime").getAsInt() : 200; // Default to 200 ticks
 
             return new GrinderRecipe(pRecipeId, input, output, processingTime);
