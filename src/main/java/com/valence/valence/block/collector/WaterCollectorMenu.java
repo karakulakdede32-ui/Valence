@@ -6,13 +6,16 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.SlotItemHandler;
+import net.minecraftforge.fluids.FluidStack;
 
 public class WaterCollectorMenu extends AbstractContainerMenu {
     private final WaterCollectorTileEntity tileEntity;
+    private final DataSlot fluidAmountSlot = DataSlot.standalone();
+    private final DataSlot fluidCapacitySlot = DataSlot.standalone();
 
     public WaterCollectorMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
         this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
@@ -22,6 +25,17 @@ public class WaterCollectorMenu extends AbstractContainerMenu {
         super(Registration.WATER_COLLECTOR_MENU.get(), id);
         this.tileEntity = (WaterCollectorTileEntity) entity;
 
+        // Data slots for syncing fluid info
+        addDataSlot(fluidAmountSlot);
+        addDataSlot(fluidCapacitySlot);
+
+        // Initialize data slots
+        if (tileEntity != null) {
+            FluidStack fluid = tileEntity.getTank().getFluid();
+            fluidAmountSlot.set(fluid.getAmount());
+            fluidCapacitySlot.set(tileEntity.getTank().getCapacity());
+        }
+
         // Player inventory
         for (int row = 0; row < 3; row++)
             for (int col = 0; col < 9; col++)
@@ -29,6 +43,17 @@ public class WaterCollectorMenu extends AbstractContainerMenu {
         // Hotbar
         for (int i = 0; i < 9; i++)
             this.addSlot(new Slot(inv, i, 8 + i * 18, 154));
+    }
+
+    @Override
+    public void broadcastChanges() {
+        // Update data slots BEFORE super sends them to the client
+        if (tileEntity != null && tileEntity.getLevel() != null && !tileEntity.getLevel().isClientSide()) {
+            FluidStack fluid = tileEntity.getTank().getFluid();
+            fluidAmountSlot.set(fluid.getAmount());
+            fluidCapacitySlot.set(tileEntity.getTank().getCapacity());
+        }
+        super.broadcastChanges();
     }
 
     @Override
@@ -44,5 +69,13 @@ public class WaterCollectorMenu extends AbstractContainerMenu {
 
     public WaterCollectorTileEntity getTileEntity() {
         return tileEntity;
+    }
+
+    public int getFluidAmount() {
+        return fluidAmountSlot.get();
+    }
+
+    public int getFluidCapacity() {
+        return fluidCapacitySlot.get();
     }
 }

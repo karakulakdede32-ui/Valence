@@ -1,12 +1,10 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.collector.WaterCollectorMenu;
-import com.valence.valence.block.collector.WaterCollectorTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.fluids.FluidStack;
 
 public class WaterCollectorScreen extends AbstractContainerScreen<WaterCollectorMenu> {
     // Panel colors
@@ -46,21 +44,17 @@ public class WaterCollectorScreen extends AbstractContainerScreen<WaterCollector
         this.renderLabels(guiGraphics, mouseX, mouseY);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
 
-        // Hover tooltip for fluid tank
-        WaterCollectorTileEntity te = menu.getTileEntity();
-        if (te != null) {
-            int tankX = this.leftPos + 79;
-            int tankY = this.topPos + 17;
-            int tankW = 18;
-            int tankH = 54;
-            if (mouseX >= tankX && mouseX < tankX + tankW && mouseY >= tankY && mouseY < tankY + tankH) {
-                FluidStack fluid = te.getTank().getFluid();
-                int amount = fluid.getAmount();
-                int capacity = te.getTank().getCapacity();
-                guiGraphics.renderTooltip(this.font,
-                    Component.literal(amount + " / " + capacity + " mB"),
-                    mouseX, mouseY);
-            }
+        // Hover tooltip for fluid tank (read from synced data slots)
+        int tankX = this.leftPos + 79;
+        int tankY = this.topPos + 17;
+        int tankW = 18;
+        int tankH = 54;
+        if (mouseX >= tankX && mouseX < tankX + tankW && mouseY >= tankY && mouseY < tankY + tankH) {
+            int amount = menu.getFluidAmount();
+            int capacity = menu.getFluidCapacity();
+            guiGraphics.renderTooltip(this.font,
+                Component.literal(amount + " / " + capacity + " mB"),
+                mouseX, mouseY);
         }
     }
 
@@ -77,8 +71,7 @@ public class WaterCollectorScreen extends AbstractContainerScreen<WaterCollector
 
         drawMachinePanel(guiGraphics, x, y, imageWidth, imageHeight);
 
-        // Draw the fluid tank (vertical gauge)
-        WaterCollectorTileEntity te = menu.getTileEntity();
+        // Draw the fluid tank (vertical gauge) using synced data slots
         int tankX = x + 79;
         int tankY = y + 17;
         int tankW = 18;
@@ -88,21 +81,18 @@ public class WaterCollectorScreen extends AbstractContainerScreen<WaterCollector
         guiGraphics.fill(tankX, tankY, tankX + tankW, tankY + tankH, TANK_BORDER);
         guiGraphics.fill(tankX + 1, tankY + 1, tankX + tankW - 1, tankY + tankH - 1, TANK_BG);
 
-        // Fluid fill
-        if (te != null) {
-            int amount = te.getTank().getFluidAmount();
-            int capacity = te.getTank().getCapacity();
-            int fillHeight = (int) ((long) amount * (tankH - 2) / capacity);
-            if (fillHeight > 0) {
-                int fluidY = tankY + tankH - 1 - fillHeight;
-                // Draw water gradient
-                for (int i = 0; i < fillHeight; i++) {
-                    int color = WATER_DARK;
-                    float t = (float) i / fillHeight;
-                    if (t > 0.7f) color = WATER_BRIGHT;
-                    else if (t > 0.3f) color = WATER_MID;
-                    guiGraphics.fill(tankX + 2, fluidY + i, tankX + tankW - 2, fluidY + i + 1, color);
-                }
+        // Fluid fill from synced data slots
+        int amount = menu.getFluidAmount();
+        int capacity = menu.getFluidCapacity();
+        int fillHeight = capacity > 0 ? (int) ((long) amount * (tankH - 2) / capacity) : 0;
+        if (fillHeight > 0) {
+            int fluidY = tankY + tankH - 1 - fillHeight;
+            for (int i = 0; i < fillHeight; i++) {
+                int color = WATER_DARK;
+                float t = (float) i / fillHeight;
+                if (t > 0.7f) color = WATER_BRIGHT;
+                else if (t > 0.3f) color = WATER_MID;
+                guiGraphics.fill(tankX + 2, fluidY + i, tankX + tankW - 2, fluidY + i + 1, color);
             }
         }
 
