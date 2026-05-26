@@ -28,5 +28,8 @@
     "container.valence.steam_dynamo": "Steam Dynamo",
     "container.valence.steam_alloyer": "Steam Alloyer",
     "container.valence.steam_furnace": "Steam Furnace",
-    "fluid.valence.steam": "Steam"
+    "fluid.valence.steam": "Steam",
+    "block.valence.seed_duplicator": "Seed Duplicator",
+    "item.valence.seed_duplicator": "Seed Duplicator",
+    "container.valence.seed_duplicator": "Seed Duplicator"
 }
