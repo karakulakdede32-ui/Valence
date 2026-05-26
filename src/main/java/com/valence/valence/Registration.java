@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -48,7 +47,6 @@ public class Registration {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ValenceMod.MODID);
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, ValenceMod.MODID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ValenceMod.MODID);
-    public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, ValenceMod.MODID);
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS, ValenceMod.MODID);
 
     // Register blocks
@@ -88,13 +86,6 @@ public class Registration {
             () -> IForgeMenuType.create(SteamDynamoMenu::new));
 
     // Fluids
-    public static final RegistryObject<FluidType> STEAM_FLUID_TYPE = FLUID_TYPES.register("steam",
-            () -> new FluidType(FluidType.Properties.create()
-                .descriptionId("fluid.valence.steam")
-                .temperature(373)
-                .density(-10)
-                .viscosity(200)
-                .lightLevel(0)));
 
     public static final RegistryObject<Fluid> STEAM = FLUIDS.register("steam",
             SteamFluid.Source::new);

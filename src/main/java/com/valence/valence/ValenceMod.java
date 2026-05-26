@@ -23,7 +23,7 @@ public class ValenceMod {
         Registration.CREATIVE_MODE_TABS.register(bus);
         Registration.RECIPE_TYPES.register(bus);
         Registration.RECIPE_SERIALIZERS.register(bus);
-        Registration.FLUID_TYPES.register(bus);
+        
         Registration.FLUIDS.register(bus);
         com.valence.valence.event.ModLootModifiers.LOOT_MODIFIER_SERIALIZERS.register(bus);
         
