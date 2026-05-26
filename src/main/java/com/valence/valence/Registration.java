@@ -37,6 +37,12 @@ import com.valence.valence.block.alloyer.SteamAlloyerMenu;
 import com.valence.valence.block.furnace.SteamFurnaceBlock;
 import com.valence.valence.block.furnace.SteamFurnaceTileEntity;
 import com.valence.valence.block.furnace.SteamFurnaceMenu;
+import com.valence.valence.block.turbine.SteamTurbineBlock;
+import com.valence.valence.block.turbine.SteamTurbineTileEntity;
+import com.valence.valence.block.turbine.SteamTurbineMenu;
+import com.valence.valence.block.dfcell.DFCellBlock;
+import com.valence.valence.block.dfcell.DFCellTileEntity;
+import com.valence.valence.block.dfcell.DFCellMenu;
 import com.valence.valence.fluid.SteamFluid;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
@@ -60,6 +66,8 @@ public class Registration {
     public static final RegistryObject<Block> STEAM_DYNAMO = BLOCKS.register("steam_dynamo", () -> new SteamDynamoBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> STEAM_ALLOYER = BLOCKS.register("steam_alloyer", () -> new SteamAlloyerBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> STEAM_FURNACE = BLOCKS.register("steam_furnace", () -> new SteamFurnaceBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> STEAM_TURBINE = BLOCKS.register("steam_turbine", () -> new SteamTurbineBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> DF_CELL = BLOCKS.register("df_cell", () -> new DFCellBlock(BLOCK_PROPS));
 
     // BlockEntityTypes
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -76,6 +84,10 @@ public class Registration {
             () -> BlockEntityType.Builder.of(SteamAlloyerTileEntity::new, STEAM_ALLOYER.get()).build(null));
     public static final RegistryObject<BlockEntityType<SteamFurnaceTileEntity>> STEAM_FURNACE_TE = BLOCK_ENTITIES.register("steam_furnace",
             () -> BlockEntityType.Builder.of(SteamFurnaceTileEntity::new, STEAM_FURNACE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<SteamTurbineTileEntity>> STEAM_TURBINE_TE = BLOCK_ENTITIES.register("steam_turbine",
+            () -> BlockEntityType.Builder.of(SteamTurbineTileEntity::new, STEAM_TURBINE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<DFCellTileEntity>> DF_CELL_TE = BLOCK_ENTITIES.register("df_cell",
+            () -> BlockEntityType.Builder.of(DFCellTileEntity::new, DF_CELL.get()).build(null));
 
     // Menus
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner", () -> IForgeMenuType.create(BasicMinerMenu::new));
@@ -85,6 +97,8 @@ public class Registration {
     public static final RegistryObject<MenuType<SteamDynamoMenu>> STEAM_DYNAMO_MENU = MENUS.register("steam_dynamo", () -> IForgeMenuType.create(SteamDynamoMenu::new));
     public static final RegistryObject<MenuType<SteamAlloyerMenu>> STEAM_ALLOYER_MENU = MENUS.register("steam_alloyer", () -> IForgeMenuType.create(SteamAlloyerMenu::new));
     public static final RegistryObject<MenuType<SteamFurnaceMenu>> STEAM_FURNACE_MENU = MENUS.register("steam_furnace", () -> IForgeMenuType.create(SteamFurnaceMenu::new));
+    public static final RegistryObject<MenuType<SteamTurbineMenu>> STEAM_TURBINE_MENU = MENUS.register("steam_turbine", () -> IForgeMenuType.create(SteamTurbineMenu::new));
+    public static final RegistryObject<MenuType<DFCellMenu>> DF_CELL_MENU = MENUS.register("df_cell", () -> IForgeMenuType.create(DFCellMenu::new));
 
     // Fluids
     public static final RegistryObject<Fluid> STEAM = FLUIDS.register("steam", SteamFluid.Source::new);
@@ -103,6 +117,8 @@ public class Registration {
     public static final RegistryObject<Item> STEAM_DYNAMO_ITEM = ITEMS.register("steam_dynamo", () -> new BlockItem(STEAM_DYNAMO.get(), new Item.Properties()));
     public static final RegistryObject<Item> STEAM_ALLOYER_ITEM = ITEMS.register("steam_alloyer", () -> new BlockItem(STEAM_ALLOYER.get(), new Item.Properties()));
     public static final RegistryObject<Item> STEAM_FURNACE_ITEM = ITEMS.register("steam_furnace", () -> new BlockItem(STEAM_FURNACE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STEAM_TURBINE_ITEM = ITEMS.register("steam_turbine", () -> new BlockItem(STEAM_TURBINE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> DF_CELL_ITEM = ITEMS.register("df_cell", () -> new BlockItem(DF_CELL.get(), new Item.Properties()));
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLD_POWDER = ITEMS.register("gold_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> REDSTONE_POWDER = ITEMS.register("redstone_powder", () -> new Item(new Item.Properties()));
@@ -123,6 +139,8 @@ public class Registration {
                         output.accept(STEAM_DYNAMO_ITEM.get());
                         output.accept(STEAM_ALLOYER_ITEM.get());
                         output.accept(STEAM_FURNACE_ITEM.get());
+                        output.accept(STEAM_TURBINE_ITEM.get());
+                        output.accept(DF_CELL_ITEM.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());

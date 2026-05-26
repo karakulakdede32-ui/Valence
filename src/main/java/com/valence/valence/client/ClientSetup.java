@@ -21,6 +21,8 @@ public class ClientSetup {
             MenuScreens.register(Registration.STEAM_DYNAMO_MENU.get(), SteamDynamoScreen::new);
             MenuScreens.register(Registration.STEAM_ALLOYER_MENU.get(), SteamAlloyerScreen::new);
             MenuScreens.register(Registration.STEAM_FURNACE_MENU.get(), SteamFurnaceScreen::new);
+            MenuScreens.register(Registration.STEAM_TURBINE_MENU.get(), SteamTurbineScreen::new);
+            MenuScreens.register(Registration.DF_CELL_MENU.get(), DFCellScreen::new);
         });
     }
 }
