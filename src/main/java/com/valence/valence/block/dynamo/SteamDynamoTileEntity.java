@@ -32,29 +32,13 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
     private static final int CONVERSION_RATE = 18;
 
     private final FluidTank waterTank = new FluidTank(WATER_TANK_CAPACITY) {
-        @Override
-        public boolean isFluidValid(FluidStack stack) {
-            return stack.getFluid() == Fluids.WATER;
-        }
-
-        @Override
-        protected void onContentsChanged() {
-            setChanged();
-            sync();
-        }
+        @Override public boolean isFluidValid(FluidStack stack) { return stack.getFluid() == Fluids.WATER; }
+        @Override protected void onContentsChanged() { setChanged(); sync(); }
     };
 
     private final FluidTank steamTank = new FluidTank(STEAM_TANK_CAPACITY) {
-        @Override
-        public boolean isFluidValid(FluidStack stack) {
-            return stack.getFluid() == Registration.STEAM.get();
-        }
-
-        @Override
-        protected void onContentsChanged() {
-            setChanged();
-            sync();
-        }
+        @Override public boolean isFluidValid(FluidStack stack) { return stack.getFluid() == Registration.STEAM.get(); }
+        @Override protected void onContentsChanged() { setChanged(); sync(); }
     };
 
     private final LazyOptional<IFluidHandler> waterHandler = LazyOptional.of(() -> waterTank);
@@ -70,13 +54,9 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    @Override
-    public Component getDisplayName() {
-        return Component.translatable("container.valence.steam_dynamo");
-    }
+    @Override public Component getDisplayName() { return Component.translatable("container.valence.steam_dynamo"); }
 
-    @Nullable
-    @Override
+    @Nullable @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
         return new SteamDynamoMenu(id, inventory, this);
     }
@@ -110,11 +90,8 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
         steamTank.readFromNBT(tag.getCompound("steam_tank"));
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+    @Nullable @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
 
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
@@ -129,38 +106,13 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.FLUID_HANDLER) {
             return LazyOptional.of(() -> new IFluidHandler() {
-                @Override
-                public int getTanks() { return 2; }
-
-                @Override
-                public @NotNull FluidStack getFluidInTank(int tank) {
-                    return tank == 0 ? waterTank.getFluid() : steamTank.getFluid();
-                }
-
-                @Override
-                public int getTankCapacity(int tank) {
-                    return tank == 0 ? waterTank.getCapacity() : steamTank.getCapacity();
-                }
-
-                @Override
-                public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
-                    return tank == 0 ? waterTank.isFluidValid(stack) : steamTank.isFluidValid(stack);
-                }
-
-                @Override
-                public int fill(FluidStack resource, FluidAction action) {
-                    return waterTank.fill(resource, action);
-                }
-
-                @Override
-                public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-                    return steamTank.drain(resource, action);
-                }
-
-                @Override
-                public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-                    return steamTank.drain(maxDrain, action);
-                }
+                @Override public int getTanks() { return 2; }
+                @Override public @NotNull FluidStack getFluidInTank(int tank) { return tank == 0 ? waterTank.getFluid() : steamTank.getFluid(); }
+                @Override public int getTankCapacity(int tank) { return tank == 0 ? waterTank.getCapacity() : steamTank.getCapacity(); }
+                @Override public boolean isFluidValid(int tank, @NotNull FluidStack stack) { return tank == 0 ? waterTank.isFluidValid(stack) : steamTank.isFluidValid(stack); }
+                @Override public int fill(FluidStack resource, FluidAction action) { return waterTank.fill(resource, action); }
+                @Override public @NotNull FluidStack drain(FluidStack resource, FluidAction action) { return steamTank.drain(resource, action); }
+                @Override public @NotNull FluidStack drain(int maxDrain, FluidAction action) { return steamTank.drain(maxDrain, action); }
             }).cast();
         }
         return super.getCapability(cap, side);
@@ -175,7 +127,6 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
 
     public static void tick(Level level, BlockPos pos, BlockState state, SteamDynamoTileEntity te) {
         if (level.isClientSide()) return;
-
         te.pullWaterFromNeighbors();
         te.convertWaterToSteam();
         te.pushSteamToNeighbors();
@@ -184,45 +135,57 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
     private void pullWaterFromNeighbors() {
         if (waterTank.getFluidAmount() >= waterTank.getCapacity() - CONVERSION_RATE) return;
 
-        for (Direction dir : Direction.values()) {
-            BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
-            if (neighbor == null) continue;
+        int space = waterTank.getCapacity() - waterTank.getFluidAmount();
+        int remaining = Math.min(CONVERSION_RATE * 2, space);
 
-            LazyOptional<IFluidHandler> cap = neighbor.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite());
-            cap.ifPresent(handler -> {
-                FluidStack toDrain = new FluidStack(Fluids.WATER, CONVERSION_RATE * 2);
-                FluidStack drained = handler.drain(toDrain, IFluidHandler.FluidAction.SIMULATE);
-                if (!drained.isEmpty() && drained.getFluid() == Fluids.WATER) {
-                    int filled = waterTank.fill(drained, IFluidHandler.FluidAction.SIMULATE);
-                    if (filled > 0) {
-                        handler.drain(new FluidStack(Fluids.WATER, filled), IFluidHandler.FluidAction.EXECUTE);
-                        waterTank.fill(new FluidStack(Fluids.WATER, filled), IFluidHandler.FluidAction.EXECUTE);
-                    }
+        for (Direction dir : Direction.values()) {
+            if (remaining <= 0) break;
+            BlockPos neighborPos = worldPosition.relative(dir);
+
+            // Try pulling from fluid inventory first
+            BlockEntity neighbor = level.getBlockEntity(neighborPos);
+            if (neighbor != null) {
+                int request = remaining;
+                int pulled = neighbor.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite())
+                    .map(handler -> {
+                        FluidStack sim = handler.drain(new FluidStack(Fluids.WATER, request), IFluidHandler.FluidAction.SIMULATE);
+                        if (sim.isEmpty() || sim.getFluid() != Fluids.WATER) return 0;
+                        int fill = waterTank.fill(sim, IFluidHandler.FluidAction.SIMULATE);
+                        if (fill <= 0) return 0;
+                        handler.drain(new FluidStack(Fluids.WATER, fill), IFluidHandler.FluidAction.EXECUTE);
+                        waterTank.fill(new FluidStack(Fluids.WATER, fill), IFluidHandler.FluidAction.EXECUTE);
+                        return fill;
+                    }).orElse(0);
+                remaining -= pulled;
+                continue;
+            }
+
+            // No block entity — check for water source blocks
+            if (remaining > 0 && level.getFluidState(neighborPos).isSource() && level.getFluidState(neighborPos).getType() == Fluids.WATER) {
+                int fill = waterTank.fill(new FluidStack(Fluids.WATER, remaining), IFluidHandler.FluidAction.SIMULATE);
+                if (fill > 0) {
+                    waterTank.fill(new FluidStack(Fluids.WATER, fill), IFluidHandler.FluidAction.EXECUTE);
+                    remaining -= fill;
                 }
-            });
+            }
         }
     }
 
     private void convertWaterToSteam() {
         if (waterTank.getFluidAmount() < CONVERSION_RATE) return;
         if (steamTank.getFluidAmount() >= steamTank.getCapacity()) return;
-
         waterTank.drain(CONVERSION_RATE, IFluidHandler.FluidAction.EXECUTE);
         steamTank.fill(new FluidStack(Registration.STEAM.get(), CONVERSION_RATE), IFluidHandler.FluidAction.EXECUTE);
     }
 
     private void pushSteamToNeighbors() {
         if (steamTank.getFluidAmount() <= 0) return;
-
         for (Direction dir : Direction.values()) {
             BlockEntity neighbor = level.getBlockEntity(worldPosition.relative(dir));
             if (neighbor == null) continue;
-
-            LazyOptional<IFluidHandler> cap = neighbor.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite());
-            cap.ifPresent(handler -> {
+            neighbor.getCapability(ForgeCapabilities.FLUID_HANDLER, dir.getOpposite()).ifPresent(handler -> {
                 FluidStack toPush = steamTank.drain(steamTank.getFluidAmount(), IFluidHandler.FluidAction.SIMULATE);
                 if (toPush.isEmpty()) return;
-
                 int filled = handler.fill(toPush, IFluidHandler.FluidAction.SIMULATE);
                 if (filled > 0) {
                     handler.fill(new FluidStack(Registration.STEAM.get(), filled), IFluidHandler.FluidAction.EXECUTE);
