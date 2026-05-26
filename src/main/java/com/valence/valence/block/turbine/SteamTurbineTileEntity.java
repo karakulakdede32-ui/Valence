@@ -38,7 +38,7 @@ public class SteamTurbineTileEntity extends BlockEntity implements MenuProvider 
         @Override protected void onContentsChanged() { setChanged(); sync(); }
     };
 
-    private final DFStorage dfStorage = new DFStorage(DF_CAPACITY, 0, 10) {
+    private final DFStorage dfStorage = new DFStorage(DF_CAPACITY, DF_PER_TICK, 10) {
         @Override protected void onEnergyChanged() { setChanged(); sync(); }
     };
 
