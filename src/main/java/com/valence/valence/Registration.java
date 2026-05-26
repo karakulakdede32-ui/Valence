@@ -13,7 +13,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -27,6 +29,10 @@ import com.valence.valence.block.miner.AdvancedMinerMenu;
 import com.valence.valence.block.collector.WaterCollectorBlock;
 import com.valence.valence.block.collector.WaterCollectorTileEntity;
 import com.valence.valence.block.collector.WaterCollectorMenu;
+import com.valence.valence.block.dynamo.SteamDynamoBlock;
+import com.valence.valence.block.dynamo.SteamDynamoTileEntity;
+import com.valence.valence.block.dynamo.SteamDynamoMenu;
+import com.valence.valence.fluid.SteamFluid;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
 public class Registration {
@@ -42,6 +48,8 @@ public class Registration {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ValenceMod.MODID);
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, ValenceMod.MODID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ValenceMod.MODID);
+    public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, ValenceMod.MODID);
+    public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS, ValenceMod.MODID);
 
     // Register blocks
     public static final RegistryObject<Block> BASIC_MINER = BLOCKS.register("basic_miner",
@@ -52,6 +60,8 @@ public class Registration {
             () -> new com.valence.valence.block.GrinderBlock());
     public static final RegistryObject<Block> WATER_COLLECTOR = BLOCKS.register("water_collector",
             () -> new WaterCollectorBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> STEAM_DYNAMO = BLOCKS.register("steam_dynamo",
+            () -> new SteamDynamoBlock(BLOCK_PROPS));
 
     // BlockEntityType suppliers
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -62,6 +72,8 @@ public class Registration {
             () -> BlockEntityType.Builder.of(com.valence.valence.block.GrinderTileEntity::new, GRINDER.get()).build(null));
     public static final RegistryObject<BlockEntityType<WaterCollectorTileEntity>> WATER_COLLECTOR_TE = BLOCK_ENTITIES.register("water_collector",
             () -> BlockEntityType.Builder.of(WaterCollectorTileEntity::new, WATER_COLLECTOR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<SteamDynamoTileEntity>> STEAM_DYNAMO_TE = BLOCK_ENTITIES.register("steam_dynamo",
+            () -> BlockEntityType.Builder.of(SteamDynamoTileEntity::new, STEAM_DYNAMO.get()).build(null));
 
     // MenuType suppliers
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner",
@@ -72,7 +84,24 @@ public class Registration {
             () -> IForgeMenuType.create(com.valence.valence.block.GrinderMenu::new));
     public static final RegistryObject<MenuType<WaterCollectorMenu>> WATER_COLLECTOR_MENU = MENUS.register("water_collector",
             () -> IForgeMenuType.create(WaterCollectorMenu::new));
+    public static final RegistryObject<MenuType<SteamDynamoMenu>> STEAM_DYNAMO_MENU = MENUS.register("steam_dynamo",
+            () -> IForgeMenuType.create(SteamDynamoMenu::new));
 
+    // Fluids
+    public static final RegistryObject<FluidType> STEAM_FLUID_TYPE = FLUID_TYPES.register("steam",
+            () -> new FluidType(FluidType.Properties.create()
+                .descriptionId("fluid.valence.steam")
+                .temperature(373)
+                .density(-10)
+                .viscosity(200)
+                .lightLevel(0)));
+
+    public static final RegistryObject<Fluid> STEAM = FLUIDS.register("steam",
+            SteamFluid.Source::new);
+    public static final RegistryObject<Fluid> STEAM_FLOWING = FLUIDS.register("steam_flowing",
+            SteamFluid.Flowing::new);
+
+    // Recipes
     public static final RegistryObject<RecipeType<GrinderRecipe>> GRINDING_RECIPE_TYPE = RECIPE_TYPES.register("grinding", () -> GrinderRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeSerializer<GrinderRecipe>> GRINDING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("grinding", () -> GrinderRecipe.Serializer.INSTANCE);
 
@@ -87,6 +116,8 @@ public class Registration {
             () -> new BlockItem(GRINDER.get(), new Item.Properties()));
     public static final RegistryObject<Item> WATER_COLLECTOR_ITEM = ITEMS.register("water_collector",
             () -> new BlockItem(WATER_COLLECTOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> STEAM_DYNAMO_ITEM = ITEMS.register("steam_dynamo",
+            () -> new BlockItem(STEAM_DYNAMO.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder",
             () -> new Item(new Item.Properties()));
@@ -98,7 +129,6 @@ public class Registration {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> BRONZE_INGOT = ITEMS.register("bronze_ingot",
             () -> new Item(new Item.Properties()));
-
     public static final RegistryObject<Item> LAPIS_POWDER = ITEMS.register("lapis_powder",
             () -> new Item(new Item.Properties()));
 
@@ -112,6 +142,7 @@ public class Registration {
                         output.accept(ADVANCED_MINER_ITEM.get());
                         output.accept(GRINDER_ITEM.get());
                         output.accept(WATER_COLLECTOR_ITEM.get());
+                        output.accept(STEAM_DYNAMO_ITEM.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());
@@ -121,7 +152,7 @@ public class Registration {
                     })
                     .build());
 
-    // Helper method for ResourceLocation - Fixed for 1.20.1
+    // Helper method
     public static ResourceLocation location(String name) {
         return new ResourceLocation(ValenceMod.MODID, name);
     }

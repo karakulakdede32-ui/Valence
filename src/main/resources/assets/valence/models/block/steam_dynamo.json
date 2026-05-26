@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "valence:block/steam_dynamo_top",
+    "side": "valence:block/steam_dynamo_side",
+    "bottom": "valence:block/steam_dynamo_bottom"
+  }
+}
