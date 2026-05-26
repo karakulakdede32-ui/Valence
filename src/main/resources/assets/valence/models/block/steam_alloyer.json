@@ -1,0 +1,1 @@
+{"parent": "minecraft:block/cube_bottom_top", "textures": {"top": "valence:block/steam_alloyer_top", "side": "valence:block/steam_alloyer_side", "bottom": "valence:block/steam_alloyer_bottom"}}

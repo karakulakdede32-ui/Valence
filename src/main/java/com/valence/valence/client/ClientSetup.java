@@ -2,11 +2,7 @@ package com.valence.valence.client;
 
 import com.valence.valence.Registration;
 import com.valence.valence.ValenceMod;
-import com.valence.valence.client.gui.AdvancedMinerScreen;
-import com.valence.valence.client.gui.BasicMinerScreen;
-import com.valence.valence.client.gui.GrinderScreen;
-import com.valence.valence.client.gui.WaterCollectorScreen;
-import com.valence.valence.client.gui.SteamDynamoScreen;
+import com.valence.valence.client.gui.*;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -23,6 +19,8 @@ public class ClientSetup {
             MenuScreens.register(Registration.GRINDER_MENU.get(), GrinderScreen::new);
             MenuScreens.register(Registration.WATER_COLLECTOR_MENU.get(), WaterCollectorScreen::new);
             MenuScreens.register(Registration.STEAM_DYNAMO_MENU.get(), SteamDynamoScreen::new);
+            MenuScreens.register(Registration.STEAM_ALLOYER_MENU.get(), SteamAlloyerScreen::new);
+            MenuScreens.register(Registration.STEAM_FURNACE_MENU.get(), SteamFurnaceScreen::new);
         });
     }
 }
