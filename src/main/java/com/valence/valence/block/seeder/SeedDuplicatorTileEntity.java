@@ -64,6 +64,8 @@ public class SeedDuplicatorTileEntity extends BlockEntity implements MenuProvide
             return stack;
         }
         @Override public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+            // Only allow extraction from output slot (1) — protect input seeds
+            if (slot != 1) return ItemStack.EMPTY;
             return itemHandler.extractItem(slot, amount, simulate);
         }
         @Override public int getSlotLimit(int slot) { return itemHandler.getSlotLimit(slot); }
