@@ -6,12 +6,16 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 
 public abstract class SteamFluid extends ForgeFlowingFluid {
     public static final FluidType STEAM_TYPE = new FluidType(FluidType.Properties.create()
-        .descriptionId("fluid.valence.steam")
         .temperature(373)
         .density(-10)
         .viscosity(200)
         .lightLevel(0)
-    );
+    ) {
+        @Override
+        public String getDescriptionId() {
+            return "fluid.valence.steam";
+        }
+    };
 
     private static final Properties PROPS = new Properties(
         () -> STEAM_TYPE,
