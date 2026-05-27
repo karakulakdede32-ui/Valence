@@ -7,122 +7,39 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 public class WaterCollectorScreen extends AbstractContainerScreen<WaterCollectorMenu> {
-    // Panel colors
-    private static final int PANEL_DARK = 0xFF373737;
-    private static final int PANEL_MID = 0xFF8B8B8B;
-    private static final int PANEL_LIGHT = 0xFFC6C6C6;
-    private static final int SLOT_BG = 0xFF6B6B6B;
-    private static final int SLOT_BORDER_DARK = 0xFF555555;
-    private static final int SLOT_BORDER_LIGHT = 0xFFD0D0D0;
-    // Water colors
-    private static final int WATER_DARK = 0xFF1A4FA0;
-    private static final int WATER_MID = 0xFF2060C0;
-    private static final int WATER_BRIGHT = 0xFF4080E0;
-    // Tank background
-    private static final int TANK_BG = 0xFF2A2A2A;
-    private static final int TANK_BORDER = 0xFF555555;
-
-    public WaterCollectorScreen(WaterCollectorMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title);
-        this.imageWidth = 176;
-        this.imageHeight = 178;
-        this.inventoryLabelY = this.imageHeight - 94;
+    public WaterCollectorScreen(WaterCollectorMenu menu, Inventory inv, Component title) {
+        super(menu, inv, title); this.imageWidth = 176; this.imageHeight = 178; this.inventoryLabelY = this.imageHeight - 94;
     }
 
-    @Override
-    protected void init() {
-        super.init();
-        this.titleLabelX = (imageWidth - font.width(title)) / 2;
-        this.titleLabelY = 6;
-        this.inventoryLabelX = 8;
+    @Override protected void init() { super.init(); titleLabelX = (imageWidth - font.width(title))/2; titleLabelY = 6; inventoryLabelX = 8; }
+
+    @Override public void render(GuiGraphics gg, int mx, int my, float delta) {
+        renderBg(gg, delta, mx, my); super.render(gg, mx, my, delta); renderLabels(gg, mx, my); renderTooltip(gg, mx, my);
+        int x = leftPos, y = topPos;
+        if (mx >= x+79 && mx < x+97 && my >= y+17 && my < y+71)
+            gg.renderTooltip(font, Component.literal("Water: "+menu.getFluidAmount()+"/"+menu.getFluidCapacity()+" mB"), mx, my);
     }
 
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBg(guiGraphics, delta, mouseX, mouseY);
-        super.render(guiGraphics, mouseX, mouseY, delta);
-        this.renderLabels(guiGraphics, mouseX, mouseY);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-
-        // Hover tooltip for fluid tank (read from synced data slots)
-        int tankX = this.leftPos + 79;
-        int tankY = this.topPos + 17;
-        int tankW = 18;
-        int tankH = 54;
-        if (mouseX >= tankX && mouseX < tankX + tankW && mouseY >= tankY && mouseY < tankY + tankH) {
-            int amount = menu.getFluidAmount();
-            int capacity = menu.getFluidCapacity();
-            guiGraphics.renderTooltip(this.font,
-                Component.literal(amount + " / " + capacity + " mB"),
-                mouseX, mouseY);
-        }
+    @Override protected void renderLabels(GuiGraphics gg, int mx, int my) {
+        gg.drawString(font, title, titleLabelX, titleLabelY, 0xCCCCCC, false);
+        gg.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 0x888888, false);
     }
 
-    @Override
-    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        guiGraphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 4210752, false);
-        guiGraphics.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
-    }
+    @Override protected void renderBg(GuiGraphics gg, float delta, int mx, int my) {
+        int x = leftPos, y = topPos;
+        ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
-    @Override
-    protected void renderBg(GuiGraphics guiGraphics, float delta, int mouseX, int mouseY) {
-        int x = this.leftPos;
-        int y = this.topPos;
+        // Large water tank in center
+        ValenceGui.drawGauge(gg, x + 79, y + 17, 18, 54,
+            ValenceGui.FLUID_TOP, ValenceGui.FLUID_BOTTOM,
+            menu.getFluidAmount(), menu.getFluidCapacity());
+        ValenceGui.drawLabel(gg, font, Component.literal("Water"), x + 88, y + 75, 0x888888);
 
-        drawMachinePanel(guiGraphics, x, y, imageWidth, imageHeight);
+        // Capacity info
+        String cap = menu.getFluidAmount()+"/"+menu.getFluidCapacity()+"mB";
+        ValenceGui.drawLabel(gg, font, Component.literal(cap), x + 88, y + 86, 0x666666);
 
-        // Draw the fluid tank (vertical gauge) using synced data slots
-        int tankX = x + 79;
-        int tankY = y + 17;
-        int tankW = 18;
-        int tankH = 54;
-
-        // Tank background
-        guiGraphics.fill(tankX, tankY, tankX + tankW, tankY + tankH, TANK_BORDER);
-        guiGraphics.fill(tankX + 1, tankY + 1, tankX + tankW - 1, tankY + tankH - 1, TANK_BG);
-
-        // Fluid fill from synced data slots
-        int amount = menu.getFluidAmount();
-        int capacity = menu.getFluidCapacity();
-        int fillHeight = capacity > 0 ? (int) ((long) amount * (tankH - 2) / capacity) : 0;
-        if (fillHeight > 0) {
-            int fluidY = tankY + tankH - 1 - fillHeight;
-            for (int i = 0; i < fillHeight; i++) {
-                int color = WATER_DARK;
-                float t = (float) i / fillHeight;
-                if (t > 0.7f) color = WATER_BRIGHT;
-                else if (t > 0.3f) color = WATER_MID;
-                guiGraphics.fill(tankX + 2, fluidY + i, tankX + tankW - 2, fluidY + i + 1, color);
-            }
-        }
-
-        // Label
-        guiGraphics.drawString(this.font, Component.literal("Water"), x + 65 - font.width("Water") / 2, y + 75, 0x555555, false);
-
-        // Player inventory
-        drawPlayerInventory(guiGraphics, x + 7, y + 95);
-    }
-
-    private static void drawMachinePanel(GuiGraphics guiGraphics, int x, int y, int width, int height) {
-        guiGraphics.fill(x, y, x + width, y + height, PANEL_DARK);
-        guiGraphics.fill(x + 1, y + 1, x + width - 1, y + height - 1, PANEL_MID);
-        guiGraphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, PANEL_LIGHT);
-    }
-
-    private static void drawSlot(GuiGraphics guiGraphics, int x, int y) {
-        guiGraphics.fill(x, y, x + 18, y + 18, SLOT_BORDER_DARK);
-        guiGraphics.fill(x + 1, y + 1, x + 17, y + 17, SLOT_BORDER_LIGHT);
-        guiGraphics.fill(x + 2, y + 2, x + 16, y + 16, SLOT_BG);
-    }
-
-    private static void drawPlayerInventory(GuiGraphics guiGraphics, int x, int y) {
-        for (int row = 0; row < 3; row++) {
-            for (int column = 0; column < 9; column++) {
-                drawSlot(guiGraphics, x + column * 18, y + row * 18);
-            }
-        }
-        for (int column = 0; column < 9; column++) {
-            drawSlot(guiGraphics, x + column * 18, y + 58);
-        }
+        for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+95+r*18);
+        for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+153);
     }
 }
