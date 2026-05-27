@@ -58,6 +58,9 @@ import com.valence.valence.block.pipe.EnergyCableBlock;
 import com.valence.valence.block.pipe.EnergyCableTileEntity;
 import com.valence.valence.block.wireless.WirelessNodeBlock;
 import com.valence.valence.block.wireless.WirelessNodeTileEntity;
+import com.valence.valence.block.megacell.MegaCellBlock;
+import com.valence.valence.block.megacell.MegaCellTileEntity;
+import com.valence.valence.block.megacell.MegaCellMenu;
 import com.valence.valence.block.wireless.WirelessNodeMenu;
 import com.valence.valence.block.efurnace.ElectricFurnaceBlock;
 import com.valence.valence.block.efurnace.ElectricFurnaceTileEntity;
@@ -95,6 +98,7 @@ public class Registration {
     public static final RegistryObject<Block> ENERGY_CABLE = BLOCKS.register("energy_cable", () -> new EnergyCableBlock(BLOCK_PROPS.noOcclusion()));
     public static final RegistryObject<Block> WIRELESS_NODE = BLOCKS.register("wireless_node", () -> new WirelessNodeBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> ELECTRIC_FURNACE = BLOCKS.register("electric_furnace", () -> new ElectricFurnaceBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> MEGA_CELL = BLOCKS.register("mega_cell", () -> new MegaCellBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> TREE_GROWTH_CHAMBER = BLOCKS.register("tree_growth_chamber", () -> new TreeGrowthChamberBlock(BLOCK_PROPS));
 
     // BlockEntityTypes
@@ -128,6 +132,8 @@ public class Registration {
             () -> BlockEntityType.Builder.of(WirelessNodeTileEntity::new, WIRELESS_NODE.get()).build(null));
     public static final RegistryObject<BlockEntityType<ElectricFurnaceTileEntity>> ELECTRIC_FURNACE_TE = BLOCK_ENTITIES.register("electric_furnace",
             () -> BlockEntityType.Builder.of(ElectricFurnaceTileEntity::new, ELECTRIC_FURNACE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<MegaCellTileEntity>> MEGA_CELL_TE = BLOCK_ENTITIES.register("mega_cell",
+            () -> BlockEntityType.Builder.of(MegaCellTileEntity::new, MEGA_CELL.get()).build(null));
     public static final RegistryObject<BlockEntityType<TreeGrowthChamberTileEntity>> TREE_GROWTH_CHAMBER_TE = BLOCK_ENTITIES.register("tree_growth_chamber",
             () -> BlockEntityType.Builder.of(TreeGrowthChamberTileEntity::new, TREE_GROWTH_CHAMBER.get()).build(null));
     // Menus
@@ -143,6 +149,7 @@ public class Registration {
     public static final RegistryObject<MenuType<SeedDuplicatorMenu>> SEED_DUPLICATOR_MENU = MENUS.register("seed_duplicator", () -> IForgeMenuType.create(SeedDuplicatorMenu::new));
     public static final RegistryObject<MenuType<TransferConduitMenu>> TRANSFER_CONDUIT_MENU = MENUS.register("transfer_conduit", () -> IForgeMenuType.create(TransferConduitMenu::new));
     public static final RegistryObject<MenuType<TreeGrowthChamberMenu>> TREE_GROWTH_CHAMBER_MENU = MENUS.register("tree_growth_chamber", () -> IForgeMenuType.create(TreeGrowthChamberMenu::new));
+    public static final RegistryObject<MenuType<MegaCellMenu>> MEGA_CELL_MENU = MENUS.register("mega_cell", () -> IForgeMenuType.create(MegaCellMenu::new));
     public static final RegistryObject<MenuType<WirelessNodeMenu>> WIRELESS_NODE_MENU = MENUS.register("wireless_node", () -> IForgeMenuType.create(WirelessNodeMenu::new));
     public static final RegistryObject<MenuType<ElectricFurnaceMenu>> ELECTRIC_FURNACE_MENU = MENUS.register("electric_furnace", () -> IForgeMenuType.create(ElectricFurnaceMenu::new));
 
@@ -169,6 +176,7 @@ public class Registration {
     public static final RegistryObject<Item> TRANSFER_CONDUIT_ITEM = ITEMS.register("transfer_conduit", () -> new BlockItem(TRANSFER_CONDUIT.get(), new Item.Properties()));
     public static final RegistryObject<Item> FLUID_PIPE_ITEM = ITEMS.register("fluid_pipe", () -> new BlockItem(FLUID_PIPE.get(), new Item.Properties()));
     public static final RegistryObject<Item> TREE_GROWTH_CHAMBER_ITEM = ITEMS.register("tree_growth_chamber", () -> new BlockItem(TREE_GROWTH_CHAMBER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> MEGA_CELL_ITEM = ITEMS.register("mega_cell", () -> new BlockItem(MEGA_CELL.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENERGY_CABLE_ITEM = ITEMS.register("energy_cable", () -> new BlockItem(ENERGY_CABLE.get(), new Item.Properties()));
     public static final RegistryObject<Item> WIRELESS_NODE_ITEM = ITEMS.register("wireless_node", () -> new BlockItem(WIRELESS_NODE.get(), new Item.Properties()));
     public static final RegistryObject<Item> ELECTRIC_FURNACE_ITEM = ITEMS.register("electric_furnace", () -> new BlockItem(ELECTRIC_FURNACE.get(), new Item.Properties()));
@@ -198,6 +206,7 @@ public class Registration {
                         output.accept(DF_CELL_ITEM.get());
                         output.accept(SEED_DUPLICATOR_ITEM.get());
                         output.accept(TRANSFER_CONDUIT_ITEM.get());
+                        output.accept(MEGA_CELL_ITEM.get());
                         output.accept(FLUID_PIPE_ITEM.get());
                         output.accept(ENERGY_CABLE_ITEM.get());
                         output.accept(WIRELESS_NODE_ITEM.get());
