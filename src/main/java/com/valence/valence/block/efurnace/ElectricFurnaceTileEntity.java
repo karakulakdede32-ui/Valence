@@ -50,6 +50,7 @@ public class ElectricFurnaceTileEntity extends BlockEntity implements MenuProvid
     };
 
     private final int[] progress = new int[SLOT_COUNT];
+    private boolean balanceMode = false;
     private final LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> dfStorage);
 
     public ElectricFurnaceTileEntity(BlockPos pos, BlockState state) {
@@ -72,6 +73,7 @@ public class ElectricFurnaceTileEntity extends BlockEntity implements MenuProvid
         super.load(tag);
         dfStorage.deserializeNBT(tag.get("df_storage"));
         itemHandler.deserializeNBT(tag.getCompound("items"));
+        balanceMode = tag.getBoolean("balance_mode");
         int[] prog = tag.getIntArray("progress");
         for (int i = 0; i < SLOT_COUNT && i < prog.length; i++) progress[i] = prog[i];
     }
@@ -81,6 +83,7 @@ public class ElectricFurnaceTileEntity extends BlockEntity implements MenuProvid
         super.saveAdditional(tag);
         tag.put("df_storage", dfStorage.serializeNBT());
         tag.put("items", itemHandler.serializeNBT());
+        tag.putBoolean("balance_mode", balanceMode);
         tag.putIntArray("progress", progress);
     }
 
@@ -96,6 +99,7 @@ public class ElectricFurnaceTileEntity extends BlockEntity implements MenuProvid
         super.handleUpdateTag(tag);
         dfStorage.deserializeNBT(tag.get("df_storage"));
         itemHandler.deserializeNBT(tag.getCompound("items"));
+        balanceMode = tag.getBoolean("balance_mode");
         int[] prog = tag.getIntArray("progress");
         for (int i = 0; i < SLOT_COUNT && i < prog.length; i++) progress[i] = prog[i];
     }
@@ -109,7 +113,8 @@ public class ElectricFurnaceTileEntity extends BlockEntity implements MenuProvid
         if (tag != null) {
             dfStorage.deserializeNBT(tag.get("df_storage"));
             itemHandler.deserializeNBT(tag.getCompound("items"));
-            int[] prog = tag.getIntArray("progress");
+            balanceMode = tag.getBoolean("balance_mode");
+        int[] prog = tag.getIntArray("progress");
             for (int i = 0; i < SLOT_COUNT && i < prog.length; i++) progress[i] = prog[i];
         }
     }
@@ -203,6 +208,9 @@ public class ElectricFurnaceTileEntity extends BlockEntity implements MenuProvid
 
         if (anyActive) te.setChanged();
     }
+
+    public void toggleBalanceMode() { balanceMode = !balanceMode; setChanged(); sync(); }
+    public boolean isBalanceMode() { return balanceMode; }
 
     public int[] getProgress() { return progress; }
     public DFStorage getDFStorage() { return dfStorage; }
