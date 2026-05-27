@@ -47,6 +47,10 @@ import com.valence.valence.block.seeder.SeedDuplicatorBlock;
 import com.valence.valence.block.seeder.SeedDuplicatorTileEntity;
 import com.valence.valence.block.seeder.SeedDuplicatorMenu;
 import com.valence.valence.fluid.SteamFluid;
+import com.valence.valence.block.conduit.TransferConduitBlock;
+import com.valence.valence.block.conduit.TransferConduitTileEntity;
+import com.valence.valence.block.conduit.TransferConduitMenu;
+import com.valence.valence.item.LinkingTool;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
 public class Registration {
@@ -72,6 +76,7 @@ public class Registration {
     public static final RegistryObject<Block> STEAM_TURBINE = BLOCKS.register("steam_turbine", () -> new SteamTurbineBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> DF_CELL = BLOCKS.register("df_cell", () -> new DFCellBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> SEED_DUPLICATOR = BLOCKS.register("seed_duplicator", () -> new SeedDuplicatorBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> TRANSFER_CONDUIT = BLOCKS.register("transfer_conduit", () -> new TransferConduitBlock(BLOCK_PROPS));
 
     // BlockEntityTypes
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -94,6 +99,8 @@ public class Registration {
             () -> BlockEntityType.Builder.of(DFCellTileEntity::new, DF_CELL.get()).build(null));
     public static final RegistryObject<BlockEntityType<SeedDuplicatorTileEntity>> SEED_DUPLICATOR_TE = BLOCK_ENTITIES.register("seed_duplicator",
             () -> BlockEntityType.Builder.of(SeedDuplicatorTileEntity::new, SEED_DUPLICATOR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<TransferConduitTileEntity>> TRANSFER_CONDUIT_TE = BLOCK_ENTITIES.register("transfer_conduit",
+            () -> BlockEntityType.Builder.of(TransferConduitTileEntity::new, TRANSFER_CONDUIT.get()).build(null));
 
     // Menus
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner", () -> IForgeMenuType.create(BasicMinerMenu::new));
@@ -106,6 +113,7 @@ public class Registration {
     public static final RegistryObject<MenuType<SteamTurbineMenu>> STEAM_TURBINE_MENU = MENUS.register("steam_turbine", () -> IForgeMenuType.create(SteamTurbineMenu::new));
     public static final RegistryObject<MenuType<DFCellMenu>> DF_CELL_MENU = MENUS.register("df_cell", () -> IForgeMenuType.create(DFCellMenu::new));
     public static final RegistryObject<MenuType<SeedDuplicatorMenu>> SEED_DUPLICATOR_MENU = MENUS.register("seed_duplicator", () -> IForgeMenuType.create(SeedDuplicatorMenu::new));
+    public static final RegistryObject<MenuType<TransferConduitMenu>> TRANSFER_CONDUIT_MENU = MENUS.register("transfer_conduit", () -> IForgeMenuType.create(TransferConduitMenu::new));
 
     // Fluids
     public static final RegistryObject<Fluid> STEAM = FLUIDS.register("steam", SteamFluid.Source::new);
@@ -127,6 +135,8 @@ public class Registration {
     public static final RegistryObject<Item> STEAM_TURBINE_ITEM = ITEMS.register("steam_turbine", () -> new BlockItem(STEAM_TURBINE.get(), new Item.Properties()));
     public static final RegistryObject<Item> DF_CELL_ITEM = ITEMS.register("df_cell", () -> new BlockItem(DF_CELL.get(), new Item.Properties()));
     public static final RegistryObject<Item> SEED_DUPLICATOR_ITEM = ITEMS.register("seed_duplicator", () -> new BlockItem(SEED_DUPLICATOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TRANSFER_CONDUIT_ITEM = ITEMS.register("transfer_conduit", () -> new BlockItem(TRANSFER_CONDUIT.get(), new Item.Properties()));
+    public static final RegistryObject<Item> LINKING_TOOL = ITEMS.register("linking_tool", () -> new LinkingTool(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLD_POWDER = ITEMS.register("gold_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> REDSTONE_POWDER = ITEMS.register("redstone_powder", () -> new Item(new Item.Properties()));
@@ -150,6 +160,8 @@ public class Registration {
                         output.accept(STEAM_TURBINE_ITEM.get());
                         output.accept(DF_CELL_ITEM.get());
                         output.accept(SEED_DUPLICATOR_ITEM.get());
+                        output.accept(TRANSFER_CONDUIT_ITEM.get());
+                        output.accept(LINKING_TOOL.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());

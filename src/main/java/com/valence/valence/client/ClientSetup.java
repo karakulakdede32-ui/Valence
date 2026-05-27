@@ -24,6 +24,7 @@ public class ClientSetup {
             MenuScreens.register(Registration.STEAM_TURBINE_MENU.get(), SteamTurbineScreen::new);
             MenuScreens.register(Registration.DF_CELL_MENU.get(), DFCellScreen::new);
             MenuScreens.register(Registration.SEED_DUPLICATOR_MENU.get(), SeedDuplicatorScreen::new);
+            MenuScreens.register(Registration.TRANSFER_CONDUIT_MENU.get(), TransferConduitScreen::new);
         });
     }
 }

@@ -31,5 +31,9 @@
     "fluid.valence.steam": "Steam",
     "block.valence.seed_duplicator": "Seed Duplicator",
     "item.valence.seed_duplicator": "Seed Duplicator",
-    "container.valence.seed_duplicator": "Seed Duplicator"
+    "container.valence.seed_duplicator": "Seed Duplicator",
+    "block.valence.transfer_conduit": "Transfer Conduit",
+    "item.valence.transfer_conduit": "Transfer Conduit",
+    "container.valence.transfer_conduit": "Transfer Conduit",
+    "item.valence.linking_tool": "Linking Tool"
 }
