@@ -40,12 +40,19 @@ public class SteamTurbineMenu extends AbstractContainerMenu {
         super.broadcastChanges();
     }
 
-    @Override public ItemStack quickMoveStack(Player pl, int idx) { return ItemStack.EMPTY; }
-
-    @Override public boolean stillValid(Player pl) {
-        return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate(
-            (l, p) -> pl.distanceToSqr(p.getX()+0.5, p.getY()+0.5, p.getZ()+0.5) <= 64, true);
+    @Override public ItemStack quickMoveStack(Player pl, int idx) {
+        Slot slot = slots.get(idx);
+        if (!slot.hasItem()) return ItemStack.EMPTY;
+        ItemStack stack = slot.getItem();
+        ItemStack result = stack.copy();
+        if (idx < 27) { if (!moveItemStackTo(stack, 27, 36, false)) return ItemStack.EMPTY; }
+        else if (idx < 36) { if (!moveItemStackTo(stack, 0, 27, false)) return ItemStack.EMPTY; }
+        else return ItemStack.EMPTY;
+        if (stack.isEmpty()) slot.set(ItemStack.EMPTY); else slot.setChanged();
+        return result;
     }
+
+    @Override public boolean stillValid(Player pl) { return true; }
 
     public SteamTurbineTileEntity getTileEntity() { return tileEntity; }
     public int getSteamAmount() { return steamAmount.get(); }

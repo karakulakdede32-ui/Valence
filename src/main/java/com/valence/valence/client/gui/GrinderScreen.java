@@ -27,17 +27,21 @@ public class GrinderScreen extends AbstractContainerScreen<GrinderMenu> {
         int x = leftPos, y = topPos;
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
-        ValenceGui.drawSlot(gg, x + 52, y + 34); // input
-        ValenceGui.drawSlot(gg, x + 106, y + 34); // output
+        ValenceGui.drawSlot(gg, x + 52, y + 34);
+        ValenceGui.drawSlot(gg, x + 106, y + 34);
 
+        // Animated arrow
         GrinderTileEntity te = menu.getTileEntity();
-        if (te != null) {
-            // Progress bar
-            ValenceGui.drawProgressBar(gg, x + 74, y + 39, 30, 6, te.getProgress(), te.getMaxProgress());
-        }
+        int prog = te != null ? te.getProgress() : 0;
+        int maxP = te != null ? te.getMaxProgress() : 1;
+        ValenceGui.drawArrow(gg, x + 74, y + 38, 30, 8, prog, maxP);
 
-        ValenceGui.drawGaugeLabel(gg, font, "Input", x + 61, y + 55, 0x888888);
-        ValenceGui.drawGaugeLabel(gg, font, "Output", x + 115, y + 55, 0x888888);
+        // Status dot
+        int status = (te != null && te.getProgress() > 0) ? 1 : (te != null && !te.getItemHandler().getStackInSlot(0).isEmpty() ? 2 : 0);
+        ValenceGui.drawStatus(gg, x + 8, y + 8, status);
+
+        ValenceGui.drawGaugeLabel(gg, font, "In", x + 61, y + 55, 0x888888);
+        ValenceGui.drawGaugeLabel(gg, font, "Out", x + 115, y + 55, 0x888888);
 
         for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+101+r*18);
         for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+159);

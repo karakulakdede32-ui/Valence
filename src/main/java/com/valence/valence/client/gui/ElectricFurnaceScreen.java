@@ -2,6 +2,7 @@ package com.valence.valence.client.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.valence.valence.block.efurnace.ElectricFurnaceMenu;
+import com.valence.valence.block.efurnace.ElectricFurnaceTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -41,20 +42,30 @@ public class ElectricFurnaceScreen extends AbstractContainerScreen<ElectricFurna
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
         // DF gauge
-        ValenceGui.drawGauge(gg, x+151, y+17, 18, 54,
-            ValenceGui.DF_TOP, ValenceGui.DF_BOTTOM,
-            menu.getDF(), menu.getDFCapacity());
-        ValenceGui.drawGaugeLabel(gg, font, "DF", x+160, y+75, 0x888888);
+        ElectricFurnaceTileEntity te = menu.getTileEntity();
+        int dfPx = te != null ? te.getDFStorage().getDF() : 0;
+        int dfMax = te != null ? te.getDFStorage().getMaxDF() : 1;
+        boolean active = te != null && te.getDFStorage().getDF() >= 5;
 
-        // 8 input slots (top row)
+        ValenceGui.drawGauge(gg, x+151, y+17, 18, 54,
+            ValenceGui.DF_TOP, ValenceGui.DF_BOTTOM, dfPx, dfMax);
+        ValenceGui.drawGaugeLabel(gg, font, "DF", x+160, y+75, 0x888888);
+        if (active) ValenceGui.drawActiveGlow(gg, x+151, y+17, 18, 54, dfPx*52/dfMax, ValenceGui.DF_TOP);
+
+        // Status
+        boolean anyActive = false;
+        if (te != null) for (int p : te.getProgress()) if (p > 0) { anyActive = true; break; }
+        ValenceGui.drawStatus(gg, x+8, y+8, anyActive ? 1 : (menu.getDF() >= 5 ? 2 : 0));
+
+        // 8 input slots
         for (int c = 0; c < 8; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+16);
         ValenceGui.drawGaugeLabel(gg, font, "Inputs", x+79, y+38, 0x888888);
 
         // 8 progress bars
         for (int c = 0; c < 8; c++)
-            ValenceGui.drawProgressBar(gg, x+7+c*18, y+43, 16, 4, menu.getProgress(c), menu.getMaxProgress());
+            ValenceGui.drawArrow(gg, x+7+c*18, y+42, 16, 6, menu.getProgress(c), menu.getMaxProgress());
 
-        // 8 output slots (bottom row)
+        // 8 output slots
         for (int c = 0; c < 8; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+61);
         ValenceGui.drawGaugeLabel(gg, font, "Outputs", x+79, y+83, 0x888888);
 

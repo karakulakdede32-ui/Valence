@@ -1,6 +1,7 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.alloyer.SteamAlloyerMenu;
+import com.valence.valence.block.alloyer.SteamAlloyerTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -35,12 +36,18 @@ public class SteamAlloyerScreen extends AbstractContainerScreen<SteamAlloyerMenu
             menu.getSteamAmount(), menu.getSteamCapacity());
         ValenceGui.drawGaugeLabel(gg, font, "Steam", x+16, y+75, 0x888888);
 
-        // Inputs (two slots)
+        // Inputs
         ValenceGui.drawSlot(gg, x+52, y+28); ValenceGui.drawSlot(gg, x+52, y+50);
         ValenceGui.drawGaugeLabel(gg, font, "In", x+61, y+72, 0x888888);
 
-        // Progress bar
-        ValenceGui.drawProgressBar(gg, x+76, y+40, 26, 6, menu.getProgress(), menu.getMaxProgress());
+        // Animated arrow
+        ValenceGui.drawArrow(gg, x+76, y+39, 26, 8, menu.getProgress(), menu.getMaxProgress());
+
+        // Status
+        SteamAlloyerTileEntity te = menu.getTileEntity();
+        boolean hasInput = te != null && !te.getItemHandler().getStackInSlot(0).isEmpty() && !te.getItemHandler().getStackInSlot(1).isEmpty();
+        int status = (te != null && te.getProgress() > 0) ? 1 : hasInput ? 2 : 0;
+        ValenceGui.drawStatus(gg, x+8, y+8, status);
 
         // Output
         ValenceGui.drawSlot(gg, x+115, y+34);
