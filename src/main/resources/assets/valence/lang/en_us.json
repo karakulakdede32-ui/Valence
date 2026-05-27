@@ -45,6 +45,8 @@
   "container.valence.wireless_node": "Wireless Node",
   "item.valence.chunk_excavator": "Chunk Excavator",
   "block.valence.electric_furnace": "Electric Furnace",
+  "block.valence.tree_growth_chamber": "Tree Growth Chamber",
   "item.valence.electric_furnace": "Electric Furnace",
+  "item.valence.tree_growth_chamber": "Tree Growth Chamber",
   "container.valence.electric_furnace": "Electric Furnace"
 }
