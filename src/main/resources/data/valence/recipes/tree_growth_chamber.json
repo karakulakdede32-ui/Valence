@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BDB",
+    "BSB",
+    "BPB"
+  ],
+  "key": {
+    "B": { "item": "valence:bronze_ingot" },
+    "D": { "item": "minecraft:bone_meal" },
+    "S": { "item": "minecraft:sapling" },
+    "P": { "item": "minecraft:piston" }
+  },
+  "result": { "item": "valence:tree_growth_chamber" }
+}

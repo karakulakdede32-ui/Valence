@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BGB",
+    "G G",
+    "BGB"
+  ],
+  "key": {
+    "B": { "item": "valence:bronze_ingot" },
+    "G": { "item": "minecraft:glass" }
+  },
+  "result": { "item": "valence:water_collector" }
+}

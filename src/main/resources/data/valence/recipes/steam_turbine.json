@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BIB",
+    "IPI",
+    "BIB"
+  ],
+  "key": {
+    "B": { "item": "valence:bronze_ingot" },
+    "I": { "item": "minecraft:iron_bars" },
+    "P": { "item": "minecraft:piston" }
+  },
+  "result": { "item": "valence:steam_turbine" }
+}
