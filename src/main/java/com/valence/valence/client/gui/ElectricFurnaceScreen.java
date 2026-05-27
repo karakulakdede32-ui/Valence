@@ -1,5 +1,7 @@
 package com.valence.valence.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import com.valence.valence.block.efurnace.ElectricFurnaceMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -41,7 +43,21 @@ public class ElectricFurnaceScreen extends AbstractContainerScreen<ElectricFurna
 
     @Override protected void renderLabels(GuiGraphics gg, int mx, int my) {
         gg.drawString(font, title, titleLabelX, titleLabelY, 4210752, false);
+        // Balance mode indicator
+        if (menu.balanceMode.get() == 1) {
+            String bal = "[Balance: ON - K to toggle]";
+            gg.drawString(font, Component.literal(bal), leftPos + 8, topPos + 88, 0xFFAA8800, false);
+        }
         gg.drawString(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, 4210752, false);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == InputConstants.KEY_K && this.menu != null) {
+            this.minecraft.player.connection.send(new net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket(this.menu.containerId, 0));
+            return true;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override protected void renderBg(GuiGraphics gg, float delta, int mx, int my) {
