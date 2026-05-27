@@ -35,5 +35,9 @@
     "block.valence.transfer_conduit": "Transfer Conduit",
     "item.valence.transfer_conduit": "Transfer Conduit",
     "container.valence.transfer_conduit": "Transfer Conduit",
-    "item.valence.linking_tool": "Linking Tool"
+    "item.valence.linking_tool": "Linking Tool",
+    "block.valence.fluid_pipe": "Fluid Pipe",
+    "item.valence.fluid_pipe": "Fluid Pipe",
+    "block.valence.energy_cable": "Energy Cable",
+    "item.valence.energy_cable": "Energy Cable"
 }
