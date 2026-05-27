@@ -44,14 +44,33 @@ public class SeedDuplicatorTileEntity extends BlockEntity implements MenuProvide
 
     private final ItemStackHandler itemHandler = new ItemStackHandler(2) {
         @Override public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            if (slot == 1) return false; // output slot
+            if (slot == 1) return false; // output slot — no manual insertion
             return isSeed(stack);
         }
         @Override protected void onContentsChanged(int slot) { setChanged(); }
     };
 
+    // Side-aware item handlers
+    // Top side: full access (insert input, extract output)
+    // Bottom/sides: extraction-only from output slot
     private final LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> dfStorage);
-    private final LazyOptional<IItemHandler> itemHandlerLazy = LazyOptional.of(() -> itemHandler);
+    private final LazyOptional<IItemHandler> fullHandler = LazyOptional.of(() -> itemHandler);
+    private final LazyOptional<IItemHandler> outputOnlyHandler = LazyOptional.of(() -> new IItemHandler() {
+        @Override public int getSlots() { return itemHandler.getSlots(); }
+        @Override public @NotNull ItemStack getStackInSlot(int slot) { return itemHandler.getStackInSlot(slot); }
+        @Override public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+            // Only allow insertion into input slot (0)
+            if (slot == 0 && isSeed(stack)) return itemHandler.insertItem(slot, stack, simulate);
+            return stack;
+        }
+        @Override public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return itemHandler.extractItem(slot, amount, simulate);
+        }
+        @Override public int getSlotLimit(int slot) { return itemHandler.getSlotLimit(slot); }
+        @Override public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+            return slot == 0 && isSeed(stack);
+        }
+    });
 
     public SeedDuplicatorTileEntity(BlockPos pos, BlockState state) {
         super(Registration.SEED_DUPLICATOR_TE.get(), pos, state);
@@ -110,7 +129,10 @@ public class SeedDuplicatorTileEntity extends BlockEntity implements MenuProvide
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ENERGY) return energyHandler.cast();
-        if (cap == ForgeCapabilities.ITEM_HANDLER) return itemHandlerLazy.cast();
+        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+            if (side == Direction.UP) return fullHandler.cast(); // Top: full access
+            return outputOnlyHandler.cast(); // Bottom/sides: extraction only
+        }
         return super.getCapability(cap, side);
     }
 
@@ -118,7 +140,8 @@ public class SeedDuplicatorTileEntity extends BlockEntity implements MenuProvide
     public void invalidateCaps() {
         super.invalidateCaps();
         energyHandler.invalidate();
-        itemHandlerLazy.invalidate();
+        fullHandler.invalidate();
+        outputOnlyHandler.invalidate();
     }
 
     private static final Set<Block> SEED_BLOCKS = new HashSet<>();
@@ -171,7 +194,6 @@ public class SeedDuplicatorTileEntity extends BlockEntity implements MenuProvide
         ItemStack output = te.itemHandler.getStackInSlot(1);
 
         if (!input.isEmpty() && te.dfStorage.getDF() >= DF_PER_USE) {
-            // Check if output slot can accept 2 of the input
             ItemStack result = input.copy();
             result.setCount(2);
             boolean canFit = output.isEmpty() || (output.is(result.getItem()) && ItemStack.isSameItemSameTags(input, output) && output.getCount() + 2 <= output.getMaxStackSize());

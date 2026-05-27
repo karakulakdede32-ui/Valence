@@ -30,9 +30,6 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
 
     @Override
     public boolean matches(SimpleContainer pContainer, Level pLevel) {
-        if (pLevel.isClientSide()) {
-            return false;
-        }
         return input.test(pContainer.getItem(0));
     }
 
@@ -92,8 +89,7 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
         public GrinderRecipe fromJson(ResourceLocation pRecipeId, JsonObject pJson) {
             Ingredient input = Ingredient.fromJson(pJson.get("ingredients"));
             ItemStack output = ShapedRecipe.itemStackFromJson(pJson.getAsJsonObject("output"));
-            int processingTime = pJson.has("processingtime") ? pJson.get("processingtime").getAsInt() : 200; // Default to 200 ticks
-
+            int processingTime = pJson.has("processingtime") ? pJson.get("processingtime").getAsInt() : 200;
             return new GrinderRecipe(pRecipeId, input, output, processingTime);
         }
 
@@ -102,7 +98,6 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
             Ingredient input = Ingredient.fromNetwork(pBuffer);
             ItemStack output = pBuffer.readItem();
             int processingTime = pBuffer.readInt();
-
             return new GrinderRecipe(pRecipeId, input, output, processingTime);
         }
 

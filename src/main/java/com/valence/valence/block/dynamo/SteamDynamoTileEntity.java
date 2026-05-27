@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
     private static final int WATER_TANK_CAPACITY = 2000;
-    private static final int STEAM_TANK_CAPACITY = 8;
+    private static final int STEAM_TANK_CAPACITY = 100;
     private static final int CONVERSION_RATE = 18;
 
     private final FluidTank waterTank = new FluidTank(WATER_TANK_CAPACITY) {
@@ -143,6 +143,7 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
             BlockPos neighborPos = worldPosition.relative(dir);
 
             // Try pulling from fluid inventory first
+            boolean pulledFromBE = false;
             BlockEntity neighbor = level.getBlockEntity(neighborPos);
             if (neighbor != null) {
                 int request = remaining;
@@ -156,12 +157,16 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
                         waterTank.fill(new FluidStack(Fluids.WATER, fill), IFluidHandler.FluidAction.EXECUTE);
                         return fill;
                     }).orElse(0);
-                remaining -= pulled;
-                continue;
+                if (pulled > 0) {
+                    remaining -= pulled;
+                    pulledFromBE = true;
+                }
             }
 
-            // No block entity — check for water source blocks
-            if (remaining > 0 && level.getFluidState(neighborPos).isSource() && level.getFluidState(neighborPos).getType() == Fluids.WATER) {
+            // If no BE or BE didn't provide water, check for water source blocks
+            if (!pulledFromBE && remaining > 0
+                    && level.getFluidState(neighborPos).isSource()
+                    && level.getFluidState(neighborPos).getType() == Fluids.WATER) {
                 int fill = waterTank.fill(new FluidStack(Fluids.WATER, remaining), IFluidHandler.FluidAction.SIMULATE);
                 if (fill > 0) {
                     waterTank.fill(new FluidStack(Fluids.WATER, fill), IFluidHandler.FluidAction.EXECUTE);
@@ -174,8 +179,14 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
     private void convertWaterToSteam() {
         if (waterTank.getFluidAmount() < CONVERSION_RATE) return;
         if (steamTank.getFluidAmount() >= steamTank.getCapacity()) return;
-        waterTank.drain(CONVERSION_RATE, IFluidHandler.FluidAction.EXECUTE);
-        steamTank.fill(new FluidStack(Registration.STEAM.get(), CONVERSION_RATE), IFluidHandler.FluidAction.EXECUTE);
+
+        // Only drain as much water as steam tank can accept
+        int steamSpace = steamTank.getCapacity() - steamTank.getFluidAmount();
+        int toConvert = Math.min(CONVERSION_RATE, steamSpace);
+        if (toConvert <= 0) return;
+
+        waterTank.drain(toConvert, IFluidHandler.FluidAction.EXECUTE);
+        steamTank.fill(new FluidStack(Registration.STEAM.get(), toConvert), IFluidHandler.FluidAction.EXECUTE);
     }
 
     private void pushSteamToNeighbors() {
