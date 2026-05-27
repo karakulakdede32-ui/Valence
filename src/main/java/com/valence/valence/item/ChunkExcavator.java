@@ -9,11 +9,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.Containers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.network.chat.Component;
@@ -35,86 +33,95 @@ public class ChunkExcavator extends Item {
 
         Player player = ctx.getPlayer();
         ItemStack stack = ctx.getItemInHand();
-
         if (player == null) return InteractionResult.FAIL;
-        if (player.isShiftKeyDown()) return InteractionResult.FAIL; // prevent accidental use while sneaking
+        if (player.isShiftKeyDown()) return InteractionResult.FAIL;
 
         ServerLevel serverLevel = (ServerLevel) level;
         BlockPos pos = ctx.getClickedPos();
         LevelChunk chunk = serverLevel.getChunkAt(pos);
 
         int oresFound = 0;
-        int oresBroken = 0;
+        int oresExtracted = 0;
+        boolean broken = false;
 
         // Scan the entire chunk (16x16 horizontal, full height)
-        for (int sectionIdx = chunk.getSectionsCount() - 1; sectionIdx >= 0; sectionIdx--) {
+        for (int sectionIdx = chunk.getSectionsCount() - 1; sectionIdx >= 0 && !broken; sectionIdx--) {
             LevelChunkSection section = chunk.getSection(sectionIdx);
             if (section == null || section.hasOnlyAir()) continue;
 
-            // Get the Y level for this section
             int sectionY = chunk.getSectionYFromSectionIndex(sectionIdx);
 
-            for (int x = 0; x < 16; x++) {
-                for (int z = 0; z < 16; z++) {
-                    for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16 && !broken; x++) {
+                for (int z = 0; z < 16 && !broken; z++) {
+                    for (int y = 0; y < 16 && !broken; y++) {
                         int worldY = (sectionY << 4) + y;
                         if (worldY < level.getMinBuildHeight() || worldY > level.getMaxBuildHeight()) continue;
 
                         BlockPos orePos = new BlockPos((chunk.getPos().x << 4) + x, worldY, (chunk.getPos().z << 4) + z);
                         BlockState state = level.getBlockState(orePos);
-                        BlockState defaultState = state.getBlock().defaultBlockState();
 
-                        boolean isOre = state.is(BlockTags.COAL_ORES) ||
-                                        state.is(BlockTags.IRON_ORES) ||
-                                        state.is(BlockTags.COPPER_ORES) ||
-                                        state.is(BlockTags.GOLD_ORES) ||
-                                        state.is(BlockTags.REDSTONE_ORES) ||
-                                        state.is(BlockTags.LAPIS_ORES) ||
-                                        state.is(BlockTags.DIAMOND_ORES) ||
-                                        state.is(BlockTags.EMERALD_ORES) ||
-                                        state.is(Blocks.NETHER_QUARTZ_ORE) ||
-                                        state.is(Blocks.NETHER_GOLD_ORE) ||
-                                        state.is(Blocks.ANCIENT_DEBRIS);
+                        if (state.isAir()) continue;
+
+                        boolean isOre = state.is(BlockTags.COAL_ORES)
+                                || state.is(BlockTags.IRON_ORES)
+                                || state.is(BlockTags.COPPER_ORES)
+                                || state.is(BlockTags.GOLD_ORES)
+                                || state.is(BlockTags.REDSTONE_ORES)
+                                || state.is(BlockTags.LAPIS_ORES)
+                                || state.is(BlockTags.DIAMOND_ORES)
+                                || state.is(BlockTags.EMERALD_ORES)
+                                || state.is(Blocks.NETHER_QUARTZ_ORE)
+                                || state.is(Blocks.NETHER_GOLD_ORE)
+                                || state.is(Blocks.ANCIENT_DEBRIS);
 
                         if (!isOre) continue;
-                        if (state.isAir()) continue;
 
                         oresFound++;
 
-                        // Check durability
-                        if (stack.getDamageValue() >= stack.getMaxDamage()) break;
-
-                        // Silk-touch: drop the ore block itself so player can process it through the grinder
-                        BlockState dropState = defaultState;
-
-                        // Handle redstone ore - always use normal ore, not lit
-                        if (state.is(Blocks.REDSTONE_ORE) || state.is(Blocks.DEEPSLATE_REDSTONE_ORE)) {
-                            dropState = state.is(Blocks.DEEPSLATE_REDSTONE_ORE) ? Blocks.DEEPSLATE_REDSTONE_ORE.defaultBlockState() : Blocks.REDSTONE_ORE.defaultBlockState();
+                        // Check durability before breaking
+                        if (stack.getDamageValue() >= stack.getMaxDamage() - 1) {
+                            broken = true;
+                            break;
                         }
 
+                        // Determine the drop item
+                        BlockState dropState = state.getBlock().defaultBlockState();
+
+                        // Handle redstone ore variants
+                        if (state.is(Blocks.REDSTONE_ORE) || state.is(Blocks.DEEPSLATE_REDSTONE_ORE)) {
+                            dropState = state.is(Blocks.DEEPSLATE_REDSTONE_ORE)
+                                    ? Blocks.DEEPSLATE_REDSTONE_ORE.defaultBlockState()
+                                    : Blocks.REDSTONE_ORE.defaultBlockState();
+                        }
+
+                        // Remove the block
                         level.destroyBlock(orePos, false, player);
-                        Containers.dropItemStack(level, orePos.getX() + 0.5, orePos.getY() + 0.5, orePos.getZ() + 0.5, new ItemStack(dropState.getBlock().asItem(), 1));
-                        oresBroken++;
+
+                        // Try to add to player inventory, drop on ground if full
+                        ItemStack oreStack = new ItemStack(dropState.getBlock().asItem(), 1);
+                        if (!player.addItem(oreStack)) {
+                            player.drop(oreStack, false);
+                        }
+
+                        oresExtracted++;
 
                         // Damage the item
-                        stack.hurt(1, serverLevel.getRandom(), (net.minecraft.server.level.ServerPlayer)null);
+                        stack.hurt(1, serverLevel.getRandom(), null);
                         if (stack.getDamageValue() >= stack.getMaxDamage()) {
                             stack.shrink(1);
-                            player.displayClientMessage(Component.literal("Chunk Excavator broke!"), true);
+                            player.displayClientMessage(Component.literal("§cChunk Excavator broke!"), true);
+                            broken = true;
                             break;
                         }
                     }
-                    if (stack.isEmpty()) break;
                 }
-                if (stack.isEmpty()) break;
             }
-            if (stack.isEmpty()) break;
         }
 
         if (oresFound > 0) {
-            player.displayClientMessage(Component.literal("Extracted " + oresBroken + "/" + oresFound + " ores from chunk"), true);
+            player.displayClientMessage(Component.literal("§aExtracted " + oresExtracted + "/" + oresFound + " ores from chunk"), true);
         } else {
-            player.displayClientMessage(Component.literal("No ores found in this chunk"), true);
+            player.displayClientMessage(Component.literal("§7No ores found in this chunk"), true);
         }
 
         return InteractionResult.SUCCESS;
@@ -123,7 +130,7 @@ public class ChunkExcavator extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, level, tooltip, flag);
-        tooltip.add(Component.literal("Right-click to extract all ores in this chunk"));
-        tooltip.add(Component.literal("Durability: " + (stack.getMaxDamage() - stack.getDamageValue()) + "/" + stack.getMaxDamage()));
+        tooltip.add(Component.literal("§7Right-click to extract all ores in this chunk"));
+        tooltip.add(Component.literal("§7Durability: " + (stack.getMaxDamage() - stack.getDamageValue()) + "/" + stack.getMaxDamage()));
     }
 }
