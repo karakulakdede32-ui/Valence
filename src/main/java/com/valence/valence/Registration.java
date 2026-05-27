@@ -55,6 +55,9 @@ import com.valence.valence.block.pipe.FluidPipeBlock;
 import com.valence.valence.block.pipe.FluidPipeTileEntity;
 import com.valence.valence.block.pipe.EnergyCableBlock;
 import com.valence.valence.block.pipe.EnergyCableTileEntity;
+import com.valence.valence.block.wireless.WirelessNodeBlock;
+import com.valence.valence.block.wireless.WirelessNodeTileEntity;
+import com.valence.valence.block.wireless.WirelessNodeMenu;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
 public class Registration {
@@ -83,6 +86,7 @@ public class Registration {
     public static final RegistryObject<Block> TRANSFER_CONDUIT = BLOCKS.register("transfer_conduit", () -> new TransferConduitBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> FLUID_PIPE = BLOCKS.register("fluid_pipe", () -> new FluidPipeBlock(BLOCK_PROPS.noOcclusion()));
     public static final RegistryObject<Block> ENERGY_CABLE = BLOCKS.register("energy_cable", () -> new EnergyCableBlock(BLOCK_PROPS.noOcclusion()));
+    public static final RegistryObject<Block> WIRELESS_NODE = BLOCKS.register("wireless_node", () -> new WirelessNodeBlock(BLOCK_PROPS));
 
     // BlockEntityTypes
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -111,6 +115,8 @@ public class Registration {
             () -> BlockEntityType.Builder.of(FluidPipeTileEntity::new, FLUID_PIPE.get()).build(null));
     public static final RegistryObject<BlockEntityType<EnergyCableTileEntity>> ENERGY_CABLE_TE = BLOCK_ENTITIES.register("energy_cable",
             () -> BlockEntityType.Builder.of(EnergyCableTileEntity::new, ENERGY_CABLE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<WirelessNodeTileEntity>> WIRELESS_NODE_TE = BLOCK_ENTITIES.register("wireless_node",
+            () -> BlockEntityType.Builder.of(WirelessNodeTileEntity::new, WIRELESS_NODE.get()).build(null));
 
     // Menus
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner", () -> IForgeMenuType.create(BasicMinerMenu::new));
@@ -124,6 +130,7 @@ public class Registration {
     public static final RegistryObject<MenuType<DFCellMenu>> DF_CELL_MENU = MENUS.register("df_cell", () -> IForgeMenuType.create(DFCellMenu::new));
     public static final RegistryObject<MenuType<SeedDuplicatorMenu>> SEED_DUPLICATOR_MENU = MENUS.register("seed_duplicator", () -> IForgeMenuType.create(SeedDuplicatorMenu::new));
     public static final RegistryObject<MenuType<TransferConduitMenu>> TRANSFER_CONDUIT_MENU = MENUS.register("transfer_conduit", () -> IForgeMenuType.create(TransferConduitMenu::new));
+    public static final RegistryObject<MenuType<WirelessNodeMenu>> WIRELESS_NODE_MENU = MENUS.register("wireless_node", () -> IForgeMenuType.create(WirelessNodeMenu::new));
 
     // Fluids
     public static final RegistryObject<Fluid> STEAM = FLUIDS.register("steam", SteamFluid.Source::new);
@@ -148,6 +155,7 @@ public class Registration {
     public static final RegistryObject<Item> TRANSFER_CONDUIT_ITEM = ITEMS.register("transfer_conduit", () -> new BlockItem(TRANSFER_CONDUIT.get(), new Item.Properties()));
     public static final RegistryObject<Item> FLUID_PIPE_ITEM = ITEMS.register("fluid_pipe", () -> new BlockItem(FLUID_PIPE.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENERGY_CABLE_ITEM = ITEMS.register("energy_cable", () -> new BlockItem(ENERGY_CABLE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> WIRELESS_NODE_ITEM = ITEMS.register("wireless_node", () -> new BlockItem(WIRELESS_NODE.get(), new Item.Properties()));
     public static final RegistryObject<Item> LINKING_TOOL = ITEMS.register("linking_tool", () -> new LinkingTool(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLD_POWDER = ITEMS.register("gold_powder", () -> new Item(new Item.Properties()));
@@ -175,6 +183,7 @@ public class Registration {
                         output.accept(TRANSFER_CONDUIT_ITEM.get());
                         output.accept(FLUID_PIPE_ITEM.get());
                         output.accept(ENERGY_CABLE_ITEM.get());
+                        output.accept(WIRELESS_NODE_ITEM.get());
                         output.accept(LINKING_TOOL.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
