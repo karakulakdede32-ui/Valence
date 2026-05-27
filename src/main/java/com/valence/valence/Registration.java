@@ -51,6 +51,7 @@ import com.valence.valence.block.conduit.TransferConduitBlock;
 import com.valence.valence.block.conduit.TransferConduitTileEntity;
 import com.valence.valence.block.conduit.TransferConduitMenu;
 import com.valence.valence.item.LinkingTool;
+import com.valence.valence.item.ChunkExcavator;
 import com.valence.valence.block.pipe.FluidPipeBlock;
 import com.valence.valence.block.pipe.FluidPipeTileEntity;
 import com.valence.valence.block.pipe.EnergyCableBlock;
@@ -157,6 +158,7 @@ public class Registration {
     public static final RegistryObject<Item> ENERGY_CABLE_ITEM = ITEMS.register("energy_cable", () -> new BlockItem(ENERGY_CABLE.get(), new Item.Properties()));
     public static final RegistryObject<Item> WIRELESS_NODE_ITEM = ITEMS.register("wireless_node", () -> new BlockItem(WIRELESS_NODE.get(), new Item.Properties()));
     public static final RegistryObject<Item> LINKING_TOOL = ITEMS.register("linking_tool", () -> new LinkingTool(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> CHUNK_EXCAVATOR = ITEMS.register("chunk_excavator", () -> new ChunkExcavator(new Item.Properties()));
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLD_POWDER = ITEMS.register("gold_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> REDSTONE_POWDER = ITEMS.register("redstone_powder", () -> new Item(new Item.Properties()));
@@ -185,6 +187,7 @@ public class Registration {
                         output.accept(ENERGY_CABLE_ITEM.get());
                         output.accept(WIRELESS_NODE_ITEM.get());
                         output.accept(LINKING_TOOL.get());
+                        output.accept(CHUNK_EXCAVATOR.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());
