@@ -46,9 +46,12 @@ public class TransferConduitScreen extends AbstractContainerScreen<TransferCondu
         if (fH > 0) { int fy2 = fy+fh-1-fH; for (int i=0; i<fH; i++) { float t = (float)i/fH; gg.fill(fx+2, fy2+i, fx+fw-2, fy2+i+1, t>0.7f?FLUID_BRIGHT:t>0.3f?FLUID_MID:FLUID_DARK); } }
         gg.drawString(font, Component.literal("Fluid"), x+22, y+75, 0x555555, false);
 
-        // Center icon
-        gg.drawString(font, Component.literal("<=>"), x+78, y+37, 0x555555, false);
-        gg.drawString(font, Component.literal("CONDUIT"), x+65, y+50, 0x555555, false);
+        // Center info: link counts
+        String srcText = "Src: " + menu.getSourceCount();
+        String dstText = "Dst: " + menu.getDestCount();
+        gg.drawString(font, Component.literal(srcText), x+72, y+22, 0x444444, false);
+        gg.drawString(font, Component.literal(dstText), x+72, y+36, 0x444444, false);
+        gg.drawString(font, Component.literal("<=>"), x+78, y+50, 0x555555, false);
 
         // DF tank (right)
         int dx = x+132, dy = y+17, dw = 18, dh = 54;
