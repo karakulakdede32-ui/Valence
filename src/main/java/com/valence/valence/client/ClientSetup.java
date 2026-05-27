@@ -25,6 +25,7 @@ public class ClientSetup {
             MenuScreens.register(Registration.DF_CELL_MENU.get(), DFCellScreen::new);
             MenuScreens.register(Registration.SEED_DUPLICATOR_MENU.get(), SeedDuplicatorScreen::new);
             MenuScreens.register(Registration.TRANSFER_CONDUIT_MENU.get(), TransferConduitScreen::new);
+            MenuScreens.register(Registration.WIRELESS_NODE_MENU.get(), WirelessNodeScreen::new);
         });
     }
 }

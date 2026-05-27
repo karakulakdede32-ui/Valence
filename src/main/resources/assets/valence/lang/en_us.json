@@ -39,5 +39,8 @@
     "block.valence.fluid_pipe": "Fluid Pipe",
     "item.valence.fluid_pipe": "Fluid Pipe",
     "block.valence.energy_cable": "Energy Cable",
-    "item.valence.energy_cable": "Energy Cable"
+    "item.valence.energy_cable": "Energy Cable",
+    "block.valence.wireless_node": "Wireless Node",
+    "item.valence.wireless_node": "Wireless Node",
+    "container.valence.wireless_node": "Wireless Node"
 }

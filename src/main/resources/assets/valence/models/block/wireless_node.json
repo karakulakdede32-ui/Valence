@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "valence:block/wireless_node_top",
+    "side": "valence:block/wireless_node_side",
+    "bottom": "valence:block/wireless_node_bottom"
+  }
+}
