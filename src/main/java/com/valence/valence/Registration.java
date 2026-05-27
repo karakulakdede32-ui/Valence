@@ -51,6 +51,10 @@ import com.valence.valence.block.conduit.TransferConduitBlock;
 import com.valence.valence.block.conduit.TransferConduitTileEntity;
 import com.valence.valence.block.conduit.TransferConduitMenu;
 import com.valence.valence.item.LinkingTool;
+import com.valence.valence.block.pipe.FluidPipeBlock;
+import com.valence.valence.block.pipe.FluidPipeTileEntity;
+import com.valence.valence.block.pipe.EnergyCableBlock;
+import com.valence.valence.block.pipe.EnergyCableTileEntity;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 
 public class Registration {
@@ -77,6 +81,8 @@ public class Registration {
     public static final RegistryObject<Block> DF_CELL = BLOCKS.register("df_cell", () -> new DFCellBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> SEED_DUPLICATOR = BLOCKS.register("seed_duplicator", () -> new SeedDuplicatorBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> TRANSFER_CONDUIT = BLOCKS.register("transfer_conduit", () -> new TransferConduitBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> FLUID_PIPE = BLOCKS.register("fluid_pipe", () -> new FluidPipeBlock(BLOCK_PROPS.noOcclusion()));
+    public static final RegistryObject<Block> ENERGY_CABLE = BLOCKS.register("energy_cable", () -> new EnergyCableBlock(BLOCK_PROPS.noOcclusion()));
 
     // BlockEntityTypes
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -101,6 +107,10 @@ public class Registration {
             () -> BlockEntityType.Builder.of(SeedDuplicatorTileEntity::new, SEED_DUPLICATOR.get()).build(null));
     public static final RegistryObject<BlockEntityType<TransferConduitTileEntity>> TRANSFER_CONDUIT_TE = BLOCK_ENTITIES.register("transfer_conduit",
             () -> BlockEntityType.Builder.of(TransferConduitTileEntity::new, TRANSFER_CONDUIT.get()).build(null));
+    public static final RegistryObject<BlockEntityType<FluidPipeTileEntity>> FLUID_PIPE_TE = BLOCK_ENTITIES.register("fluid_pipe",
+            () -> BlockEntityType.Builder.of(FluidPipeTileEntity::new, FLUID_PIPE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<EnergyCableTileEntity>> ENERGY_CABLE_TE = BLOCK_ENTITIES.register("energy_cable",
+            () -> BlockEntityType.Builder.of(EnergyCableTileEntity::new, ENERGY_CABLE.get()).build(null));
 
     // Menus
     public static final RegistryObject<MenuType<BasicMinerMenu>> BASIC_MINER_MENU = MENUS.register("basic_miner", () -> IForgeMenuType.create(BasicMinerMenu::new));
@@ -136,6 +146,8 @@ public class Registration {
     public static final RegistryObject<Item> DF_CELL_ITEM = ITEMS.register("df_cell", () -> new BlockItem(DF_CELL.get(), new Item.Properties()));
     public static final RegistryObject<Item> SEED_DUPLICATOR_ITEM = ITEMS.register("seed_duplicator", () -> new BlockItem(SEED_DUPLICATOR.get(), new Item.Properties()));
     public static final RegistryObject<Item> TRANSFER_CONDUIT_ITEM = ITEMS.register("transfer_conduit", () -> new BlockItem(TRANSFER_CONDUIT.get(), new Item.Properties()));
+    public static final RegistryObject<Item> FLUID_PIPE_ITEM = ITEMS.register("fluid_pipe", () -> new BlockItem(FLUID_PIPE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ENERGY_CABLE_ITEM = ITEMS.register("energy_cable", () -> new BlockItem(ENERGY_CABLE.get(), new Item.Properties()));
     public static final RegistryObject<Item> LINKING_TOOL = ITEMS.register("linking_tool", () -> new LinkingTool(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> IRON_POWDER = ITEMS.register("iron_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLD_POWDER = ITEMS.register("gold_powder", () -> new Item(new Item.Properties()));
@@ -161,6 +173,8 @@ public class Registration {
                         output.accept(DF_CELL_ITEM.get());
                         output.accept(SEED_DUPLICATOR_ITEM.get());
                         output.accept(TRANSFER_CONDUIT_ITEM.get());
+                        output.accept(FLUID_PIPE_ITEM.get());
+                        output.accept(ENERGY_CABLE_ITEM.get());
                         output.accept(LINKING_TOOL.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
