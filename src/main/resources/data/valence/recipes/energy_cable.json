@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GBG",
+    "GRG",
+    "GBG"
+  ],
+  "key": {
+    "G": { "item": "minecraft:gold_ingot" },
+    "B": { "item": "valence:bronze_ingot" },
+    "R": { "item": "minecraft:redstone_block" }
+  },
+  "result": { "item": "valence:energy_cable", "count": 4 }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BHB",
+    "BRB",
+    "BHB"
+  ],
+  "key": {
+    "B": { "item": "valence:bronze_ingot" },
+    "H": { "item": "minecraft:hopper" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "item": "valence:seed_duplicator" }
+}

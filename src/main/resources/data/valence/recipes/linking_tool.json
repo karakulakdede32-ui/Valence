@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  B",
+    " R ",
+    "S  "
+  ],
+  "key": {
+    "B": { "item": "valence:bronze_ingot" },
+    "R": { "item": "minecraft:redstone" },
+    "S": { "item": "minecraft:stick" }
+  },
+  "result": { "item": "valence:linking_tool" }
+}

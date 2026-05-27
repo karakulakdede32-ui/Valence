@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DBD",
+    "DED",
+    "DBD"
+  ],
+  "key": {
+    "B": { "item": "valence:bronze_ingot" },
+    "D": { "item": "minecraft:diamond" },
+    "E": { "item": "valence:basic_miner" }
+  },
+  "result": { "item": "valence:advanced_miner" }
+}
