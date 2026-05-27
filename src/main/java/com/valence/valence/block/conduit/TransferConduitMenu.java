@@ -14,17 +14,22 @@ public class TransferConduitMenu extends AbstractContainerMenu {
     public final DataSlot fluidCapacity = DataSlot.standalone();
     public final DataSlot dfAmount = DataSlot.standalone();
     public final DataSlot dfCapacity = DataSlot.standalone();
+    public final DataSlot sourceCount = DataSlot.standalone();
+    public final DataSlot destCount = DataSlot.standalone();
 
     public TransferConduitMenu(int id, Inventory inv, FriendlyByteBuf buf) { this(id, inv, inv.player.level().getBlockEntity(buf.readBlockPos())); }
     public TransferConduitMenu(int id, Inventory inv, BlockEntity entity) {
         super(Registration.TRANSFER_CONDUIT_MENU.get(), id);
         tileEntity = (TransferConduitTileEntity) entity;
         addDataSlot(fluidAmount); addDataSlot(fluidCapacity); addDataSlot(dfAmount); addDataSlot(dfCapacity);
+        addDataSlot(sourceCount); addDataSlot(destCount);
         if (tileEntity != null) {
             fluidAmount.set(tileEntity.getFluidTank().getFluidAmount());
             fluidCapacity.set(tileEntity.getFluidTank().getCapacity());
             dfAmount.set(tileEntity.getDFStorage().getDF());
             dfCapacity.set(tileEntity.getDFStorage().getMaxDF());
+            sourceCount.set(tileEntity.getLinkedSources().size());
+            destCount.set(tileEntity.getLinkedDests().size());
         }
         for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) addSlot(new Slot(inv, c+r*9+9, 8+c*18, 102+r*18));
         for (int i = 0; i < 9; i++) addSlot(new Slot(inv, i, 8+i*18, 160));
@@ -36,6 +41,8 @@ public class TransferConduitMenu extends AbstractContainerMenu {
             fluidCapacity.set(tileEntity.getFluidTank().getCapacity());
             dfAmount.set(tileEntity.getDFStorage().getDF());
             dfCapacity.set(tileEntity.getDFStorage().getMaxDF());
+            sourceCount.set(tileEntity.getLinkedSources().size());
+            destCount.set(tileEntity.getLinkedDests().size());
         }
         super.broadcastChanges();
     }
@@ -51,4 +58,6 @@ public class TransferConduitMenu extends AbstractContainerMenu {
     public int getFluidCapacity() { return fluidCapacity.get(); }
     public int getDF() { return dfAmount.get(); }
     public int getDFCapacity() { return dfCapacity.get(); }
+    public int getSourceCount() { return sourceCount.get(); }
+    public int getDestCount() { return destCount.get(); }
 }
