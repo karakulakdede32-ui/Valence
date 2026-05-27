@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "valence:block/df_cell_top",
+    "side": "valence:block/df_cell_side",
+    "bottom": "valence:block/df_cell_bottom"
+  }
+}

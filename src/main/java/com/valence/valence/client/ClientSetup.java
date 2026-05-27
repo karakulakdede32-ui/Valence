@@ -27,6 +27,7 @@ public class ClientSetup {
             MenuScreens.register(Registration.TRANSFER_CONDUIT_MENU.get(), TransferConduitScreen::new);
             MenuScreens.register(Registration.WIRELESS_NODE_MENU.get(), WirelessNodeScreen::new);
             MenuScreens.register(Registration.ELECTRIC_FURNACE_MENU.get(), ElectricFurnaceScreen::new);
+            MenuScreens.register(Registration.MEGA_CELL_MENU.get(), MegaCellScreen::new);
             MenuScreens.register(Registration.TREE_GROWTH_CHAMBER_MENU.get(), TreeGrowthChamberScreen::new);
         });
     }
