@@ -30,11 +30,11 @@ public class TreeGrowthChamberMenu extends AbstractContainerMenu {
         }
         if (tileEntity != null) {
             addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 0, 55, 34)); // sapling
-            addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 1, 106, 28)); // logs out
-            addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 2, 106, 52)); // leaves out
+            addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 1, 115, 28)); // logs
+            addSlot(new SlotItemHandler(tileEntity.getItemHandler(), 2, 115, 50)); // leaves
         }
-        for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) addSlot(new Slot(inv, c+r*9+9, 8+c*18, 102+r*18));
-        for (int i = 0; i < 9; i++) addSlot(new Slot(inv, i, 8+i*18, 160));
+        for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) addSlot(new Slot(inv, c+r*9+9, 8+c*18, 106+r*18));
+        for (int i = 0; i < 9; i++) addSlot(new Slot(inv, i, 8+i*18, 164));
     }
 
     @Override public void broadcastChanges() {
@@ -47,7 +47,26 @@ public class TreeGrowthChamberMenu extends AbstractContainerMenu {
         super.broadcastChanges();
     }
 
-    @Override public ItemStack quickMoveStack(Player pl, int idx) { return ItemStack.EMPTY; }
+    @Override public ItemStack quickMoveStack(Player pl, int idx) {
+        Slot slot = slots.get(idx);
+        if (!slot.hasItem()) return ItemStack.EMPTY;
+        ItemStack stack = slot.getItem();
+        ItemStack result = stack.copy();
+        // 0=sap, 1=log, 2=leaf, 3-29=main, 30-38=hotbar
+        if (idx < 3) {
+            if (!moveItemStackTo(stack, 3, 39, true)) return ItemStack.EMPTY;
+        } else if (tileEntity != null && tileEntity.getItemHandler().isItemValid(0, stack)) {
+            if (!moveItemStackTo(stack, 0, 1, false)) return ItemStack.EMPTY;
+        } else if (idx < 30) {
+            if (!moveItemStackTo(stack, 30, 39, false)) return ItemStack.EMPTY;
+        } else {
+            if (!moveItemStackTo(stack, 3, 30, false)) return ItemStack.EMPTY;
+        }
+        if (stack.isEmpty()) slot.set(ItemStack.EMPTY);
+        else slot.setChanged();
+        return result;
+    }
+
     @Override public boolean stillValid(Player pl) {
         return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate(
             (l, p) -> pl.distanceToSqr(p.getX()+0.5, p.getY()+0.5, p.getZ()+0.5) <= 64, true);

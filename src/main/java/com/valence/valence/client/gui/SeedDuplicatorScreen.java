@@ -1,6 +1,7 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.seeder.SeedDuplicatorMenu;
+import com.valence.valence.block.seeder.SeedDuplicatorTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -29,11 +30,17 @@ public class SeedDuplicatorScreen extends AbstractContainerScreen<SeedDuplicator
         int x = leftPos, y = topPos;
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
+        SeedDuplicatorTileEntity te = menu.getTileEntity();
+        boolean canRun = te != null && !te.getItemHandler().getStackInSlot(0).isEmpty() && te.getDFStorage().getDF() >= 50;
+
         // DF gauge
         ValenceGui.drawGauge(gg, x+7, y+17, 18, 54,
             ValenceGui.DF_TOP, ValenceGui.DF_BOTTOM,
             menu.getDF(), menu.getDFCapacity());
         ValenceGui.drawGaugeLabel(gg, font, "DF", x+16, y+75, 0x888888);
+
+        // Status
+        ValenceGui.drawStatus(gg, x+30, y+8, canRun ? 1 : 0);
 
         // Input / Output
         ValenceGui.drawSlot(gg, x+55, y+34);
@@ -45,7 +52,7 @@ public class SeedDuplicatorScreen extends AbstractContainerScreen<SeedDuplicator
         ValenceGui.drawGaugeLabel(gg, font, "Seed In", x+64, y+55, 0x888888);
         ValenceGui.drawGaugeLabel(gg, font, "Dupe Out", x+124, y+55, 0x888888);
 
-        for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+101+r*18);
-        for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+159);
+        for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+102+r*18);
+        for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+160);
     }
 }

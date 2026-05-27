@@ -1,6 +1,7 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.turbine.SteamTurbineMenu;
+import com.valence.valence.block.turbine.SteamTurbineTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -31,19 +32,32 @@ public class SteamTurbineScreen extends AbstractContainerScreen<SteamTurbineMenu
         int x = leftPos, y = topPos;
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
-        // Steam → DF conversion display
+        SteamTurbineTileEntity te = menu.getTileEntity();
+        boolean active = te != null && te.getSteamTank().getFluidAmount() >= 5;
+        int sPx = te != null ? te.getSteamTank().getFluidAmount() : 0;
+        int sMax = te != null ? te.getSteamTank().getCapacity() : 1;
+        int dPx = te != null ? te.getDFStorage().getDF() : 0;
+        int dMax = te != null ? te.getDFStorage().getMaxDF() : 1;
+
         ValenceGui.drawGauge(gg, x+26, y+17, 18, 54,
-            ValenceGui.STEAM_TOP, ValenceGui.STEAM_BOTTOM,
-            menu.getSteamAmount(), menu.getSteamCapacity());
+            ValenceGui.STEAM_TOP, ValenceGui.STEAM_BOTTOM, sPx, sMax);
         ValenceGui.drawGaugeLabel(gg, font, "Steam", x+35, y+75, 0x888888);
+        if (active && sPx > 0) {
+            ValenceGui.drawActiveGlow(gg, x+26, y+17, 18, 54,
+                sPx * 52 / sMax, ValenceGui.STEAM_TOP);
+        }
 
         ValenceGui.drawLabel(gg, font, Component.literal("5:1"), x+88, y+37, 0xFFAA00);
         ValenceGui.drawLabel(gg, font, Component.literal("══►"), x+88, y+49, 0x888888);
+        ValenceGui.drawStatus(gg, x+83, y+8, active ? 1 : (sPx > 0 ? 2 : 0));
 
         ValenceGui.drawGauge(gg, x+132, y+17, 18, 54,
-            ValenceGui.DF_TOP, ValenceGui.DF_BOTTOM,
-            menu.getDF(), menu.getDFCapacity());
+            ValenceGui.DF_TOP, ValenceGui.DF_BOTTOM, dPx, dMax);
         ValenceGui.drawGaugeLabel(gg, font, "DF", x+141, y+75, 0x888888);
+        if (dPx > 0) {
+            ValenceGui.drawActiveGlow(gg, x+132, y+17, 18, 54,
+                dPx * 52 / dMax, ValenceGui.DF_TOP);
+        }
 
         for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+101+r*18);
         for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+159);

@@ -4,74 +4,62 @@ import com.valence.valence.Registration;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.DataSlot;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.fluids.FluidStack;
 
 public class SteamDynamoMenu extends AbstractContainerMenu {
     private final SteamDynamoTileEntity tileEntity;
-    private final DataSlot waterAmountSlot = DataSlot.standalone();
-    private final DataSlot waterCapacitySlot = DataSlot.standalone();
-    private final DataSlot steamAmountSlot = DataSlot.standalone();
-    private final DataSlot steamCapacitySlot = DataSlot.standalone();
+    private final DataSlot waterAmount = DataSlot.standalone();
+    private final DataSlot waterCapacity = DataSlot.standalone();
+    private final DataSlot steamAmount = DataSlot.standalone();
+    private final DataSlot steamCapacity = DataSlot.standalone();
 
-    public SteamDynamoMenu(int id, Inventory inv, FriendlyByteBuf extraData) {
-        this(id, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
-    }
-
+    public SteamDynamoMenu(int id, Inventory inv, FriendlyByteBuf buf) { this(id, inv, inv.player.level().getBlockEntity(buf.readBlockPos())); }
     public SteamDynamoMenu(int id, Inventory inv, BlockEntity entity) {
         super(Registration.STEAM_DYNAMO_MENU.get(), id);
-        this.tileEntity = (SteamDynamoTileEntity) entity;
-
-        addDataSlot(waterAmountSlot);
-        addDataSlot(waterCapacitySlot);
-        addDataSlot(steamAmountSlot);
-        addDataSlot(steamCapacitySlot);
-
+        tileEntity = (SteamDynamoTileEntity) entity;
+        addDataSlot(waterAmount); addDataSlot(waterCapacity); addDataSlot(steamAmount); addDataSlot(steamCapacity);
         if (tileEntity != null) {
-            waterAmountSlot.set(tileEntity.getWaterTank().getFluidAmount());
-            waterCapacitySlot.set(tileEntity.getWaterTank().getCapacity());
-            steamAmountSlot.set(tileEntity.getSteamTank().getFluidAmount());
-            steamCapacitySlot.set(tileEntity.getSteamTank().getCapacity());
+            waterAmount.set(tileEntity.getWaterTank().getFluidAmount());
+            waterCapacity.set(tileEntity.getWaterTank().getCapacity());
+            steamAmount.set(tileEntity.getSteamTank().getFluidAmount());
+            steamCapacity.set(tileEntity.getSteamTank().getCapacity());
         }
-
-        // Player inventory
-        for (int row = 0; row < 3; row++)
-            for (int col = 0; col < 9; col++)
-                this.addSlot(new Slot(inv, col + row * 9 + 9, 8 + col * 18, 108 + row * 18));
-        for (int i = 0; i < 9; i++)
-            this.addSlot(new Slot(inv, i, 8 + i * 18, 166));
+        for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) addSlot(new Slot(inv, c+r*9+9, 8+c*18, 102+r*18));
+        for (int i = 0; i < 9; i++) addSlot(new Slot(inv, i, 8+i*18, 160));
     }
 
-    @Override
-    public void broadcastChanges() {
+    @Override public void broadcastChanges() {
         if (tileEntity != null && tileEntity.getLevel() != null && !tileEntity.getLevel().isClientSide()) {
-            waterAmountSlot.set(tileEntity.getWaterTank().getFluidAmount());
-            waterCapacitySlot.set(tileEntity.getWaterTank().getCapacity());
-            steamAmountSlot.set(tileEntity.getSteamTank().getFluidAmount());
-            steamCapacitySlot.set(tileEntity.getSteamTank().getCapacity());
+            waterAmount.set(tileEntity.getWaterTank().getFluidAmount());
+            waterCapacity.set(tileEntity.getWaterTank().getCapacity());
+            steamAmount.set(tileEntity.getSteamTank().getFluidAmount());
+            steamCapacity.set(tileEntity.getSteamTank().getCapacity());
         }
         super.broadcastChanges();
     }
 
-    @Override
-    public ItemStack quickMoveStack(Player player, int index) {
-        return ItemStack.EMPTY;
+    @Override public ItemStack quickMoveStack(Player pl, int idx) {
+        Slot slot = slots.get(idx);
+        if (!slot.hasItem()) return ItemStack.EMPTY;
+        ItemStack stack = slot.getItem();
+        ItemStack result = stack.copy();
+        if (idx < 27) { if (!moveItemStackTo(stack, 27, 36, false)) return ItemStack.EMPTY; }
+        else if (idx < 36) { if (!moveItemStackTo(stack, 0, 27, false)) return ItemStack.EMPTY; }
+        else return ItemStack.EMPTY;
+        if (stack.isEmpty()) slot.set(ItemStack.EMPTY); else slot.setChanged();
+        return result;
     }
 
-    @Override
-    public boolean stillValid(Player player) {
-        return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate((level, pos) ->
-            player.distanceToSqr((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D) <= 64.0D, true);
+    @Override public boolean stillValid(Player player) {
+        return tileEntity != null && ContainerLevelAccess.create(tileEntity.getLevel(), tileEntity.getBlockPos()).evaluate(
+            (level, pos) -> player.distanceToSqr((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D) <= 64.0D, true);
     }
 
     public SteamDynamoTileEntity getTileEntity() { return tileEntity; }
-    public int getWaterAmount() { return waterAmountSlot.get(); }
-    public int getWaterCapacity() { return waterCapacitySlot.get(); }
-    public int getSteamAmount() { return steamAmountSlot.get(); }
-    public int getSteamCapacity() { return steamCapacitySlot.get(); }
+    public int getWaterAmount() { return waterAmount.get(); }
+    public int getWaterCapacity() { return waterCapacity.get(); }
+    public int getSteamAmount() { return steamAmount.get(); }
+    public int getSteamCapacity() { return steamCapacity.get(); }
 }

@@ -1,6 +1,7 @@
 package com.valence.valence.client.gui;
 
 import com.valence.valence.block.furnace.SteamFurnaceMenu;
+import com.valence.valence.block.furnace.SteamFurnaceTileEntity;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -29,17 +30,22 @@ public class SteamFurnaceScreen extends AbstractContainerScreen<SteamFurnaceMenu
         int x = leftPos, y = topPos;
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
-        // Steam tank
         ValenceGui.drawGauge(gg, x+7, y+17, 18, 54,
             ValenceGui.STEAM_TOP, ValenceGui.STEAM_BOTTOM,
             menu.getSteamAmount(), menu.getSteamCapacity());
         ValenceGui.drawGaugeLabel(gg, font, "Steam", x+16, y+75, 0x888888);
 
-        // Input / Output
         ValenceGui.drawSlot(gg, x+52, y+34);
         ValenceGui.drawSlot(gg, x+115, y+34);
 
-        ValenceGui.drawProgressBar(gg, x+76, y+39, 26, 6, menu.getProgress(), menu.getMaxProgress());
+        // Animated arrow
+        ValenceGui.drawArrow(gg, x+76, y+38, 26, 8, menu.getProgress(), menu.getMaxProgress());
+
+        // Status
+        SteamFurnaceTileEntity te = menu.getTileEntity();
+        boolean busy = te != null && te.getProgress() > 0;
+        boolean hasInput = te != null && !te.getItemHandler().getStackInSlot(0).isEmpty();
+        ValenceGui.drawStatus(gg, x+8, y+8, busy ? 1 : hasInput ? 2 : 0);
 
         ValenceGui.drawGaugeLabel(gg, font, "In", x+61, y+55, 0x888888);
         ValenceGui.drawGaugeLabel(gg, font, "Out", x+124, y+55, 0x888888);
