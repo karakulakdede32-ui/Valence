@@ -43,5 +43,8 @@
   "block.valence.wireless_node": "Wireless Node",
   "item.valence.wireless_node": "Wireless Node",
   "container.valence.wireless_node": "Wireless Node",
-  "item.valence.chunk_excavator": "Chunk Excavator"
+  "item.valence.chunk_excavator": "Chunk Excavator",
+  "block.valence.electric_furnace": "Electric Furnace",
+  "item.valence.electric_furnace": "Electric Furnace",
+  "container.valence.electric_furnace": "Electric Furnace"
 }
