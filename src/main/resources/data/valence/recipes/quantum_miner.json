@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "DMD",
+    "CAC",
+    "DMD"
+  ],
+  "key": {
+    "D": {
+      "item": "minecraft:diamond_block"
+    },
+    "M": {
+      "item": "valence:mega_cell"
+    },
+    "C": {
+      "item": "valence:advanced_miner"
+    },
+    "A": {
+      "item": "valence:assembler"
+    }
+  },
+  "result": {
+    "item": "valence:quantum_miner"
+  }
+}

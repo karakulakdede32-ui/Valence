@@ -50,7 +50,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == 0) {
-                return stack.getBurnTime(RecipeType.SMELTING) > 0;
+                return stack.getBurnTime(RecipeType.SMELTING) > 0 || stack.is(net.minecraft.world.item.Items.SUGAR_CANE);
             }
             return false;
         }
@@ -145,6 +145,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         ItemStack fuelStack = itemHandler.getStackInSlot(0);
         if (!fuelStack.isEmpty()) {
             int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(fuelStack, RecipeType.SMELTING);
+            if (burnTime <= 0 && fuelStack.is(net.minecraft.world.item.Items.SUGAR_CANE)) burnTime = 100;
             if (burnTime > 0) {
                 fuel = burnTime;
                 itemHandler.extractItem(0, 1, false);
@@ -254,7 +255,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return direction != Direction.DOWN && index == 0;
+        return direction != Direction.DOWN && index == 0 && (stack.getBurnTime(RecipeType.SMELTING) > 0 || stack.is(net.minecraft.world.item.Items.SUGAR_CANE));
     }
 
     @Override

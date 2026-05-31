@@ -15,6 +15,9 @@ import com.valence.valence.block.blastfurnace.BlastFurnaceBlock;
 import com.valence.valence.block.blastfurnace.BlastFurnaceTileEntity;
 import com.valence.valence.block.blastfurnace.BlastFurnaceMenu;
 import com.valence.valence.item.GuideBookItem;
+import com.valence.valence.block.quantumminer.QuantumMinerBlock;
+import com.valence.valence.block.quantumminer.QuantumMinerTileEntity;
+import com.valence.valence.block.quantumminer.QuantumMinerMenu;
 import com.valence.valence.recipe.AlloyerRecipe;
 
 import net.minecraft.core.registries.Registries;
@@ -122,6 +125,7 @@ public class Registration {
     public static final RegistryObject<Block> REACTOR = BLOCKS.register("reactor", () -> new ChemicalReactorBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> ASSEMBLER = BLOCKS.register("assembler", () -> new AssemblerBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> BLAST_FURNACE = BLOCKS.register("blast_furnace", () -> new BlastFurnaceBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> QUANTUM_MINER = BLOCKS.register("quantum_miner", () -> new QuantumMinerBlock(BLOCK_PROPS));
 
     // BlockEntityTypes
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -166,6 +170,8 @@ public class Registration {
             () -> BlockEntityType.Builder.of(AssemblerTileEntity::new, ASSEMBLER.get()).build(null));
     public static final RegistryObject<BlockEntityType<BlastFurnaceTileEntity>> BLAST_FURNACE_TE = BLOCK_ENTITIES.register("blast_furnace",
             () -> BlockEntityType.Builder.of(BlastFurnaceTileEntity::new, BLAST_FURNACE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<QuantumMinerTileEntity>> QUANTUM_MINER_TE = BLOCK_ENTITIES.register("quantum_miner",
+            () -> BlockEntityType.Builder.of(QuantumMinerTileEntity::new, QUANTUM_MINER.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<TreeGrowthChamberTileEntity>> TREE_GROWTH_CHAMBER_TE = BLOCK_ENTITIES.register("tree_growth_chamber",
             () -> BlockEntityType.Builder.of(TreeGrowthChamberTileEntity::new, TREE_GROWTH_CHAMBER.get()).build(null));
@@ -191,6 +197,8 @@ public class Registration {
             () -> IForgeMenuType.create(AssemblerMenu::new));
     public static final RegistryObject<MenuType<BlastFurnaceMenu>> BLAST_FURNACE_MENU = MENUS.register("blast_furnace",
             () -> IForgeMenuType.create(BlastFurnaceMenu::new));
+    public static final RegistryObject<MenuType<QuantumMinerMenu>> QUANTUM_MINER_MENU = MENUS.register("quantum_miner",
+            () -> IForgeMenuType.create(QuantumMinerMenu::new));
 
     public static final RegistryObject<MenuType<TreeGrowthChamberMenu>> TREE_GROWTH_CHAMBER_MENU = MENUS.register("tree_growth_chamber", () -> IForgeMenuType.create(TreeGrowthChamberMenu::new));
     public static final RegistryObject<MenuType<MegaCellMenu>> MEGA_CELL_MENU = MENUS.register("mega_cell", () -> IForgeMenuType.create(MegaCellMenu::new));
@@ -231,6 +239,8 @@ public class Registration {
             () -> new BlockItem(ASSEMBLER.get(), new Item.Properties()));
     public static final RegistryObject<Item> BLAST_FURNACE_ITEM = ITEMS.register("blast_furnace",
             () -> new BlockItem(BLAST_FURNACE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> QUANTUM_MINER_ITEM = ITEMS.register("quantum_miner",
+            () -> new BlockItem(QUANTUM_MINER.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> TREE_GROWTH_CHAMBER_ITEM = ITEMS.register("tree_growth_chamber", () -> new BlockItem(TREE_GROWTH_CHAMBER.get(), new Item.Properties()));
     public static final RegistryObject<Item> MEGA_CELL_ITEM = ITEMS.register("mega_cell", () -> new BlockItem(MEGA_CELL.get(), new Item.Properties()));
@@ -277,6 +287,7 @@ public class Registration {
                         output.accept(REACTOR_ITEM.get());
                         output.accept(ASSEMBLER_ITEM.get());
                         output.accept(BLAST_FURNACE_ITEM.get());
+                        output.accept(QUANTUM_MINER_ITEM.get());
                         output.accept(GUIDE_BOOK.get());
                         output.accept(STONE_PEBBLE.get());
                         output.accept(IRON_POWDER.get());
