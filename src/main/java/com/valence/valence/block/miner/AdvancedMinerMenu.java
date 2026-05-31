@@ -30,7 +30,10 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
             // Output slots: 2x4 grid
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 4; j++) {
-                    this.addSlot(new SlotItemHandler(te.getItemHandler(), 1 + j + i * 4, 26 + j * 27, 44 + i * 27));
+                    final int slotIdx = 1 + j + i * 4;
+                    this.addSlot(new SlotItemHandler(te.getItemHandler(), slotIdx, 26 + j * 27, 44 + i * 27) {
+                        @Override public boolean mayPlace(ItemStack s) { return false; }
+                    });
                 }
             }
         }
