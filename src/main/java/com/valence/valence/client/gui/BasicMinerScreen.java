@@ -38,6 +38,14 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
             ValenceGui.drawFuelBar(gg, x + 106, y + 9, barH, 16, te.getFuel(), 200);
         }
 
+        // Scan progress (0-255 columns)
+        if (te != null && !te.hasScanned() && te.getFuel() > 0) {
+            int scanned = te.getScanProgress();
+            String scanText = "Scan: " + scanned + "/256";
+            ValenceGui.drawProgressBar(gg, x + 52, y + 26, 70, 6, scanned, 256);
+            ValenceGui.drawGaugeLabel(gg, font, scanText, x + 87, y + 18, 0x888888);
+        }
+
         // Output 2x2
         ValenceGui.drawSlot(gg, x + 61, y + 43); ValenceGui.drawSlot(gg, x + 79, y + 43);
         ValenceGui.drawSlot(gg, x + 61, y + 61); ValenceGui.drawSlot(gg, x + 79, y + 61);

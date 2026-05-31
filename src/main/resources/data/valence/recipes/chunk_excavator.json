@@ -1,22 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "NIN",
+    "NAN",
     "IGI",
     "NIN"
   ],
   "key": {
-    "N": {
-      "item": "minecraft:netherite_ingot"
-    },
-    "I": {
-      "item": "minecraft:iron_block"
-    },
-    "G": {
-      "item": "minecraft:gold_ingot"
-    }
+    "N": { "item": "minecraft:netherite_ingot" },
+    "A": { "item": "valence:advanced_miner" },
+    "I": { "item": "minecraft:iron_block" },
+    "G": { "item": "minecraft:gold_ingot" }
   },
-  "result": {
-    "item": "valence:chunk_excavator"
-  }
+  "result": { "item": "valence:chunk_excavator" }
 }

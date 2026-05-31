@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ECE",
+    "C C",
+    "ECE"
+  ],
+  "key": {
+    "E": { "item": "minecraft:netherite_scrap" },
+    "C": { "item": "valence:df_cell" }
+  },
+  "result": { "item": "valence:mega_cell" }
+}

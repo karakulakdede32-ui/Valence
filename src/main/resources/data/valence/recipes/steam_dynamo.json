@@ -1,12 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "BBB",
+    "BMB",
     "BFB",
     "BRB"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
+    "M": { "item": "valence:basic_miner" },
     "F": { "item": "minecraft:furnace" },
     "R": { "item": "minecraft:redstone" }
   },

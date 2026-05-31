@@ -2,12 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "BRB",
-    "B B",
+    "S S",
     "BBB"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
-    "R": { "item": "minecraft:blast_furnace" }
+    "R": { "item": "minecraft:blast_furnace" },
+    "S": { "item": "valence:steam_furnace" }
   },
   "result": { "item": "valence:steam_alloyer" }
 }
