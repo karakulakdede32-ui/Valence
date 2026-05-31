@@ -66,5 +66,8 @@
   "block.valence.blast_furnace": "Blast Furnace",
   "item.valence.blast_furnace": "Blast Furnace",
   "container.valence.blast_furnace": "Blast Furnace",
-  "item.valence.guide_book": "Valence Guide"
+  "item.valence.guide_book": "Valence Guide",
+  "block.valence.quantum_miner": "Quantum Miner",
+  "item.valence.quantum_miner": "Quantum Miner",
+  "container.valence.quantum_miner": "Quantum Miner"
 }

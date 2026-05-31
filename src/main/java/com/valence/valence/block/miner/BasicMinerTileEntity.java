@@ -52,7 +52,8 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
             if (slot == 0) {
-                return stack.is(net.minecraft.world.item.Items.COAL) || stack.is(net.minecraft.world.item.Items.CHARCOAL);
+                return stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING) > 0
+                    || stack.is(net.minecraft.world.item.Items.SUGAR_CANE);
             }
             return false;
         }
@@ -198,7 +199,9 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         if (fuel > 0) return;
         ItemStack fuelStack = itemHandler.getStackInSlot(0);
         if (!fuelStack.isEmpty()) {
-            fuel = 200;
+            int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(fuelStack, net.minecraft.world.item.crafting.RecipeType.SMELTING);
+            if (burnTime <= 0 && fuelStack.is(net.minecraft.world.item.Items.SUGAR_CANE)) burnTime = 100;
+            fuel = Math.max(burnTime, 100);
             itemHandler.extractItem(0, 1, false);
             // Don't reset scan progress — resume from where we left off if interrupted
             hasScanned = false;
@@ -298,7 +301,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return direction != Direction.DOWN && index == 0 && (stack.is(net.minecraft.world.item.Items.COAL) || stack.is(net.minecraft.world.item.Items.CHARCOAL));
+        return direction != Direction.DOWN && index == 0 && (stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING) > 0 || stack.is(net.minecraft.world.item.Items.SUGAR_CANE));
     }
 
     @Override
