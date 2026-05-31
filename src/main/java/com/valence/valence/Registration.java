@@ -1,4 +1,21 @@
 package com.valence.valence;
+import com.valence.valence.block.washer.OreWasherBlock;
+import com.valence.valence.block.washer.OreWasherTileEntity;
+import com.valence.valence.block.washer.OreWasherMenu;
+import com.valence.valence.block.centrifuge.CentrifugeBlock;
+import com.valence.valence.block.centrifuge.CentrifugeTileEntity;
+import com.valence.valence.block.centrifuge.CentrifugeMenu;
+import com.valence.valence.block.reactor.ChemicalReactorBlock;
+import com.valence.valence.block.reactor.ChemicalReactorTileEntity;
+import com.valence.valence.block.reactor.ChemicalReactorMenu;
+import com.valence.valence.block.assembler.AssemblerBlock;
+import com.valence.valence.block.assembler.AssemblerTileEntity;
+import com.valence.valence.block.assembler.AssemblerMenu;
+import com.valence.valence.block.blastfurnace.BlastFurnaceBlock;
+import com.valence.valence.block.blastfurnace.BlastFurnaceTileEntity;
+import com.valence.valence.block.blastfurnace.BlastFurnaceMenu;
+import com.valence.valence.item.GuideBookItem;
+import com.valence.valence.recipe.AlloyerRecipe;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -100,6 +117,11 @@ public class Registration {
     public static final RegistryObject<Block> ELECTRIC_FURNACE = BLOCKS.register("electric_furnace", () -> new ElectricFurnaceBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> MEGA_CELL = BLOCKS.register("mega_cell", () -> new MegaCellBlock(BLOCK_PROPS));
     public static final RegistryObject<Block> TREE_GROWTH_CHAMBER = BLOCKS.register("tree_growth_chamber", () -> new TreeGrowthChamberBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> ORE_WASHER = BLOCKS.register("ore_washer", () -> new OreWasherBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> CENTRIFUGE = BLOCKS.register("centrifuge", () -> new CentrifugeBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> REACTOR = BLOCKS.register("reactor", () -> new ChemicalReactorBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> ASSEMBLER = BLOCKS.register("assembler", () -> new AssemblerBlock(BLOCK_PROPS));
+    public static final RegistryObject<Block> BLAST_FURNACE = BLOCKS.register("blast_furnace", () -> new BlastFurnaceBlock(BLOCK_PROPS));
 
     // BlockEntityTypes
     public static final RegistryObject<BlockEntityType<BasicMinerTileEntity>> BASIC_MINER_TE = BLOCK_ENTITIES.register("basic_miner",
@@ -134,6 +156,17 @@ public class Registration {
             () -> BlockEntityType.Builder.of(ElectricFurnaceTileEntity::new, ELECTRIC_FURNACE.get()).build(null));
     public static final RegistryObject<BlockEntityType<MegaCellTileEntity>> MEGA_CELL_TE = BLOCK_ENTITIES.register("mega_cell",
             () -> BlockEntityType.Builder.of(MegaCellTileEntity::new, MEGA_CELL.get()).build(null));
+    public static final RegistryObject<BlockEntityType<OreWasherTileEntity>> ORE_WASHER_TE = BLOCK_ENTITIES.register("ore_washer",
+            () -> BlockEntityType.Builder.of(OreWasherTileEntity::new, ORE_WASHER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CentrifugeTileEntity>> CENTRIFUGE_TE = BLOCK_ENTITIES.register("centrifuge",
+            () -> BlockEntityType.Builder.of(CentrifugeTileEntity::new, CENTRIFUGE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<ChemicalReactorTileEntity>> REACTOR_TE = BLOCK_ENTITIES.register("reactor",
+            () -> BlockEntityType.Builder.of(ChemicalReactorTileEntity::new, REACTOR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<AssemblerTileEntity>> ASSEMBLER_TE = BLOCK_ENTITIES.register("assembler",
+            () -> BlockEntityType.Builder.of(AssemblerTileEntity::new, ASSEMBLER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<BlastFurnaceTileEntity>> BLAST_FURNACE_TE = BLOCK_ENTITIES.register("blast_furnace",
+            () -> BlockEntityType.Builder.of(BlastFurnaceTileEntity::new, BLAST_FURNACE.get()).build(null));
+
     public static final RegistryObject<BlockEntityType<TreeGrowthChamberTileEntity>> TREE_GROWTH_CHAMBER_TE = BLOCK_ENTITIES.register("tree_growth_chamber",
             () -> BlockEntityType.Builder.of(TreeGrowthChamberTileEntity::new, TREE_GROWTH_CHAMBER.get()).build(null));
     // Menus
@@ -148,6 +181,17 @@ public class Registration {
     public static final RegistryObject<MenuType<DFCellMenu>> DF_CELL_MENU = MENUS.register("df_cell", () -> IForgeMenuType.create(DFCellMenu::new));
     public static final RegistryObject<MenuType<SeedDuplicatorMenu>> SEED_DUPLICATOR_MENU = MENUS.register("seed_duplicator", () -> IForgeMenuType.create(SeedDuplicatorMenu::new));
     public static final RegistryObject<MenuType<TransferConduitMenu>> TRANSFER_CONDUIT_MENU = MENUS.register("transfer_conduit", () -> IForgeMenuType.create(TransferConduitMenu::new));
+    public static final RegistryObject<MenuType<OreWasherMenu>> ORE_WASHER_MENU = MENUS.register("ore_washer",
+            () -> IForgeMenuType.create(OreWasherMenu::new));
+    public static final RegistryObject<MenuType<CentrifugeMenu>> CENTRIFUGE_MENU = MENUS.register("centrifuge",
+            () -> IForgeMenuType.create(CentrifugeMenu::new));
+    public static final RegistryObject<MenuType<ChemicalReactorMenu>> REACTOR_MENU = MENUS.register("reactor",
+            () -> IForgeMenuType.create(ChemicalReactorMenu::new));
+    public static final RegistryObject<MenuType<AssemblerMenu>> ASSEMBLER_MENU = MENUS.register("assembler",
+            () -> IForgeMenuType.create(AssemblerMenu::new));
+    public static final RegistryObject<MenuType<BlastFurnaceMenu>> BLAST_FURNACE_MENU = MENUS.register("blast_furnace",
+            () -> IForgeMenuType.create(BlastFurnaceMenu::new));
+
     public static final RegistryObject<MenuType<TreeGrowthChamberMenu>> TREE_GROWTH_CHAMBER_MENU = MENUS.register("tree_growth_chamber", () -> IForgeMenuType.create(TreeGrowthChamberMenu::new));
     public static final RegistryObject<MenuType<MegaCellMenu>> MEGA_CELL_MENU = MENUS.register("mega_cell", () -> IForgeMenuType.create(MegaCellMenu::new));
     public static final RegistryObject<MenuType<WirelessNodeMenu>> WIRELESS_NODE_MENU = MENUS.register("wireless_node", () -> IForgeMenuType.create(WirelessNodeMenu::new));
@@ -160,6 +204,8 @@ public class Registration {
     // Recipes
     public static final RegistryObject<RecipeType<GrinderRecipe>> GRINDING_RECIPE_TYPE = RECIPE_TYPES.register("grinding", () -> GrinderRecipe.Type.INSTANCE);
     public static final RegistryObject<RecipeSerializer<GrinderRecipe>> GRINDING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("grinding", () -> GrinderRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeType<AlloyerRecipe>> ALLOYING_RECIPE_TYPE = RECIPE_TYPES.register("alloying", () -> AlloyerRecipe.Type.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<AlloyerRecipe>> ALLOYING_RECIPE_SERIALIZER = RECIPE_SERIALIZERS.register("alloying", () -> AlloyerRecipe.Serializer.INSTANCE);
 
     // Items
     public static final RegistryObject<Item> BASIC_MINER_ITEM = ITEMS.register("basic_miner", () -> new BlockItem(BASIC_MINER.get(), new Item.Properties()));
@@ -175,6 +221,17 @@ public class Registration {
     public static final RegistryObject<Item> SEED_DUPLICATOR_ITEM = ITEMS.register("seed_duplicator", () -> new BlockItem(SEED_DUPLICATOR.get(), new Item.Properties()));
     public static final RegistryObject<Item> TRANSFER_CONDUIT_ITEM = ITEMS.register("transfer_conduit", () -> new BlockItem(TRANSFER_CONDUIT.get(), new Item.Properties()));
     public static final RegistryObject<Item> FLUID_PIPE_ITEM = ITEMS.register("fluid_pipe", () -> new BlockItem(FLUID_PIPE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ORE_WASHER_ITEM = ITEMS.register("ore_washer",
+            () -> new BlockItem(ORE_WASHER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> CENTRIFUGE_ITEM = ITEMS.register("centrifuge",
+            () -> new BlockItem(CENTRIFUGE.get(), new Item.Properties()));
+    public static final RegistryObject<Item> REACTOR_ITEM = ITEMS.register("reactor",
+            () -> new BlockItem(REACTOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> ASSEMBLER_ITEM = ITEMS.register("assembler",
+            () -> new BlockItem(ASSEMBLER.get(), new Item.Properties()));
+    public static final RegistryObject<Item> BLAST_FURNACE_ITEM = ITEMS.register("blast_furnace",
+            () -> new BlockItem(BLAST_FURNACE.get(), new Item.Properties()));
+
     public static final RegistryObject<Item> TREE_GROWTH_CHAMBER_ITEM = ITEMS.register("tree_growth_chamber", () -> new BlockItem(TREE_GROWTH_CHAMBER.get(), new Item.Properties()));
     public static final RegistryObject<Item> MEGA_CELL_ITEM = ITEMS.register("mega_cell", () -> new BlockItem(MEGA_CELL.get(), new Item.Properties()));
     public static final RegistryObject<Item> ENERGY_CABLE_ITEM = ITEMS.register("energy_cable", () -> new BlockItem(ENERGY_CABLE.get(), new Item.Properties()));
@@ -187,6 +244,7 @@ public class Registration {
     public static final RegistryObject<Item> REDSTONE_POWDER = ITEMS.register("redstone_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> COPPER_POWDER = ITEMS.register("copper_powder", () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> BRONZE_INGOT = ITEMS.register("bronze_ingot", () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> GUIDE_BOOK = ITEMS.register("guide_book", () -> new GuideBookItem(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> LAPIS_POWDER = ITEMS.register("lapis_powder", () -> new Item(new Item.Properties()));
 
     // Creative tab
@@ -214,6 +272,12 @@ public class Registration {
                         output.accept(TREE_GROWTH_CHAMBER_ITEM.get());
                         output.accept(LINKING_TOOL.get());
                         output.accept(CHUNK_EXCAVATOR.get());
+                        output.accept(ORE_WASHER_ITEM.get());
+                        output.accept(CENTRIFUGE_ITEM.get());
+                        output.accept(REACTOR_ITEM.get());
+                        output.accept(ASSEMBLER_ITEM.get());
+                        output.accept(BLAST_FURNACE_ITEM.get());
+                        output.accept(GUIDE_BOOK.get());
                         output.accept(STONE_PEBBLE.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());

@@ -50,5 +50,21 @@
   "item.valence.electric_furnace": "Electric Furnace",
   "item.valence.mega_cell": "Mega Cell",
   "item.valence.tree_growth_chamber": "Tree Growth Chamber",
-  "container.valence.electric_furnace": "Electric Furnace"
+  "container.valence.electric_furnace": "Electric Furnace",
+  "block.valence.ore_washer": "Ore Washer",
+  "item.valence.ore_washer": "Ore Washer",
+  "container.valence.ore_washer": "Ore Washer",
+  "block.valence.centrifuge": "Centrifuge",
+  "item.valence.centrifuge": "Centrifuge",
+  "container.valence.centrifuge": "Centrifuge",
+  "block.valence.reactor": "Chemical Reactor",
+  "item.valence.reactor": "Chemical Reactor",
+  "container.valence.reactor": "Chemical Reactor",
+  "block.valence.assembler": "Assembler",
+  "item.valence.assembler": "Assembler",
+  "container.valence.assembler": "Assembler",
+  "block.valence.blast_furnace": "Blast Furnace",
+  "item.valence.blast_furnace": "Blast Furnace",
+  "container.valence.blast_furnace": "Blast Furnace",
+  "item.valence.guide_book": "Valence Guide"
 }

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MCM",
+    "CAC",
+    "MCM"
+  ],
+  "key": {
+    "M": {
+      "item": "valence:mega_cell"
+    },
+    "C": {
+      "item": "valence:reactor"
+    },
+    "A": {
+      "item": "valence:advanced_miner"
+    }
+  },
+  "result": {
+    "item": "valence:assembler"
+  }
+}
