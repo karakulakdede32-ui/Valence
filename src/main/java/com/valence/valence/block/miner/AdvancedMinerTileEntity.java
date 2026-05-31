@@ -59,7 +59,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     private final LazyOptional<IItemHandler> unsidedWrapper = LazyOptional.of(() -> new InvWrapper(this));
 
     public AdvancedMinerTileEntity(BlockPos pos, BlockState state) {
-        this((BlockEntityType<AdvancedMinerTileEntity>) null, pos, state);
+        super(Registration.ADVANCED_MINER_TE.get(), pos, state);
     }
 
     public AdvancedMinerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -198,13 +198,26 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         // Full 16x16 cycle complete — output ores and consume fuel
         if (scanZ >= 16) {
             scanZ = 0;
-            int slot = 1;
             for (Block ore : foundOres) {
-                if (slot >= 9) break;
-                if (itemHandler.getStackInSlot(slot).isEmpty()) {
-                    itemHandler.setStackInSlot(slot, new ItemStack(ore, 1));
+                // Try to merge with existing stacks first, then find empty slot
+                boolean placed = false;
+                for (int slot = 1; slot < 9; slot++) {
+                    ItemStack stack = itemHandler.getStackInSlot(slot);
+                    if (!stack.isEmpty() && stack.is(ore.asItem()) && stack.getCount() < stack.getMaxStackSize()) {
+                        itemHandler.setStackInSlot(slot, new ItemStack(ore, stack.getCount() + 1));
+                        placed = true;
+                        break;
+                    }
                 }
-                slot++;
+                if (!placed) {
+                    for (int slot = 1; slot < 9; slot++) {
+                        if (itemHandler.getStackInSlot(slot).isEmpty()) {
+                            itemHandler.setStackInSlot(slot, new ItemStack(ore, 1));
+                            placed = true;
+                            break;
+                        }
+                    }
+                }
             }
             foundOres.clear();
             fuel--;
