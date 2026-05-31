@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BBB",
+    "SFS",
+    "BBB"
+  ],
+  "key": {
+    "B": {
+      "item": "valence:bronze_ingot"
+    },
+    "S": {
+      "item": "minecraft:smooth_stone"
+    },
+    "F": {
+      "item": "valence:steam_furnace"
+    }
+  },
+  "result": {
+    "item": "valence:blast_furnace"
+  }
+}

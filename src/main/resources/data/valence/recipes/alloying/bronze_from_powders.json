@@ -1,0 +1,15 @@
+{
+  "type": "valence:alloying",
+  "input_a": {
+    "item": "valence:iron_powder"
+  },
+  "input_b": {
+    "item": "valence:copper_powder"
+  },
+  "output": {
+    "item": "valence:bronze_ingot",
+    "count": 2
+  },
+  "processingtime": 100,
+  "steam": 18
+}

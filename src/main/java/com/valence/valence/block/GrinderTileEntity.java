@@ -168,6 +168,11 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
             } else {
                 itemHandler.setStackInSlot(1, new ItemStack(result.getItem(), output.getCount() + result.getCount()));
             }
+            // XP byproduct: small chance to spawn XP orb
+            if (level != null && !level.isClientSide() && level.random.nextFloat() < 0.15f) {
+                net.minecraft.world.entity.ExperienceOrb.award((net.minecraft.server.level.ServerLevel) level, 
+                    net.minecraft.world.phys.Vec3.atCenterOf(getBlockPos().above()), 1 + level.random.nextInt(3));
+            }
             resetProgress();
         });
     }

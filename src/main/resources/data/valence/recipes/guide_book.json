@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:book"
+    },
+    {
+      "item": "valence:stone_pebble"
+    }
+  ],
+  "result": {
+    "item": "valence:guide_book"
+  }
+}

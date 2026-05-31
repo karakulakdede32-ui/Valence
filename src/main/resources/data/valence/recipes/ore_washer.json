@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "BGB",
+    "WCW",
+    "BGB"
+  ],
+  "key": {
+    "B": {
+      "item": "valence:bronze_ingot"
+    },
+    "G": {
+      "item": "minecraft:glass"
+    },
+    "W": {
+      "item": "minecraft:water_bucket"
+    },
+    "C": {
+      "item": "valence:steam_furnace"
+    }
+  },
+  "result": {
+    "item": "valence:ore_washer"
+  }
+}
