@@ -1,5 +1,7 @@
 package com.valence.valence.block.miner;
 
+import com.valence.valence.Registration;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -79,27 +81,6 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         currentZ = tag.getInt("currentZ");
         fuel = tag.getInt("fuel");
 
-        scannedOres.clear();
-        if (tag.contains("ScannedOres")) {
-            ListTag oreList = tag.getList("ScannedOres", 10);
-            for (int i = 0; i < oreList.size(); i++) {
-                CompoundTag oreTag = oreList.getCompound(i);
-                scannedOres.add(ItemStack.of(oreTag));
-            }
-        }
-
-        oreCounts.clear();
-        if (tag.contains("OreCounts")) {
-            ListTag countList = tag.getList("OreCounts", 10);
-            for (int i = 0; i < countList.size(); i++) {
-                CompoundTag entry = countList.getCompound(i);
-                Block block = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(
-                    new net.minecraft.resources.ResourceLocation(entry.getString("block")));
-                if (block != null) {
-                    oreCounts.put(block, entry.getInt("count"));
-                }
-            }
-        }
     }
 
     @Override
@@ -111,22 +92,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         tag.putInt("currentZ", currentZ);
         tag.putInt("fuel", fuel);
 
-        ListTag oreList = new ListTag();
-        for (ItemStack ore : scannedOres) {
-            CompoundTag oreTag = new CompoundTag();
-            ore.save(oreTag);
-            oreList.add(oreTag);
-        }
-        tag.put("ScannedOres", oreList);
 
-        ListTag countList = new ListTag();
-        for (Map.Entry<Block, Integer> entry : oreCounts.entrySet()) {
-            CompoundTag entryTag = new CompoundTag();
-            entryTag.putString("block", net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(entry.getKey()).toString());
-            entryTag.putInt("count", entry.getValue());
-            countList.add(entryTag);
-        }
-        tag.put("OreCounts", countList);
     }
 
     @Override
@@ -254,6 +220,10 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     public int getFuel() {
         return fuel;
+    }
+
+    public int getScanProgress() {
+        return currentZ * 16 + currentX;
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BasicMinerTileEntity pEntity) {

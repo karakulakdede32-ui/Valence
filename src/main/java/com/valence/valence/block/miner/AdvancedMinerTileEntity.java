@@ -1,5 +1,7 @@
 package com.valence.valence.block.miner;
 
+import com.valence.valence.Registration;
+
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -76,18 +78,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         scanX = tag.getInt("scanX");
         scanZ = tag.getInt("scanZ");
 
-        foundOres.clear();
-        if (tag.contains("FoundOres")) {
-            ListTag list = tag.getList("FoundOres", 8);
-            for (int i = 0; i < list.size(); i++) {
-                String id = list.getString(i);
-                Block block = net.minecraftforge.registries.ForgeRegistries.BLOCKS.getValue(
-                    new net.minecraft.resources.ResourceLocation(id));
-                if (block != null && block != net.minecraft.world.level.block.Blocks.AIR) {
-                    foundOres.add(block);
-                }
-            }
-        }
     }
 
     @Override
@@ -98,12 +88,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         tag.putInt("scanX", scanX);
         tag.putInt("scanZ", scanZ);
 
-        ListTag list = new ListTag();
-        for (Block block : foundOres) {
-            list.add(StringTag.valueOf(
-                net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(block).toString()));
-        }
-        tag.put("FoundOres", list);
     }
 
     @Override

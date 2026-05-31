@@ -2,13 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "BEB",
-    "RBR",
+    "RTR",
     "B B"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
     "E": { "item": "minecraft:ender_pearl" },
-    "R": { "item": "minecraft:redstone" }
+    "R": { "item": "minecraft:redstone" },
+    "T": { "item": "valence:transfer_conduit" }
   },
   "result": { "item": "valence:wireless_node" }
 }

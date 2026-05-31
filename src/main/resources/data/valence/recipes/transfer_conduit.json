@@ -2,12 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "BRB",
-    "R R",
+    "D R",
     "BRB"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
-    "R": { "item": "minecraft:redstone" }
+    "R": { "item": "minecraft:redstone" },
+    "D": { "item": "valence:df_cell" }
   },
   "result": { "item": "valence:transfer_conduit", "count": 2 }
 }

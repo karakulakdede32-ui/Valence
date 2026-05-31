@@ -2,12 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "BGB",
-    "   ",
+    "C  ",
     "BGB"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
-    "G": { "item": "minecraft:glass" }
+    "G": { "item": "minecraft:glass" },
+    "C": { "item": "valence:transfer_conduit" }
   },
   "result": { "item": "valence:fluid_pipe", "count": 4 }
 }

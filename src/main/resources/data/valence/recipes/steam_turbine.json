@@ -1,12 +1,13 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "BIB",
+    "BDB",
     "IPI",
     "BIB"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
+    "D": { "item": "valence:steam_dynamo" },
     "I": { "item": "minecraft:iron_bars" },
     "P": { "item": "minecraft:piston" }
   },

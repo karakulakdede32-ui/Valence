@@ -2,12 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "BDB",
-    "BSB",
+    "ESE",
     "BPB"
   ],
   "key": {
     "B": { "item": "valence:bronze_ingot" },
     "D": { "item": "minecraft:bone_meal" },
+    "E": { "item": "valence:electric_furnace" },
     "S": { "item": "minecraft:sapling" },
     "P": { "item": "minecraft:piston" }
   },

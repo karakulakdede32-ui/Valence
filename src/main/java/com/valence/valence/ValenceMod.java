@@ -1,5 +1,7 @@
 package com.valence.valence;
 
+import com.valence.valence.config.ValenceConfig;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -13,6 +15,7 @@ public class ValenceMod {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public ValenceMod() {
+        com.valence.valence.config.ValenceConfig.register();
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         
         // Register all deferred registries
