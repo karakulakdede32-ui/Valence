@@ -61,7 +61,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     private final LazyOptional<IItemHandler> unsidedWrapper = LazyOptional.of(() -> new InvWrapper(this));
 
     public BasicMinerTileEntity(BlockPos pos, BlockState state) {
-        this((BlockEntityType<BasicMinerTileEntity>) null, pos, state);
+        super(Registration.BASIC_MINER_TE.get(), pos, state);
     }
 
     public BasicMinerTileEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -234,10 +234,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         if (!fuelStack.isEmpty()) {
             fuel = 200;
             itemHandler.extractItem(0, 1, false);
-            currentX = 0;
-            currentZ = 0;
-            scannedOres.clear();
-            oreCounts.clear();
+            // Don't reset scan progress — resume from where we left off if interrupted
             hasScanned = false;
             setChanged();
         }

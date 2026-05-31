@@ -44,11 +44,11 @@ public class PebbleEventHandler {
                         if (!player.getInventory().add(pebble)) {
                             player.drop(pebble, false);
                         }
+                        player.swing(InteractionHand.MAIN_HAND);
                     }
                 }
-                // Cancel event to prevent other interactions and play arm animation
+                // Cancel event to prevent other interactions
                 event.setCanceled(true);
-                player.swing(InteractionHand.MAIN_HAND);
             }
         }
     }

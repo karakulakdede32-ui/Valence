@@ -214,6 +214,7 @@ public class Registration {
                         output.accept(TREE_GROWTH_CHAMBER_ITEM.get());
                         output.accept(LINKING_TOOL.get());
                         output.accept(CHUNK_EXCAVATOR.get());
+                        output.accept(STONE_PEBBLE.get());
                         output.accept(IRON_POWDER.get());
                         output.accept(GOLD_POWDER.get());
                         output.accept(REDSTONE_POWDER.get());
