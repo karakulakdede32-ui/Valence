@@ -54,4 +54,16 @@ public class GrinderBlock extends BaseEntityBlock {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return createTickerHelper(type, Registration.GRINDER_TE.get(), GrinderTileEntity::tick);
     }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) { return true; }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof GrinderTileEntity te) {
+            return te.getComparatorOutput();
+        }
+        return 0;
+    }
+
 }

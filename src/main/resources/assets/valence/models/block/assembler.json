@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "valence:block/assembler"
+    "particle": "valence:block/assembler_side",
+    "down": "valence:block/assembler_bottom",
+    "up": "valence:block/assembler_top",
+    "north": "valence:block/assembler_side",
+    "south": "valence:block/assembler_side",
+    "east": "valence:block/assembler_side",
+    "west": "valence:block/assembler_side"
   }
 }

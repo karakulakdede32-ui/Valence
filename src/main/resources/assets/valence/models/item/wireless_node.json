@@ -1,3 +1,6 @@
 {
-  "parent": "valence:block/wireless_node"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/wireless_node"
+  }
 }

@@ -15,11 +15,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
@@ -31,17 +29,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class BlastFurnaceTileEntity extends BlockEntity implements MenuProvider {
-    public static final int PROGRESS_MAX = 300; // Slower than normal furnace
+    public static final int PROGRESS_MAX = 300;
 
     private final ItemStackHandler itemHandler = new ItemStackHandler(2) {
         @Override public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            if (slot == 1) return false; // output
+            if (slot == 1) return false;
             return true;
         }
         @Override protected void onContentsChanged(int slot) { setChanged(); }
     };
     private int progress = 0;
     private boolean multiblockValid = false;
+    private int recheckDelay = 0;
 
     public BlastFurnaceTileEntity(BlockPos pos, BlockState state) { super(Registration.BLAST_FURNACE_TE.get(), pos, state); }
 
@@ -61,17 +60,29 @@ public class BlastFurnaceTileEntity extends BlockEntity implements MenuProvider 
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlastFurnaceTileEntity te) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            // Client: smoke particles when running
+            if (te.progress > 0 && level.random.nextInt(3) == 0) {
+                double x = pos.getX() + 0.5;
+                double y = pos.getY() + 1.0;
+                double z = pos.getZ() + 0.5;
+                level.addParticle(com.valence.valence.Registration.SMOKE.get(), x + (level.random.nextDouble()-0.5)*0.3, y, z + (level.random.nextDouble()-0.5)*0.3, 0, 0.04, 0);
+            }
+            return;
+        }
 
-        // Check multiblock structure
-        te.multiblockValid = BlastFurnaceBlock.isFormed(level, pos);
+        // Recheck multiblock every 40 ticks (2 seconds) to reduce CPU load
+        te.recheckDelay--;
+        if (te.recheckDelay <= 0) {
+            te.multiblockValid = BlastFurnaceBlock.isFormed(level, pos);
+            te.recheckDelay = 40;
+        }
 
         if (!te.multiblockValid) {
             if (te.progress > 0) { te.progress = 0; te.setChanged(); }
             return;
         }
 
-        // 2x speed boost when formed
         ItemStack input = te.itemHandler.getStackInSlot(0);
         ItemStack output = te.itemHandler.getStackInSlot(1);
 
@@ -98,6 +109,12 @@ public class BlastFurnaceTileEntity extends BlockEntity implements MenuProvider 
             te.progress = 0;
         }
         te.setChanged();
+    }
+
+    public int getComparatorOutput() {
+        if (progress > 0) return (int)(15.0 * progress / PROGRESS_MAX);
+        if (!itemHandler.getStackInSlot(1).isEmpty()) return 15;
+        return 0;
     }
 
     public boolean isMultiblockValid() { return multiblockValid; }

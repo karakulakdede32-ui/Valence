@@ -13,12 +13,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 import com.valence.valence.Registration;
 
 public class BlastFurnaceBlock extends BaseEntityBlock {
+    private static final java.util.Set<net.minecraft.world.level.block.Block> HEAT_BRICKS = java.util.Set.of(
+        Blocks.BRICKS, Blocks.NETHER_BRICKS, Blocks.STONE_BRICKS, Blocks.DEEPSLATE_BRICKS,
+        Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.END_STONE_BRICKS
+    );
+
     public BlastFurnaceBlock(Properties p) { super(p.noOcclusion()); }
     @Override public RenderShape getRenderShape(BlockState p) { return RenderShape.MODEL; }
     @Nullable @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new BlastFurnaceTileEntity(pos, state); }
@@ -32,12 +38,29 @@ public class BlastFurnaceBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    // Simple multiblock check: needs lava below and air above
+    // Real multiblock: lava below, air above, brick ring around
     public static boolean isFormed(Level level, BlockPos pos) {
         BlockPos below = pos.below();
-        BlockState belowState = level.getBlockState(below);
-        BlockPos above = pos.above();
-        BlockState aboveState = level.getBlockState(above);
-        return (belowState.is(Blocks.LAVA) || belowState.is(Blocks.LAVA_CAULDRON)) && aboveState.isAir();
+        if (!level.getBlockState(below).is(Blocks.LAVA) && !level.getBlockState(below).is(Blocks.LAVA_CAULDRON))
+            return false;
+        if (!level.getBlockState(pos.above()).isAir())
+            return false;
+        // Check 4 sides for heat-resistant brick blocks
+        for (Direction dir : java.util.List.of(Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST)) {
+            BlockState side = level.getBlockState(pos.relative(dir));
+            if (!HEAT_BRICKS.contains(side.getBlock())) return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) { return true; }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof BlastFurnaceTileEntity te) {
+            return te.getComparatorOutput();
+        }
+        return 0;
     }
 }

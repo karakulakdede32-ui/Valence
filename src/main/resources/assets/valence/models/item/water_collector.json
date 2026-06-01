@@ -1,3 +1,6 @@
 {
-  "parent": "valence:block/water_collector"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/water_collector"
+  }
 }

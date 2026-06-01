@@ -270,4 +270,22 @@ public class GrinderTileEntity extends BlockEntity implements MenuProvider, Worl
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
         return direction == Direction.DOWN && index == 1;
     }
+
+    public int getComparatorOutput() {
+        // Returns 0-15 based on how full the output slots are
+        boolean hasItems = false;
+        int totalSlots = 0;
+        int filledSlots = 0;
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                hasItems = true;
+                filledSlots++;
+            }
+            totalSlots++;
+        }
+        if (!hasItems) return 0;
+        // Scale: empty=0, half-filled=8, fully-filled=15
+        return Math.max(1, filledSlots * 15 / Math.max(1, totalSlots));
+    }
+
 }

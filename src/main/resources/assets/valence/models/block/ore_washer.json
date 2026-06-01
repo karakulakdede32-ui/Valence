@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "valence:block/ore_washer"
+    "particle": "valence:block/ore_washer_side",
+    "down": "valence:block/ore_washer_bottom",
+    "up": "valence:block/ore_washer_top",
+    "north": "valence:block/ore_washer_side",
+    "south": "valence:block/ore_washer_side",
+    "east": "valence:block/ore_washer_side",
+    "west": "valence:block/ore_washer_side"
   }
 }

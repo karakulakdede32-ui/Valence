@@ -110,7 +110,16 @@ public class SteamTurbineTileEntity extends BlockEntity implements MenuProvider 
     public void invalidateCaps() { super.invalidateCaps(); fluidHandler.invalidate(); energyHandler.invalidate(); }
 
     public static void tick(Level level, BlockPos pos, BlockState state, SteamTurbineTileEntity te) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            // Client: steam particles when generating power
+            if (te.getSteamTank().getFluidAmount() > 0 && level.random.nextInt(6) == 0) {
+                double x = pos.getX() + 0.5;
+                double y = pos.getY() + 0.5;
+                double z = pos.getZ() + 0.5;
+                level.addParticle(com.valence.valence.Registration.STEAM_PUFF.get(), x, y, z, (level.random.nextDouble()-0.5)*0.02, 0.02, (level.random.nextDouble()-0.5)*0.02);
+            }
+            return;
+        }
 
         // Pull steam from neighbors
         if (te.steamTank.getFluidAmount() < te.steamTank.getCapacity()) {

@@ -32,4 +32,16 @@ public class SteamFurnaceBlock extends BaseEntityBlock {
         }
         return InteractionResult.SUCCESS;
     }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) { return true; }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof SteamFurnaceTileEntity te) {
+            return te.getComparatorOutput();
+        }
+        return 0;
+    }
+
 }

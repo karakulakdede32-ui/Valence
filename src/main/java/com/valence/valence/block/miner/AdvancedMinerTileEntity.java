@@ -44,6 +44,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     private int fuel = 0;
     private int scanX = 0;
     private int scanZ = 0;
+    private int scanCooldown = 0;
     private final Set<Block> foundOres = new HashSet<>();
 
     // Slot 0 = Fuel input, Slots 1-12 = Output slots
@@ -247,7 +248,15 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, AdvancedMinerTileEntity pEntity) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            if (pEntity.fuel > 0 && level.random.nextInt(8) == 0) {
+                double x = pos.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                double y = pos.getY() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                double z = pos.getZ() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE, x, y, z, 0, 0.01, 0);
+            }
+            return;
+        }
 
         // Pull DF from neighbors
         if (pEntity.dfStorage.getDF() < pEntity.dfStorage.getMaxDF()) {
@@ -284,7 +293,18 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
             if (pEntity.scanZ >= 16) {
                 pEntity.scanZ = 0;
             }
-            pEntity.scanOneColumn((ServerLevel) level);
+            pEntity.scanCooldown++;
+            if (pEntity.scanCooldown >= 2) {
+                pEntity.scanCooldown = 0;
+                pEntity.scanOneColumn((ServerLevel) level);
+                // Consume fuel per tick
+                if (pEntity.fuel > 0) {
+                    pEntity.fuel--;
+                    if (pEntity.fuel <= 0) {
+                        pEntity.tryConsumeFuel();
+                    }
+                }
+            }
             // Consume fuel per tick
             if (pEntity.fuel > 0) {
                 pEntity.fuel--;
@@ -367,4 +387,22 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
             itemHandler.setStackInSlot(i, ItemStack.EMPTY);
         }
     }
+
+    public int getComparatorOutput() {
+        // Returns 0-15 based on how full the output slots are
+        boolean hasItems = false;
+        int totalSlots = 0;
+        int filledSlots = 0;
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                hasItems = true;
+                filledSlots++;
+            }
+            totalSlots++;
+        }
+        if (!hasItems) return 0;
+        // Scale: empty=0, half-filled=8, fully-filled=15
+        return Math.max(1, filledSlots * 15 / Math.max(1, totalSlots));
+    }
+
 }

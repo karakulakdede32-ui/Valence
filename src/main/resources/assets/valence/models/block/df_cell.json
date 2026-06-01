@@ -1,1 +1,12 @@
-{"parent": "minecraft:block/cube_bottom_top", "textures": {"top": "valence:block/df_cell_top", "side": "valence:block/df_cell_side", "bottom": "valence:block/df_cell_bottom"}}
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "valence:block/df_cell_side",
+    "down": "valence:block/df_cell_bottom",
+    "up": "valence:block/df_cell_top",
+    "north": "valence:block/df_cell_side",
+    "south": "valence:block/df_cell_side",
+    "east": "valence:block/df_cell_side",
+    "west": "valence:block/df_cell_side"
+  }
+}

@@ -29,4 +29,16 @@ public class QuantumMinerBlock extends BaseEntityBlock {
         if (l.getBlockEntity(pos) instanceof QuantumMinerTileEntity te && p instanceof ServerPlayer sp) NetworkHooks.openScreen(sp, te, pos);
         return InteractionResult.SUCCESS;
     }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) { return true; }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof QuantumMinerTileEntity te) {
+            return te.getComparatorOutput();
+        }
+        return 0;
+    }
+
 }

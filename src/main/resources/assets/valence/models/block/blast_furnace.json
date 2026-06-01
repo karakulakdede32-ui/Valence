@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "valence:block/blast_furnace"
+    "particle": "valence:block/blast_furnace_side",
+    "down": "valence:block/blast_furnace_bottom",
+    "up": "valence:block/blast_furnace_top",
+    "north": "valence:block/blast_furnace_side",
+    "south": "valence:block/blast_furnace_side",
+    "east": "valence:block/blast_furnace_side",
+    "west": "valence:block/blast_furnace_side"
   }
 }

@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/steam_dynamo_top",
-    "side": "valence:block/steam_dynamo_side",
-    "bottom": "valence:block/steam_dynamo_bottom"
+    "particle": "valence:block/steam_dynamo_side",
+    "down": "valence:block/steam_dynamo_bottom",
+    "up": "valence:block/steam_dynamo_top",
+    "north": "valence:block/steam_dynamo_side",
+    "south": "valence:block/steam_dynamo_side",
+    "east": "valence:block/steam_dynamo_side",
+    "west": "valence:block/steam_dynamo_side"
   }
 }

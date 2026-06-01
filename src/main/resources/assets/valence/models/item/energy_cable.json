@@ -1,3 +1,6 @@
 {
-  "parent": "valence:block/pipe/energy_cable_center"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/energy_cable"
+  }
 }

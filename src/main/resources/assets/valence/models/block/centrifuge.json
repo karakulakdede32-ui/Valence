@@ -1,6 +1,12 @@
 {
-  "parent": "block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "valence:block/centrifuge"
+    "particle": "valence:block/centrifuge_side",
+    "down": "valence:block/centrifuge_bottom",
+    "up": "valence:block/centrifuge_top",
+    "north": "valence:block/centrifuge_side",
+    "south": "valence:block/centrifuge_side",
+    "east": "valence:block/centrifuge_side",
+    "west": "valence:block/centrifuge_side"
   }
 }
