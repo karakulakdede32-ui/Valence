@@ -29,6 +29,13 @@ public class ClientSetup {
             MenuScreens.register(Registration.ELECTRIC_FURNACE_MENU.get(), ElectricFurnaceScreen::new);
             MenuScreens.register(Registration.MEGA_CELL_MENU.get(), MegaCellScreen::new);
             MenuScreens.register(Registration.TREE_GROWTH_CHAMBER_MENU.get(), TreeGrowthChamberScreen::new);
+            MenuScreens.register(Registration.ASSEMBLER_MENU.get(), AssemblerScreen::new);
+            MenuScreens.register(Registration.BLAST_FURNACE_MENU.get(), BlastFurnaceScreen::new);
+            MenuScreens.register(Registration.CENTRIFUGE_MENU.get(), CentrifugeScreen::new);
+            MenuScreens.register(Registration.ORE_WASHER_MENU.get(), OreWasherScreen::new);
+            MenuScreens.register(Registration.QUANTUM_MINER_MENU.get(), QuantumMinerScreen::new);
+            MenuScreens.register(Registration.REACTOR_MENU.get(), ChemicalReactorScreen::new);
+
         });
     }
 }

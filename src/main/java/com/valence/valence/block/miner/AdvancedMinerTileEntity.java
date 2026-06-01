@@ -1,13 +1,12 @@
 package com.valence.valence.block.miner;
 
 import com.valence.valence.Registration;
+import com.valence.valence.energy.DFStorage;
 
 import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
@@ -15,6 +14,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,19 +26,28 @@ import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyContainer, MenuProvider {
+    public static final int DF_CAPACITY = 10000;
+    public static final int DF_PER_SCAN = 5;
+    public static final int MAX_OUTPUT_SLOTS = 12;
+
+    private final DFStorage dfStorage = new DFStorage(DF_CAPACITY, 100, 0) {
+        @Override protected void onEnergyChanged() { setChanged(); sync(); }
+    };
+
     private int fuel = 0;
     private int scanX = 0;
     private int scanZ = 0;
     private final Set<Block> foundOres = new HashSet<>();
 
-    // Slot 0 = Fuel input, Slots 1-8 = Output slots
-    private final ItemStackHandler itemHandler = new ItemStackHandler(9) {
+    // Slot 0 = Fuel input, Slots 1-12 = Output slots
+    private final ItemStackHandler itemHandler = new ItemStackHandler(MAX_OUTPUT_SLOTS + 1) {
         @Override
         public void onContentsChanged(int slot) {
             setChanged();
@@ -50,15 +59,20 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (slot == 0) {
-                return stack.getBurnTime(RecipeType.SMELTING) > 0 || stack.is(net.minecraft.world.item.Items.SUGAR_CANE);
+                return stack.getBurnTime(RecipeType.SMELTING) > 0
+                    || stack.is(Items.SUGAR_CANE)
+                    || stack.is(Items.CHARCOAL)
+                    || stack.is(Items.COAL)
+                    || stack.is(Items.COAL_BLOCK);
             }
             return false;
         }
     };
 
-    // Sided wrappers for mod compatibility (Create funnels, EnderIO conduits, etc.)
+    // Sided wrappers for mod compatibility
     private final Map<Direction, LazyOptional<IItemHandler>> sidedWrappers = new EnumMap<>(Direction.class);
     private final LazyOptional<IItemHandler> unsidedWrapper = LazyOptional.of(() -> new InvWrapper(this));
+    private final LazyOptional<IEnergyStorage> energyHandler = LazyOptional.of(() -> dfStorage);
 
     public AdvancedMinerTileEntity(BlockPos pos, BlockState state) {
         super(Registration.ADVANCED_MINER_TE.get(), pos, state);
@@ -68,26 +82,32 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         super(type, pos, state);
     }
 
+    private void sync() {
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+        }
+    }
+
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
         if (tag.contains("Items")) {
             itemHandler.deserializeNBT(tag.getCompound("Items"));
         }
+        dfStorage.deserializeNBT(tag.get("df"));
         fuel = tag.getInt("fuel");
         scanX = tag.getInt("scanX");
         scanZ = tag.getInt("scanZ");
-
     }
 
     @Override
     public void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
         tag.put("Items", itemHandler.serializeNBT());
+        tag.put("df", dfStorage.serializeNBT());
         tag.putInt("fuel", fuel);
         tag.putInt("scanX", scanX);
         tag.putInt("scanZ", scanZ);
-
     }
 
     @Override
@@ -99,6 +119,9 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
             return sidedWrappers.computeIfAbsent(side, s ->
                 LazyOptional.of(() -> new SidedInvWrapper(this, s))).cast();
         }
+        if (cap == ForgeCapabilities.ENERGY) {
+            return energyHandler.cast();
+        }
         return super.getCapability(cap, side);
     }
 
@@ -106,6 +129,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     public void invalidateCaps() {
         super.invalidateCaps();
         unsidedWrapper.invalidate();
+        energyHandler.invalidate();
         for (LazyOptional<IItemHandler> lo : sidedWrappers.values()) {
             lo.invalidate();
         }
@@ -128,6 +152,8 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         return fuel;
     }
 
+    public DFStorage getDFStorage() { return dfStorage; }
+
     public int getScanProgress() {
         return scanZ * 16 + scanX;
     }
@@ -137,7 +163,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     }
 
     public boolean hasFuel() {
-        return fuel > 0;
+        return fuel > 0 || dfStorage.getDF() >= DF_PER_SCAN;
     }
 
     private void tryConsumeFuel() {
@@ -145,19 +171,19 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         ItemStack fuelStack = itemHandler.getStackInSlot(0);
         if (!fuelStack.isEmpty()) {
             int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(fuelStack, RecipeType.SMELTING);
-            if (burnTime <= 0 && fuelStack.is(net.minecraft.world.item.Items.SUGAR_CANE)) burnTime = 100;
-            if (burnTime > 0) {
-                fuel = burnTime;
-                itemHandler.extractItem(0, 1, false);
-                scanX = 0;
-                scanZ = 0;
-                foundOres.clear();
+            if (burnTime <= 0 && fuelStack.is(Items.SUGAR_CANE)) burnTime = 100;
+            // Also accept coal/charcoal directly
+            if (burnTime <= 0 && (fuelStack.is(Items.COAL) || fuelStack.is(Items.CHARCOAL) || fuelStack.is(Items.COAL_BLOCK))) {
+                burnTime = fuelStack.is(Items.COAL_BLOCK) ? 16000 : 1600;
             }
+            fuel = Math.max(burnTime, 100);
+            itemHandler.extractItem(0, 1, false);
+            setChanged();
         }
     }
 
     public void scanOneColumn(ServerLevel lvl) {
-        if (lvl == null || fuel <= 0) return;
+        if (lvl == null) return;
 
         BlockPos p = this.getBlockPos();
         if (p == null) return;
@@ -165,11 +191,10 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
         int chunkStartX = (p.getX() >> 4) << 4;
         int chunkStartZ = (p.getZ() >> 4) << 4;
 
-        // Scan one vertical column per call (384 blocks per tick)
         for (int y = -64; y < 320; y++) {
             BlockPos checkPos = new BlockPos(chunkStartX + scanX, y, chunkStartZ + scanZ);
             BlockState bs = lvl.getBlockState(checkPos);
-            if (isOre(bs) && !foundOres.contains(bs.getBlock()) && foundOres.size() < 8) {
+            if (isOre(bs) && !foundOres.contains(bs.getBlock()) && foundOres.size() < MAX_OUTPUT_SLOTS) {
                 foundOres.add(bs.getBlock());
             }
         }
@@ -180,13 +205,12 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
             scanZ++;
         }
 
-        // Full 16x16 cycle complete — output ores and consume fuel
+        // Full 16x16 cycle complete — output ores and consume fuel/DF
         if (scanZ >= 16) {
             scanZ = 0;
             for (Block ore : foundOres) {
-                // Try to merge with existing stacks first, then find empty slot
                 boolean placed = false;
-                for (int slot = 1; slot < 9; slot++) {
+                for (int slot = 1; slot <= MAX_OUTPUT_SLOTS; slot++) {
                     ItemStack stack = itemHandler.getStackInSlot(slot);
                     if (!stack.isEmpty() && stack.is(ore.asItem()) && stack.getCount() < stack.getMaxStackSize()) {
                         itemHandler.setStackInSlot(slot, new ItemStack(ore, stack.getCount() + 1));
@@ -195,7 +219,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
                     }
                 }
                 if (!placed) {
-                    for (int slot = 1; slot < 9; slot++) {
+                    for (int slot = 1; slot <= MAX_OUTPUT_SLOTS; slot++) {
                         if (itemHandler.getStackInSlot(slot).isEmpty()) {
                             itemHandler.setStackInSlot(slot, new ItemStack(ore, 1));
                             placed = true;
@@ -205,10 +229,6 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
                 }
             }
             foundOres.clear();
-            fuel--;
-            if (fuel <= 0) {
-                tryConsumeFuel();
-            }
         }
 
         setChanged();
@@ -229,12 +249,49 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     public static void tick(Level level, BlockPos pos, BlockState state, AdvancedMinerTileEntity pEntity) {
         if (level.isClientSide()) return;
 
-        if (pEntity.fuel <= 0) {
-            pEntity.tryConsumeFuel();
+        // Pull DF from neighbors
+        if (pEntity.dfStorage.getDF() < pEntity.dfStorage.getMaxDF()) {
+            for (Direction d : Direction.values()) {
+                int need = pEntity.dfStorage.getMaxDF() - pEntity.dfStorage.getDF();
+                if (need <= 0) break;
+                BlockEntity nb = level.getBlockEntity(pos.relative(d));
+                if (nb == null) continue;
+                int req = Math.min(50, need);
+                nb.getCapability(ForgeCapabilities.ENERGY, d.getOpposite()).ifPresent(h -> {
+                    int got = h.extractEnergy(req, false);
+                    if (got > 0) pEntity.dfStorage.receiveEnergy(got, false);
+                });
+            }
         }
 
-        if (pEntity.fuel > 0) {
+        // Try consuming fuel if DF is low
+        if (pEntity.dfStorage.getDF() < DF_PER_SCAN) {
+            if (pEntity.fuel <= 0) {
+                pEntity.tryConsumeFuel();
+            }
+        }
+
+        // Use DF first, then fuel
+        boolean canScan = false;
+        if (pEntity.dfStorage.getDF() >= DF_PER_SCAN) {
+            pEntity.dfStorage.consumeDF(DF_PER_SCAN, false);
+            canScan = true;
+        } else if (pEntity.fuel > 0) {
+            canScan = true;
+        }
+
+        if (canScan) {
+            if (pEntity.scanZ >= 16) {
+                pEntity.scanZ = 0;
+            }
             pEntity.scanOneColumn((ServerLevel) level);
+            // Consume fuel per tick
+            if (pEntity.fuel > 0) {
+                pEntity.fuel--;
+                if (pEntity.fuel <= 0) {
+                    pEntity.tryConsumeFuel();
+                }
+            }
             setChanged(level, pos, state);
         }
     }
@@ -242,7 +299,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
     // ========== Container implementation ==========
     @Override
     public boolean isEmpty() {
-        for (int i = 1; i < 9; i++) {
+        for (int i = 1; i <= MAX_OUTPUT_SLOTS; i++) {
             if (!itemHandler.getStackInSlot(i).isEmpty()) return false;
         }
         return true;
@@ -250,12 +307,19 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     @Override
     public int[] getSlotsForFace(Direction side) {
-        return side == Direction.DOWN ? new int[]{1, 2, 3, 4, 5, 6, 7, 8} : new int[]{0};
+        int[] outSlots = new int[MAX_OUTPUT_SLOTS];
+        for (int i = 0; i < MAX_OUTPUT_SLOTS; i++) outSlots[i] = i + 1;
+        return side == Direction.DOWN ? outSlots : new int[]{0};
     }
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return direction != Direction.DOWN && index == 0 && (stack.getBurnTime(RecipeType.SMELTING) > 0 || stack.is(net.minecraft.world.item.Items.SUGAR_CANE));
+        return direction != Direction.DOWN && index == 0 &&
+            (stack.getBurnTime(RecipeType.SMELTING) > 0 ||
+             stack.is(Items.SUGAR_CANE) ||
+             stack.is(Items.COAL) ||
+             stack.is(Items.CHARCOAL) ||
+             stack.is(Items.COAL_BLOCK));
     }
 
     @Override
@@ -265,7 +329,7 @@ public class AdvancedMinerTileEntity extends BlockEntity implements WorldlyConta
 
     @Override
     public int getContainerSize() {
-        return 9;
+        return MAX_OUTPUT_SLOTS + 1;
     }
 
     @Override

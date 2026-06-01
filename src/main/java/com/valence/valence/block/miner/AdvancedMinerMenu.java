@@ -15,20 +15,24 @@ import com.valence.valence.Registration;
 
 public class AdvancedMinerMenu extends AbstractContainerMenu {
     private final AdvancedMinerTileEntity tileEntity;
-
-    private static final int PLAYER_INVENTORY_START = 9;
-    private static final int HOTBAR_END = 45;
+    public static final int OUTPUT_SLOTS = 12;
+    private static final int PLAYER_INVENTORY_START = 1 + OUTPUT_SLOTS; // slot 0 = fuel, 1..12 = output
+    private static final int HOTBAR_END = PLAYER_INVENTORY_START + 36;
 
     public AdvancedMinerMenu(int id, Inventory playerInv, AdvancedMinerTileEntity te) {
         super(Registration.ADVANCED_MINER_MENU.get(), id);
         this.tileEntity = te;
 
         if (te != null) {
-            // Fuel slot
-            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 80, 8));
-
-            // Output slots: 2x4 grid
-            for (int i = 0; i < 2; i++) {
+            // Fuel slot — manually clickable
+            this.addSlot(new SlotItemHandler(te.getItemHandler(), 0, 80, 8) {
+                @Override
+                public boolean mayPlace(ItemStack stack) {
+                    return getItemHandler().isItemValid(getSlotIndex(), stack);
+                }
+            });
+            // Output slots: 3x4 grid — cannot place anything manually
+            for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 4; j++) {
                     final int slotIdx = 1 + j + i * 4;
                     this.addSlot(new SlotItemHandler(te.getItemHandler(), slotIdx, 26 + j * 27, 44 + i * 27) {
@@ -38,17 +42,14 @@ public class AdvancedMinerMenu extends AbstractContainerMenu {
             }
         }
 
-        // Player inventory
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 9; j++) {
+        // Player inventory (3 rows)
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 9; j++)
                 this.addSlot(new Slot(playerInv, j + i * 9 + 9, 8 + j * 18, 106 + i * 18));
-            }
-        }
 
         // Hotbar
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 9; i++)
             this.addSlot(new Slot(playerInv, i, 8 + i * 18, 160));
-        }
     }
 
     public AdvancedMinerMenu(int id, Inventory inv, FriendlyByteBuf buf) {
