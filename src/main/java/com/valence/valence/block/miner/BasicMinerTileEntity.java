@@ -5,20 +5,22 @@ import com.valence.valence.Registration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.tags.ItemTags;
 
 import java.util.*;
 
@@ -52,12 +54,34 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         @Override
         public boolean isItemValid(int slot, @NotNull ItemStack stack) {
             if (slot == 0) {
-                return stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING) > 0
-                    || stack.is(net.minecraft.world.item.Items.SUGAR_CANE);
+                return isFuel(stack);
             }
             return false;
         }
     };
+
+    /** Check if an item is a valid fuel: burnable items (coal, charcoal, logs, etc.) + sugar cane */
+    private static boolean isFuel(ItemStack stack) {
+        // Check burn time via Forge API (works on both sides in 1.20.1)
+        int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(stack, RecipeType.SMELTING);
+        if (burnTime > 0) return true;
+
+        // Direct checks as fallback
+        return stack.is(Items.SUGAR_CANE)
+            || stack.is(Items.COAL)
+            || stack.is(Items.CHARCOAL)
+            || stack.is(Items.COAL_BLOCK)
+            || stack.is(Items.DRIED_KELP_BLOCK)
+            || stack.is(Items.BLAZE_ROD)
+            // Logs (any)
+            || stack.is(ItemTags.LOGS)
+            // Planks (any)
+            || stack.is(ItemTags.PLANKS)
+            // Bamboo
+            || stack.is(Items.BAMBOO)
+            // Sticks
+            || stack.is(Items.STICK);
+    }
 
     // Sided wrappers for mod compatibility
     private final Map<Direction, LazyOptional<IItemHandler>> sidedWrappers = new EnumMap<>(Direction.class);
@@ -81,7 +105,6 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         currentX = tag.getInt("currentX");
         currentZ = tag.getInt("currentZ");
         fuel = tag.getInt("fuel");
-
     }
 
     @Override
@@ -92,8 +115,6 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         tag.putInt("currentX", currentX);
         tag.putInt("currentZ", currentZ);
         tag.putInt("fuel", fuel);
-
-
     }
 
     @Override
@@ -140,8 +161,10 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         for (int y = -64; y < 320; y++) {
             BlockPos checkPos = new BlockPos(chunkStartX + currentX, y, chunkStartZ + currentZ);
             BlockState bs = lvl.getBlockState(checkPos);
+            Block blk = bs.getBlock();
+            // aggregate counts for final output
             if (isOre(bs)) {
-                oreCounts.merge(bs.getBlock(), 1, Integer::sum);
+                oreCounts.merge(blk, 1, Integer::sum);
             }
         }
 
@@ -153,11 +176,13 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
         if (currentZ >= 16) {
             finalizeScan();
+            currentZ = 0;
             fuel--;
-            setChanged();
             if (fuel <= 0) {
                 tryConsumeFuel();
+                hasScanned = false;
             }
+            setChanged();
         }
     }
 
@@ -199,11 +224,20 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
         if (fuel > 0) return;
         ItemStack fuelStack = itemHandler.getStackInSlot(0);
         if (!fuelStack.isEmpty()) {
-            int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(fuelStack, net.minecraft.world.item.crafting.RecipeType.SMELTING);
-            if (burnTime <= 0 && fuelStack.is(net.minecraft.world.item.Items.SUGAR_CANE)) burnTime = 100;
+            int burnTime = net.minecraftforge.common.ForgeHooks.getBurnTime(fuelStack, RecipeType.SMELTING);
+            if (burnTime <= 0 && fuelStack.is(Items.SUGAR_CANE)) burnTime = 100;
+            if (burnTime <= 0 && fuelStack.is(Items.COAL_BLOCK)) burnTime = 16000;
+            if (burnTime <= 0 && (fuelStack.is(Items.COAL) || fuelStack.is(Items.CHARCOAL))) burnTime = 1600;
+            if (burnTime <= 0 && fuelStack.is(Items.DRIED_KELP_BLOCK)) burnTime = 4000;
+            if (burnTime <= 0 && fuelStack.is(Items.BLAZE_ROD)) burnTime = 2400;
+            // Logs/planks fallback
+            if (burnTime <= 0 && (fuelStack.is(ItemTags.LOGS) || fuelStack.is(ItemTags.PLANKS))) burnTime = 300;
+            if (burnTime <= 0 && fuelStack.is(Items.BAMBOO)) burnTime = 50;
+            if (burnTime <= 0 && fuelStack.is(Items.STICK)) burnTime = 100;
+
             fuel = Math.max(burnTime, 100);
             itemHandler.extractItem(0, 1, false);
-            // Don't reset scan progress — resume from where we left off if interrupted
+            // Reset scan when new fuel is added
             hasScanned = false;
             setChanged();
         }
@@ -301,7 +335,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
     @Override
     public boolean canPlaceItemThroughFace(int index, ItemStack stack, Direction direction) {
-        return direction != Direction.DOWN && index == 0 && (stack.getBurnTime(net.minecraft.world.item.crafting.RecipeType.SMELTING) > 0 || stack.is(net.minecraft.world.item.Items.SUGAR_CANE));
+        return direction != Direction.DOWN && index == 0 && isFuel(stack);
     }
 
     @Override

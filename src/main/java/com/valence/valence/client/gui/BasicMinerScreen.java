@@ -30,7 +30,7 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
         // Fuel
-        ValenceGui.drawSlot(gg, x + 79, y + 7);
+        ValenceGui.drawSlot(gg, x + 80, y + 8);
         ValenceGui.drawGaugeLabel(gg, font, "Fuel", x + 88, y + 2, 0x888888);
         BasicMinerTileEntity te = menu.getTileEntity();
         if (te != null) {
@@ -47,8 +47,8 @@ public class BasicMinerScreen extends AbstractContainerScreen<BasicMinerMenu> {
         }
 
         // Output 2x2
-        ValenceGui.drawSlot(gg, x + 61, y + 43); ValenceGui.drawSlot(gg, x + 79, y + 43);
-        ValenceGui.drawSlot(gg, x + 61, y + 61); ValenceGui.drawSlot(gg, x + 79, y + 61);
+        ValenceGui.drawSlot(gg, x + 62, y + 44); ValenceGui.drawSlot(gg, x + 80, y + 44);
+        ValenceGui.drawSlot(gg, x + 62, y + 62); ValenceGui.drawSlot(gg, x + 80, y + 62);
         ValenceGui.drawGaugeLabel(gg, font, "Output", x + 70, y + 82, 0x888888);
 
         // Player inventory

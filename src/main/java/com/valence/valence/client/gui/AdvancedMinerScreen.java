@@ -27,27 +27,33 @@ public class AdvancedMinerScreen extends AbstractContainerScreen<AdvancedMinerMe
         int x = leftPos, y = topPos;
         ValenceGui.drawPanel(gg, x, y, imageWidth, imageHeight);
 
-        // Fuel slot & bar
-        ValenceGui.drawSlot(gg, x + 79, y + 7);
+        // Fuel slot
+        ValenceGui.drawSlot(gg, x + 80, y + 8);
         ValenceGui.drawGaugeLabel(gg, font, "Fuel", x + 88, y + 2, 0x888888);
         AdvancedMinerTileEntity te = menu.getTileEntity();
         if (te != null) {
-            int barH = 6;
-            ValenceGui.drawFuelBar(gg, x + 106, y + 9, barH, 16, te.getFuel(), te.getMaxFuel());
+            // Fuel bar (coal/charcoal backup)
+            int fuelBarH = 16;
+            ValenceGui.drawFuelBar(gg, x + 106, y + 9, 6, fuelBarH, te.getFuel(), te.getMaxFuel());
+            // DF gauge
+            ValenceGui.drawGauge(gg, x + 116, y + 9, 6, fuelBarH,
+                ValenceGui.DF_TOP, ValenceGui.DF_BOTTOM,
+                te.getDFStorage().getDF(), te.getDFStorage().getMaxDF());
+            ValenceGui.drawGaugeLabel(gg, font, "DF", x + 119, y + 2, ValenceGui.DF_TOP);
         }
 
         // Scan progress
-        if (te != null && te.getFuel() > 0) {
+        if (te != null && te.hasFuel()) {
             int scanned = te.getScanProgress();
             String scanText = "Scan: " + scanned + "/256";
             ValenceGui.drawProgressBar(gg, x + 52, y + 26, 70, 6, scanned, 256);
             ValenceGui.drawGaugeLabel(gg, font, scanText, x + 87, y + 18, 0x888888);
         }
 
-        // Output 2x4 grid
-        for (int i = 0; i < 2; i++) for (int j = 0; j < 4; j++)
-            ValenceGui.drawSlot(gg, x + 25 + j * 27, y + 43 + i * 27);
-        ValenceGui.drawGaugeLabel(gg, font, "Output", x + 88, y + 98, 0x888888);
+        // Output 3x4 grid
+        for (int i = 0; i < 3; i++) for (int j = 0; j < 4; j++)
+            ValenceGui.drawSlot(gg, x + 26 + j * 27, y + 44 + i * 27);
+        ValenceGui.drawGaugeLabel(gg, font, "Output", x + 88, y + 124, 0x888888);
 
         // Player inventory
         for (int r = 0; r < 3; r++) for (int c = 0; c < 9; c++) ValenceGui.drawSlot(gg, x+7+c*18, y+105+r*18);

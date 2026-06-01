@@ -28,6 +28,7 @@ public class ValenceMod {
         Registration.RECIPE_SERIALIZERS.register(bus);
         
         Registration.FLUIDS.register(bus);
+        Registration.FLUID_TYPES.register(bus);
         com.valence.valence.event.ModLootModifiers.LOOT_MODIFIER_SERIALIZERS.register(bus);
         
         bus.addListener(this::commonSetup);
