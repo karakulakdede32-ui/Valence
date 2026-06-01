@@ -1,1 +1,12 @@
-{"parent": "minecraft:block/cube_all", "textures": {"all": "valence:block/grinder"}}
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "valence:block/grinder_side",
+    "down": "valence:block/grinder_bottom",
+    "up": "valence:block/grinder_top",
+    "north": "valence:block/grinder_side",
+    "south": "valence:block/grinder_side",
+    "east": "valence:block/grinder_side",
+    "west": "valence:block/grinder_side"
+  }
+}

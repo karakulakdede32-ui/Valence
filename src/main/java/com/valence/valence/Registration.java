@@ -35,6 +35,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -103,6 +105,7 @@ public class Registration {
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, ValenceMod.MODID);
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(ForgeRegistries.FLUIDS, ValenceMod.MODID);
     public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(ForgeRegistries.Keys.FLUID_TYPES, ValenceMod.MODID);
+    public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES = DeferredRegister.create(Registries.PARTICLE_TYPE, ValenceMod.MODID);
 
     // Blocks
     public static final RegistryObject<Block> BASIC_MINER = BLOCKS.register("basic_miner", () -> new BasicMinerBlock(BLOCK_PROPS));
@@ -206,6 +209,11 @@ public class Registration {
     public static final RegistryObject<MenuType<MegaCellMenu>> MEGA_CELL_MENU = MENUS.register("mega_cell", () -> IForgeMenuType.create(MegaCellMenu::new));
     public static final RegistryObject<MenuType<WirelessNodeMenu>> WIRELESS_NODE_MENU = MENUS.register("wireless_node", () -> IForgeMenuType.create(WirelessNodeMenu::new));
     public static final RegistryObject<MenuType<ElectricFurnaceMenu>> ELECTRIC_FURNACE_MENU = MENUS.register("electric_furnace", () -> IForgeMenuType.create(ElectricFurnaceMenu::new));
+
+    // Particles
+    public static final RegistryObject<SimpleParticleType> STEAM_PUFF = PARTICLE_TYPES.register("steam_puff", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> SPARK = PARTICLE_TYPES.register("spark", () -> new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> SMOKE = PARTICLE_TYPES.register("smoke", () -> new SimpleParticleType(false));
 
     // Fluids
     public static final RegistryObject<FluidType> STEAM_FLUID_TYPE = FLUID_TYPES.register("steam_type", () -> SteamFluid.STEAM_TYPE);

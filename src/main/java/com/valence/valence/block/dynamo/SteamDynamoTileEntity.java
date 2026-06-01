@@ -126,7 +126,16 @@ public class SteamDynamoTileEntity extends BlockEntity implements MenuProvider {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, SteamDynamoTileEntity te) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            // Client: steam particles when producing steam
+            if (te.getSteamTank().getFluidAmount() > 0 && level.random.nextInt(4) == 0) {
+                double x = pos.getX() + 0.3 + level.random.nextDouble() * 0.4;
+                double y = pos.getY() + 0.5 + level.random.nextDouble() * 0.3;
+                double z = pos.getZ() + 0.3 + level.random.nextDouble() * 0.4;
+                level.addParticle(com.valence.valence.Registration.STEAM_PUFF.get(), x, y, z, 0, 0.03, 0);
+            }
+            return;
+        }
         te.pullWaterFromNeighbors();
         te.convertWaterToSteam();
         te.pushSteamToNeighbors();

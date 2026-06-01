@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/water_collector",
-    "side": "valence:block/water_collector_side",
-    "bottom": "valence:block/water_collector_bottom"
+    "particle": "valence:block/water_collector_side",
+    "down": "valence:block/water_collector_bottom",
+    "up": "valence:block/water_collector_top",
+    "north": "valence:block/water_collector_side",
+    "south": "valence:block/water_collector_side",
+    "east": "valence:block/water_collector_side",
+    "west": "valence:block/water_collector_side"
   }
 }

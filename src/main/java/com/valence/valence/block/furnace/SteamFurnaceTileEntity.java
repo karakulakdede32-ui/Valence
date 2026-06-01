@@ -123,7 +123,16 @@ public class SteamFurnaceTileEntity extends BlockEntity implements MenuProvider 
     public void invalidateCaps() { super.invalidateCaps(); fluidHandler.invalidate(); }
 
     public static void tick(Level level, BlockPos pos, BlockState state, SteamFurnaceTileEntity te) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            // Client: spawn particles when running
+            if (te.progress > 0 && level.random.nextInt(4) == 0) {
+                double x = pos.getX() + 0.3 + level.random.nextDouble() * 0.4;
+                double y = pos.getY() + 0.8;
+                double z = pos.getZ() + 0.3 + level.random.nextDouble() * 0.4;
+                level.addParticle(com.valence.valence.Registration.STEAM_PUFF.get(), x, y, z, 0, 0.02, 0);
+            }
+            return;
+        }
 
         // Pull steam from neighbors
         te.pullSteam();
@@ -204,4 +213,22 @@ public class SteamFurnaceTileEntity extends BlockEntity implements MenuProvider 
     public ItemStackHandler getItemHandler() { return itemHandler; }
     public int getProgress() { return progress; }
     public int getMaxProgress() { return PROGRESS_MAX; }
+
+    public int getComparatorOutput() {
+        // Returns 0-15 based on how full the output slots are
+        boolean hasItems = false;
+        int totalSlots = 0;
+        int filledSlots = 0;
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                hasItems = true;
+                filledSlots++;
+            }
+            totalSlots++;
+        }
+        if (!hasItems) return 0;
+        // Scale: empty=0, half-filled=8, fully-filled=15
+        return Math.max(1, filledSlots * 15 / Math.max(1, totalSlots));
+    }
+
 }

@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/seed_duplicator_top",
-    "side": "valence:block/seed_duplicator_side",
-    "bottom": "valence:block/seed_duplicator_bottom"
+    "particle": "valence:block/seed_duplicator_side",
+    "down": "valence:block/seed_duplicator_bottom",
+    "up": "valence:block/seed_duplicator_top",
+    "north": "valence:block/seed_duplicator_side",
+    "south": "valence:block/seed_duplicator_side",
+    "east": "valence:block/seed_duplicator_side",
+    "west": "valence:block/seed_duplicator_side"
   }
 }

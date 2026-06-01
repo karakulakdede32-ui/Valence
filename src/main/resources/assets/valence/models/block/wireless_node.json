@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/wireless_node_top",
-    "side": "valence:block/wireless_node_side",
-    "bottom": "valence:block/wireless_node_bottom"
+    "particle": "valence:block/wireless_node_side",
+    "down": "valence:block/wireless_node_bottom",
+    "up": "valence:block/wireless_node_top",
+    "north": "valence:block/wireless_node_side",
+    "south": "valence:block/wireless_node_side",
+    "east": "valence:block/wireless_node_side",
+    "west": "valence:block/wireless_node_side"
   }
 }

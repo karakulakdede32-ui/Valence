@@ -1,3 +1,6 @@
 {
-  "parent": "valence:block/blast_furnace"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/blast_furnace"
+  }
 }

@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/transfer_conduit_top",
-    "side": "valence:block/transfer_conduit_side",
-    "bottom": "valence:block/transfer_conduit_bottom"
+    "particle": "valence:block/transfer_conduit_side",
+    "down": "valence:block/transfer_conduit_bottom",
+    "up": "valence:block/transfer_conduit_top",
+    "north": "valence:block/transfer_conduit_side",
+    "south": "valence:block/transfer_conduit_side",
+    "east": "valence:block/transfer_conduit_side",
+    "west": "valence:block/transfer_conduit_side"
   }
 }

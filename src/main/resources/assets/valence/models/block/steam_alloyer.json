@@ -1,1 +1,12 @@
-{"parent": "minecraft:block/cube_bottom_top", "textures": {"top": "valence:block/steam_alloyer_top", "side": "valence:block/steam_alloyer_side", "bottom": "valence:block/steam_alloyer_bottom"}}
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "valence:block/steam_alloyer_side",
+    "down": "valence:block/steam_alloyer_bottom",
+    "up": "valence:block/steam_alloyer_top",
+    "north": "valence:block/steam_alloyer_side",
+    "south": "valence:block/steam_alloyer_side",
+    "east": "valence:block/steam_alloyer_side",
+    "west": "valence:block/steam_alloyer_side"
+  }
+}

@@ -1,3 +1,6 @@
 {
-  "parent": "valence:block/tree_growth_chamber"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/tree_growth_chamber"
+  }
 }

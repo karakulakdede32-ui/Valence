@@ -1,1 +1,12 @@
-{"parent": "minecraft:block/cube_all", "textures": {"all": "valence:block/advanced_miner"}}
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "valence:block/advanced_miner_side",
+    "down": "valence:block/advanced_miner_bottom",
+    "up": "valence:block/advanced_miner_top",
+    "north": "valence:block/advanced_miner_side",
+    "south": "valence:block/advanced_miner_side",
+    "east": "valence:block/advanced_miner_side",
+    "west": "valence:block/advanced_miner_side"
+  }
+}

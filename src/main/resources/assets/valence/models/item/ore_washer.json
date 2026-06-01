@@ -1,3 +1,6 @@
 {
-  "parent": "valence:block/ore_washer"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/ore_washer"
+  }
 }

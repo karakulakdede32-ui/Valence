@@ -40,6 +40,7 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     private int currentZ = 0;
     private final Map<Block, Integer> oreCounts = new HashMap<>();
     private int fuel = 0;
+    private int scanCooldown = 0; // Skip ticks between scans to reduce lag
 
     // Slot 0 = Fuel, Slots 1-4 = Output
     private final ItemStackHandler itemHandler = new ItemStackHandler(5) {
@@ -264,7 +265,16 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BasicMinerTileEntity pEntity) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            // Client: spawn spark particles when running
+            if (pEntity.fuel > 0 && !pEntity.hasScanned() && level.random.nextInt(8) == 0) {
+                double x = pos.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                double y = pos.getY() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                double z = pos.getZ() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.SMOKE, x, y, z, 0, 0.01, 0);
+            }
+            return;
+        }
 
         if (pEntity.fuel <= 0) {
             pEntity.tryConsumeFuel();
@@ -272,8 +282,13 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
 
         if (!pEntity.hasScanned()) {
             if (pEntity.fuel > 0) {
-                pEntity.scanStep((ServerLevel) level);
-                setChanged(level, pos, state);
+                // Scan cooldown: skip 1 tick between scans to reduce CPU load
+                pEntity.scanCooldown++;
+                if (pEntity.scanCooldown >= 2) {
+                    pEntity.scanCooldown = 0;
+                    pEntity.scanStep((ServerLevel) level);
+                    setChanged(level, pos, state);
+                }
             }
         }
     }
@@ -342,4 +357,22 @@ public class BasicMinerTileEntity extends BlockEntity implements WorldlyContaine
     public boolean canTakeItemThroughFace(int index, ItemStack stack, Direction direction) {
         return direction == Direction.DOWN && index > 0;
     }
+
+    public int getComparatorOutput() {
+        // Returns 0-15 based on how full the output slots are
+        boolean hasItems = false;
+        int totalSlots = 0;
+        int filledSlots = 0;
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                hasItems = true;
+                filledSlots++;
+            }
+            totalSlots++;
+        }
+        if (!hasItems) return 0;
+        // Scale: empty=0, half-filled=8, fully-filled=15
+        return Math.max(1, filledSlots * 15 / Math.max(1, totalSlots));
+    }
+
 }

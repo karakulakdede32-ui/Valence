@@ -1,0 +1,47 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "valence:block/energy_cable",
+    "center": "valence:block/energy_cable"
+  },
+  "elements": [
+    {
+      "from": [
+        6,
+        6,
+        6
+      ],
+      "to": [
+        10,
+        10,
+        10
+      ],
+      "faces": {
+        "down": {
+          "texture": "#center",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#center",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#center",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#center",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#center",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#center",
+          "cullface": "east"
+        }
+      }
+    }
+  ]
+}

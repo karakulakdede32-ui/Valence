@@ -1,1 +1,6 @@
-{"parent": "valence:block/df_cell"}
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/df_cell"
+  }
+}

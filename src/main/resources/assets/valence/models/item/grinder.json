@@ -1,1 +1,6 @@
-{"parent": "valence:block/grinder"}
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/grinder"
+  }
+}

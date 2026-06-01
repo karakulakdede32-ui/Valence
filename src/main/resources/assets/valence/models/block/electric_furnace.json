@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/electric_furnace_top",
-    "side": "valence:block/electric_furnace_side",
-    "bottom": "valence:block/electric_furnace_bottom"
+    "particle": "valence:block/electric_furnace_side",
+    "down": "valence:block/electric_furnace_bottom",
+    "up": "valence:block/electric_furnace_top",
+    "north": "valence:block/electric_furnace_side",
+    "south": "valence:block/electric_furnace_side",
+    "east": "valence:block/electric_furnace_side",
+    "west": "valence:block/electric_furnace_side"
   }
 }

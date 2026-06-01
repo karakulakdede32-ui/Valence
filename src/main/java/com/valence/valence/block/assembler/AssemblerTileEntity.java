@@ -146,4 +146,22 @@ public class AssemblerTileEntity extends BlockEntity implements MenuProvider {
     public ItemStackHandler getItemHandler() { return itemHandler; }
     public int getProgress() { return progress; }
     public int getMaxProgress() { return 80; }
+
+    public int getComparatorOutput() {
+        // Returns 0-15 based on how full the output slots are
+        boolean hasItems = false;
+        int totalSlots = 0;
+        int filledSlots = 0;
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                hasItems = true;
+                filledSlots++;
+            }
+            totalSlots++;
+        }
+        if (!hasItems) return 0;
+        // Scale: empty=0, half-filled=8, fully-filled=15
+        return Math.max(1, filledSlots * 15 / Math.max(1, totalSlots));
+    }
+
 }

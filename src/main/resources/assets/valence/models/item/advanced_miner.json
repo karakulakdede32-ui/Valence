@@ -1,1 +1,6 @@
-{"parent": "valence:block/advanced_miner"}
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "valence:item/advanced_miner"
+  }
+}

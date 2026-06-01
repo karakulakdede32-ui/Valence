@@ -1,8 +1,12 @@
 {
-  "parent": "minecraft:block/cube_bottom_top",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "top": "valence:block/seed_duplicator_top",
-    "side": "valence:block/seed_duplicator_side",
-    "bottom": "valence:block/seed_duplicator_bottom"
+    "particle": "valence:block/tree_growth_chamber_side",
+    "down": "valence:block/tree_growth_chamber_bottom",
+    "up": "valence:block/tree_growth_chamber_top",
+    "north": "valence:block/tree_growth_chamber_side",
+    "south": "valence:block/tree_growth_chamber_side",
+    "east": "valence:block/tree_growth_chamber_side",
+    "west": "valence:block/tree_growth_chamber_side"
   }
 }

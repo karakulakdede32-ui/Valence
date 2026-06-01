@@ -12,6 +12,41 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 @Mod.EventBusSubscriber(modid = ValenceMod.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {
     @SubscribeEvent
+    public static void registerParticles(net.minecraftforge.client.event.RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(com.valence.valence.Registration.STEAM_PUFF.get(), (sprite) -> {
+            return (type, level, x, y, z, vx, vy, vz) -> {
+                net.minecraft.client.particle.TerrainParticle particle = new net.minecraft.client.particle.TerrainParticle(level, x, y, z, vx, vy, vz,
+                    net.minecraft.world.level.block.Blocks.SNOW_BLOCK.defaultBlockState());
+                particle.setColor(0.78f, 0.82f, 0.9f);
+                particle.scale(0.5f);
+                particle.setLifetime(30 + level.random.nextInt(20));
+                return particle;
+            };
+        });
+        event.registerSpriteSet(com.valence.valence.Registration.SPARK.get(), (sprite) -> {
+            return (type, level, x, y, z, vx, vy, vz) -> {
+                net.minecraft.client.particle.TerrainParticle particle = new net.minecraft.client.particle.TerrainParticle(level, x, y, z, vx, vy, vz,
+                    net.minecraft.world.level.block.Blocks.REDSTONE_ORE.defaultBlockState());
+                particle.setColor(1.0f, 0.8f, 0.2f);
+                particle.scale(0.3f);
+                particle.setLifetime(15 + level.random.nextInt(10));
+                return particle;
+            };
+        });
+        event.registerSpriteSet(com.valence.valence.Registration.SMOKE.get(), (sprite) -> {
+            return (type, level, x, y, z, vx, vy, vz) -> {
+                net.minecraft.client.particle.TerrainParticle particle = new net.minecraft.client.particle.TerrainParticle(level, x, y, z, vx, vy, vz,
+                    net.minecraft.world.level.block.Blocks.COAL_BLOCK.defaultBlockState());
+                particle.setColor(0.3f, 0.3f, 0.35f);
+                particle.scale(0.8f);
+                particle.setLifetime(40 + level.random.nextInt(30));
+                return particle;
+            };
+        });
+    }
+
+
+    @SubscribeEvent
     public static void init(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             MenuScreens.register(Registration.BASIC_MINER_MENU.get(), BasicMinerScreen::new);

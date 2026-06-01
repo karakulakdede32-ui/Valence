@@ -93,7 +93,15 @@ public class QuantumMinerTileEntity extends BlockEntity implements MenuProvider,
 
     // Scans 4x faster than Advanced Miner (4 columns per tick) and outputs 2 of each ore
     public static void tick(Level level, BlockPos pos, BlockState state, QuantumMinerTileEntity te) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            if (te.dfStorage.getDF() > 0 && level.random.nextInt(6) == 0) {
+                double x = pos.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                double y = pos.getY() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                double z = pos.getZ() + 0.5 + (level.random.nextDouble() - 0.5) * 0.6;
+                level.addParticle(net.minecraft.core.particles.ParticleTypes.END_ROD, x, y, z, 0, 0.01, 0);
+            }
+            return;
+        }
 
         // Pull DF from neighbors
         if (te.dfStorage.getDF() < te.dfStorage.getMaxDF()) {
@@ -187,4 +195,22 @@ public class QuantumMinerTileEntity extends BlockEntity implements MenuProvider,
     @Override public void setItem(int i, ItemStack s) { itemHandler.setStackInSlot(i, s); }
     @Override public boolean stillValid(Player p) { return p.distanceToSqr(getBlockPos().getX()+0.5, getBlockPos().getY()+0.5, getBlockPos().getZ()+0.5) <= 64; }
     @Override public void clearContent() { for (int i = 0; i < itemHandler.getSlots(); i++) itemHandler.setStackInSlot(i, ItemStack.EMPTY); }
+
+    public int getComparatorOutput() {
+        // Returns 0-15 based on how full the output slots are
+        boolean hasItems = false;
+        int totalSlots = 0;
+        int filledSlots = 0;
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                hasItems = true;
+                filledSlots++;
+            }
+            totalSlots++;
+        }
+        if (!hasItems) return 0;
+        // Scale: empty=0, half-filled=8, fully-filled=15
+        return Math.max(1, filledSlots * 15 / Math.max(1, totalSlots));
+    }
+
 }
