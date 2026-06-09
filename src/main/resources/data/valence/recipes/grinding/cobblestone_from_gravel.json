@@ -1,0 +1,11 @@
+{
+  "type": "valence:grinding",
+  "ingredient": {
+    "item": "minecraft:gravel"
+  },
+  "output": {
+    "item": "minecraft:cobblestone",
+    "count": 1
+  },
+  "processingtime": 100
+}

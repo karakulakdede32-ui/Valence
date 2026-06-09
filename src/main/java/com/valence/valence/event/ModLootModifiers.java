@@ -43,14 +43,7 @@ public class ModLootModifiers {
         }
 
         private boolean isOre(BlockState state) {
-            return state.is(BlockTags.IRON_ORES) ||
-                    state.is(BlockTags.GOLD_ORES) ||
-                    state.is(BlockTags.COPPER_ORES) ||
-                    state.is(BlockTags.REDSTONE_ORES) ||
-                    state.is(BlockTags.LAPIS_ORES) ||
-                    state.is(BlockTags.DIAMOND_ORES) ||
-                    state.is(BlockTags.EMERALD_ORES) ||
-                    state.is(BlockTags.COAL_ORES);
+            return com.valence.valence.util.OreUtils.isOre(state);
         }
 
         @Override
