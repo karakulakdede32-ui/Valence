@@ -87,7 +87,7 @@ public class GrinderRecipe implements Recipe<SimpleContainer> {
 
         @Override
         public GrinderRecipe fromJson(ResourceLocation pRecipeId, JsonObject pJson) {
-            Ingredient input = Ingredient.fromJson(pJson.get("ingredients"));
+            Ingredient input = Ingredient.fromJson(pJson.get("ingredient"));
             ItemStack output = ShapedRecipe.itemStackFromJson(pJson.getAsJsonObject("output"));
             int processingTime = pJson.has("processingtime") ? pJson.get("processingtime").getAsInt() : 200;
             return new GrinderRecipe(pRecipeId, input, output, processingTime);
