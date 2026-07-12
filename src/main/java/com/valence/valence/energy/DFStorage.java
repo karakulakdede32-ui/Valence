@@ -9,16 +9,21 @@ public class DFStorage extends EnergyStorage {
     public DFStorage(int capacity, int maxTransfer) { super(capacity, maxTransfer, maxTransfer); }
     public DFStorage(int capacity, int maxReceive, int maxExtract) { super(capacity, maxReceive, maxExtract); }
 
+    public static int clampAmount(long amount) {
+        if (amount <= 0) return 0;
+        return (int) Math.min(Integer.MAX_VALUE, amount);
+    }
+
     @Override
     public int receiveEnergy(int maxReceive, boolean simulate) {
-        int filled = super.receiveEnergy(maxReceive, simulate);
+        int filled = super.receiveEnergy(clampAmount(maxReceive), simulate);
         if (!simulate && filled > 0) onEnergyChanged();
         return filled;
     }
 
     @Override
     public int extractEnergy(int maxExtract, boolean simulate) {
-        int extracted = super.extractEnergy(maxExtract, simulate);
+        int extracted = super.extractEnergy(clampAmount(maxExtract), simulate);
         if (!simulate && extracted > 0) onEnergyChanged();
         return extracted;
     }
@@ -27,8 +32,10 @@ public class DFStorage extends EnergyStorage {
 
     public int getDF() { return energy; }
     public int getMaxDF() { return capacity; }
-    public int generateDF(int amount, boolean simulate) { return receiveEnergy(amount, simulate); }
-    public int consumeDF(int amount, boolean simulate) { return extractEnergy(amount, simulate); }
+    public int generateDF(int amount, boolean simulate) { return receiveEnergy(clampAmount(amount), simulate); }
+    public int generateDF(long amount, boolean simulate) { return receiveEnergy(clampAmount(amount), simulate); }
+    public int consumeDF(int amount, boolean simulate) { return extractEnergy(clampAmount(amount), simulate); }
+    public int consumeDF(long amount, boolean simulate) { return extractEnergy(clampAmount(amount), simulate); }
 
     public void serializeNBT(Tag tag) { if (tag instanceof IntTag intTag) energy = intTag.getAsInt(); }
     public Tag serializeNBT() { return IntTag.valueOf(energy); }

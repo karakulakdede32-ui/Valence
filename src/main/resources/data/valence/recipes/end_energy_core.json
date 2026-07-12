@@ -1,0 +1,28 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "QMQ",
+    "WXW",
+    "QCQ"
+  ],
+  "key": {
+    "Q": {
+      "item": "valence:quantum_miner"
+    },
+    "M": {
+      "item": "valence:mega_cell"
+    },
+    "W": {
+      "item": "valence:wireless_node"
+    },
+    "X": {
+      "item": "minecraft:nether_star"
+    },
+    "C": {
+      "item": "valence:chunk_excavator"
+    }
+  },
+  "result": {
+    "item": "valence:end_energy_core"
+  }
+}

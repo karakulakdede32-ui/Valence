@@ -28,6 +28,8 @@ public class GuideBookItem extends Item {
             player.displayClientMessage(Component.literal(" §7Tier 4 (Electric): §fElectric Furnace, DF Cell, Ore Washer"), false);
             player.displayClientMessage(Component.literal(" §7Tier 5 (Late): §fCentrifuge, Reactor, Assembler, Mega Cell"), false);
             player.displayClientMessage(Component.literal(" §7Tier 6 (Quantum): §fQuantum Miner (DF-powered)"), false);
+            player.displayClientMessage(Component.literal(" §7Tier 7 (Hyper Grid): §fEnd Energy Cable + high-throughput routing"), false);
+            player.displayClientMessage(Component.literal(" §7Tier 8 (End Energy): §fEnd Energy Core"), false);
             player.displayClientMessage(Component.literal(""), false);
             player.displayClientMessage(Component.literal("§eMachines:"), false);
             player.displayClientMessage(Component.literal(" §7Grinder: §fGrinds raw ores into powders. Input top, output bottom."), false);
@@ -50,6 +52,13 @@ public class GuideBookItem extends Item {
             player.displayClientMessage(Component.literal(" §7Generate: §fSteam Dynamo → Steam Turbine (Water + heat = Steam = DF)"), false);
             player.displayClientMessage(Component.literal(" §7Store: §fDF Cell (1k DF), Mega Cell (100M DF)"), false);
             player.displayClientMessage(Component.literal(" §7Transmit: §fEnergy Cable (wired), Wireless Node (wireless, 32 block range)"), false);
+            player.displayClientMessage(Component.literal(" §7End Stage: §fEnd Energy Core can scale to 2,147,483,647 FE/t"), false);
+            player.displayClientMessage(Component.literal(""), false);
+            player.displayClientMessage(Component.literal("§eAutomation Line:"), false);
+            player.displayClientMessage(Component.literal(" §fPebbles → Grinder → Basic Miner → Steam Line"), false);
+            player.displayClientMessage(Component.literal(" §fSteam Line → Electric Line → Advanced Processing"), false);
+            player.displayClientMessage(Component.literal(" §fAdvanced Processing → Quantum Miner → End Energy Cable"), false);
+            player.displayClientMessage(Component.literal(" §fEnd Energy Cable → End Energy Core (final generation tier)"), false);
             player.displayClientMessage(Component.literal(""), false);
             player.displayClientMessage(Component.literal("§eOre Processing Chain:"), false);
             player.displayClientMessage(Component.literal(" §fRaw Ore §7→ §fGrinder §7→ Powder §7→ §fFurnace §7→ Ingot"), false);

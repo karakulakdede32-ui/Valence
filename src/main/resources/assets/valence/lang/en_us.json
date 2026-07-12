@@ -69,5 +69,10 @@
   "item.valence.guide_book": "Valence Guide",
   "block.valence.quantum_miner": "Quantum Miner",
   "item.valence.quantum_miner": "Quantum Miner",
-  "container.valence.quantum_miner": "Quantum Miner"
+  "container.valence.quantum_miner": "Quantum Miner",
+  "block.valence.end_energy_core": "End Energy Core",
+  "item.valence.end_energy_core": "End Energy Core",
+  "container.valence.end_energy_core": "End Energy Core",
+  "block.valence.end_energy_cable": "End Energy Cable",
+  "item.valence.end_energy_cable": "End Energy Cable"
 }

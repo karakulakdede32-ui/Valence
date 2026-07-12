@@ -16,6 +16,7 @@ public class ValenceGui {
     public static final int DARK     = 0xFF2A2A2A;
     public static final int MID      = 0xFF3A3A3A;
     public static final int LIGHT    = 0xFF4A4A4A;
+    public static final int ACCENT   = 0xFF00BCD4;
 
     // ── Slot colors ──
     public static final int SLOT_OUTER = 0xFF1A1A1A;
@@ -48,6 +49,8 @@ public class ValenceGui {
         gg.fill(x + 2, y + 2, x + w - 2, y + h - 2, DARK);
         gg.fill(x + 2, y + h - 2, x + w - 2, y + h - 1, LIGHT);
         gg.fill(x + w - 2, y + 2, x + w - 1, y + h - 2, LIGHT);
+        gg.fill(x + 2, y + 2, x + w - 2, y + 4, ACCENT);
+        gg.fill(x + 3, y + 5, x + w - 3, y + 6, 0x3300BCD4);
     }
 
     // ── Draw slot ──

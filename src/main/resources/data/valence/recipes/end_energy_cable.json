@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ECE",
+    "EME",
+    "ECE"
+  ],
+  "key": {
+    "E": {
+      "item": "valence:energy_cable"
+    },
+    "C": {
+      "item": "valence:end_energy_core"
+    },
+    "M": {
+      "item": "valence:mega_cell"
+    }
+  },
+  "result": {
+    "item": "valence:end_energy_cable",
+    "count": 8
+  }
+}

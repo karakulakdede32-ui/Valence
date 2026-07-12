@@ -70,6 +70,7 @@ public class ClientSetup {
             MenuScreens.register(Registration.ORE_WASHER_MENU.get(), OreWasherScreen::new);
             MenuScreens.register(Registration.QUANTUM_MINER_MENU.get(), QuantumMinerScreen::new);
             MenuScreens.register(Registration.REACTOR_MENU.get(), ChemicalReactorScreen::new);
+            MenuScreens.register(Registration.END_ENERGY_CORE_MENU.get(), EndEnergyCoreScreen::new);
 
         });
     }

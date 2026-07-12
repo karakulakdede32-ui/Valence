@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "valence:block/quantum_miner_side",
+    "down": "valence:block/reactor_bottom",
+    "up": "valence:block/quantum_miner_top",
+    "north": "valence:block/quantum_miner_side",
+    "south": "valence:block/quantum_miner_side",
+    "east": "valence:block/quantum_miner_side",
+    "west": "valence:block/quantum_miner_side"
+  }
+}

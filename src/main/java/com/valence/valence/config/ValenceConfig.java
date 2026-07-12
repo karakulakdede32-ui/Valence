@@ -35,6 +35,11 @@ public class ValenceConfig {
     public static final ForgeConfigSpec.IntValue DF_CELL_CAPACITY;
     public static final ForgeConfigSpec.IntValue MEGA_CELL_CAPACITY;
     public static final ForgeConfigSpec.IntValue DF_TRANSFER_RATE;
+    public static final ForgeConfigSpec.IntValue END_ENERGY_CORE_CAPACITY;
+    public static final ForgeConfigSpec.IntValue END_ENERGY_CORE_GENERATION;
+    public static final ForgeConfigSpec.IntValue END_ENERGY_CORE_TRANSFER;
+    public static final ForgeConfigSpec.IntValue END_ENERGY_CABLE_CAPACITY;
+    public static final ForgeConfigSpec.IntValue END_ENERGY_CABLE_TRANSFER;
 
     static {
         BUILDER.comment("Valence Mod Configuration").push("general");
@@ -100,6 +105,21 @@ public class ValenceConfig {
         DF_TRANSFER_RATE = BUILDER
                 .comment("Maximum DF transfer rate per tick between machines")
                 .defineInRange("transfer_rate", 20, 1, 100000);
+        END_ENERGY_CORE_CAPACITY = BUILDER
+                .comment("End Energy Core capacity")
+                .defineInRange("end_energy_core_capacity", Integer.MAX_VALUE, 100000, Integer.MAX_VALUE);
+        END_ENERGY_CORE_GENERATION = BUILDER
+                .comment("End Energy Core FE generated per tick")
+                .defineInRange("end_energy_core_generation", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
+        END_ENERGY_CORE_TRANSFER = BUILDER
+                .comment("End Energy Core max transfer per tick")
+                .defineInRange("end_energy_core_transfer", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
+        END_ENERGY_CABLE_CAPACITY = BUILDER
+                .comment("End Energy Cable internal buffer capacity")
+                .defineInRange("end_energy_cable_capacity", 50000000, 1000, Integer.MAX_VALUE);
+        END_ENERGY_CABLE_TRANSFER = BUILDER
+                .comment("End Energy Cable max transfer per tick")
+                .defineInRange("end_energy_cable_transfer", Integer.MAX_VALUE, 1, Integer.MAX_VALUE);
         BUILDER.pop();
 
         BUILDER.pop();
